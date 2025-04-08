@@ -48,10 +48,10 @@ const enemiesPosInit = [
 ];
 
 const DIST = {
-    LEFT: { dr: 0, dc: -1 },
-    UP: { dr: -1, dc: 0 },
-    RIGHT: { dr: 0, dc: 1 },
-    DOWN: { dr: 1, dc: 0 }
+    LEFT: { num: 0, dr: 0, dc: -1 },
+    UP: { num: 1, dr: -1, dc: 0 },
+    RIGHT: { num: 2, dr: 0, dc: 1 },
+    DOWN: { num: 3, dr: 1, dc: 0 }
 };
 
 class Player {
@@ -289,9 +289,9 @@ function create() {
     this.fieldEvaluation.updateEvaluation(this.player.row, this.player.column);
 }
 
-function update() {
-    //この関数の実行時間を計測。デバッグ用。
-    const begin = Date.now();
+
+function update(time, delta) {
+    //console.log(delta);
 
     // キーボードの情報を取得
     const cursors = this.input.keyboard.createCursorKeys();
@@ -326,11 +326,8 @@ function update() {
 
 
     // 敵
-    let enemyDist = this.enemyList[0].decideMoveDirection(this.fieldEvaluation.shortestDirectionFlags);
-    console.log(enemyDist);
-    this.enemyList[0].move(enemyDist);
-    this.enemyList[0].draw();
-
-    //この関数の実行時間を計測。デバッグ用。
-    console.log(Date.now() - begin);
+    //let enemyDist = this.enemyList[0].decideMoveDirection(this.fieldEvaluation.shortestDirectionFlags);
+    //console.log(enemyDist);
+    //this.enemyList[0].move(enemyDist);
+    //this.enemyList[0].draw();
 }
