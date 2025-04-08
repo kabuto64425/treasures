@@ -117,9 +117,37 @@ class Enemy {
         this.graphics = scene.add.graphics();
         this.row = iniRow;
         this.column = iniColumn;
+        this.chargeAmount = 0;
     }
 
-    decideDirection() {
+    charge() {
+        this.chargeAmount++;
+    }
+
+    isChargeCompleted() {
+        if (this.chargeAmount >= 6) {
+            return true;
+        }
+        return false;
+    }
+
+    decideMoveDirection(shortestDirectionFlags) {
+        const distEntries = Object.entries(DIST);
+        for(let i = 0; i < 4; i++) {
+            console.log([this.column]);
+            if(shortestDirectionFlags[this.row][this.column][i]) {
+                const [key, d] = distEntries[i];
+                return d;
+            }
+        }
+    }
+
+    move(dist) {
+        //if (this.chargeAmount >= 6) {
+            this.row += dist.dr;
+            this.column += dist.dc;
+            this.chargeAmount = 0;
+        //}
     }
 
     draw() {
@@ -265,7 +293,6 @@ function update() {
     //この関数の実行時間を計測。デバッグ用。
     const begin = Date.now();
 
-    //console.log("update!!");
     // キーボードの情報を取得
     const cursors = this.input.keyboard.createCursorKeys();
     let input_dist = null;
@@ -283,6 +310,7 @@ function update() {
         input_dist = DIST.DOWN;
     }
 
+    // プレイヤー
     if (this.player.isChargeCompleted()) {
         if (input_dist !== null && this.player.canMove(input_dist)) {
             this.player.move(input_dist);
@@ -291,9 +319,17 @@ function update() {
         this.player.charge();
     }
 
+    this.player.draw();
+
+    // フィールド評価
     this.fieldEvaluation.updateEvaluation(this.player.row, this.player.column);
 
-    this.player.draw();
+
+    // 敵
+    let enemyDist = this.enemyList[0].decideMoveDirection(this.fieldEvaluation.shortestDirectionFlags);
+    console.log(enemyDist);
+    this.enemyList[0].move(enemyDist);
+    this.enemyList[0].draw();
 
     //この関数の実行時間を計測。デバッグ用。
     console.log(Date.now() - begin);
