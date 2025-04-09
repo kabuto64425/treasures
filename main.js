@@ -133,6 +133,7 @@ class Enemy {
 
     decideMoveDirection(shortestDirectionMaps) {
         for (const [key, d] of Object.entries(DIST)) {
+            console.log(shortestDirectionMaps[this.row][this.column]);
             if(shortestDirectionMaps[this.row][this.column].get(key)) {
                 return d;
             }
@@ -281,16 +282,16 @@ function create() {
     this.player = new Player(this, playerPosInit.row, playerPosInit.column);
     this.player.draw();
 
+    // フィールド評価
+    this.fieldEvaluation = new FieldEvalution();
+    this.fieldEvaluation.updateEvaluation(this.player.row, this.player.column);
+
     // 敵
     this.enemyList = [];
     for (let i = 0; i < 4; i++) {
         this.enemyList.push(new Enemy(this, enemiesPosInit[i].row, enemiesPosInit[i].column));
         this.enemyList[i].draw();
     }
-
-    // フィールド評価
-    this.fieldEvaluation = new FieldEvalution();
-    this.fieldEvaluation.updateEvaluation(this.player.row, this.player.column);
 }
 
 
@@ -326,6 +327,7 @@ function update(time, delta) {
     this.player.draw();
 
     // フィールド評価
+    console.log(this.player.row);
     this.fieldEvaluation.updateEvaluation(this.player.row, this.player.column);
 
     // 敵
