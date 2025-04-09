@@ -48,10 +48,10 @@ const enemiesPosInit = [
 ];
 
 const DIST = {
-    LEFT: { num: 0, dr: 0, dc: -1 },
-    UP: { num: 1, dr: -1, dc: 0 },
-    RIGHT: { num: 2, dr: 0, dc: 1 },
-    DOWN: { num: 3, dr: 1, dc: 0 }
+    LEFT: { keyName: "LEFT", dr: 0, dc: -1, reverse() { return DIST.RIGHT; } },
+    UP: { keyName: "UP", dr: -1, dc: 0, reverse() { return DIST.DOWN; } },
+    RIGHT: { keyName: "RIGHT", dr: 0, dc: 1, reverse() { return DIST.LEFT; } },
+    DOWN: { keyName: "DOWN", dr: 1, dc: 0, reverse() { return DIST.UP; } }
 };
 
 class Player {
@@ -131,23 +131,20 @@ class Enemy {
         return false;
     }
 
-    decideMoveDirection(shortestDirectionFlags) {
-        const distEntries = Object.entries(DIST);
-        for(let i = 0; i < 4; i++) {
-            console.log([this.column]);
-            if(shortestDirectionFlags[this.row][this.column][i]) {
-                const [key, d] = distEntries[i];
+    decideMoveDirection(shortestDirectionMaps) {
+        for (const [key, d] of Object.entries(DIST)) {
+            if(shortestDirectionMaps[this.row][this.column].get(key)) {
                 return d;
             }
         }
     }
 
     move(dist) {
-        //if (this.chargeAmount >= 6) {
+        if (this.chargeAmount >= 6) {
             this.row += dist.dr;
             this.column += dist.dc;
             this.chargeAmount = 0;
-        //}
+        }
     }
 
     draw() {
@@ -160,17 +157,25 @@ class Enemy {
 
 class FieldEvalution {
     constructor() {
-        this.shortestDirectionFlags = [...Array(H)].map(n => [...Array(W)].map(m => [...Array(4).fill(false)]));
+        this.shortestDirectionMaps = [...Array(H)].map(n => [...Array(W)].map(m => this.generateDirectionFlagMap()));
+    }
+
+    generateDirectionFlagMap() {
+        const pairs = Object.keys(DIST).map(key => [key, false]);
+        return new Map(pairs);
+    }
+
+    resetMapValues(dir, value) {
+        Array.from(dir.entries()).forEach(([key, ]) => {
+            dir.set(key, value);
+        });
     }
 
     updateEvaluation(playerRow, playerColumn) {
-        this.shortestDirectionFlags.forEach(n => n.forEach(m => m.fill(false)));
-
-        const distEntries = Object.entries(DIST);
+        this.shortestDirectionMaps.forEach(n => n.forEach(dir => {this.resetMapValues(dir, false)}));
 
         const queue = [];
         const dist = [...Array(H)].map(n => [...Array(W)].fill(-1));
-        let pre = [...Array(H)].map(n => [...Array(W)].fill(-1));
 
         queue.push([playerRow, playerColumn]);
         dist[playerRow][playerColumn] = 0;
@@ -178,8 +183,8 @@ class FieldEvalution {
         while (queue.length > 0) {
             const v = queue.shift();
             // 左、上、右、下の順でチェック
-            for (let i = 0; i < distEntries.length; i++) {
-                const [key, d] = distEntries[i];
+            for (const entry of Object.entries(DIST)) {
+                const [, d] = entry;
                 const next_row = v[0] + d.dr;
                 const next_column = v[1] + d.dc;
 
@@ -190,14 +195,13 @@ class FieldEvalution {
 
                 if (dist[next_row][next_column] !== -1) {
                     if (dist[next_row][next_column] === dist[v[0]][v[1]] + 1) {
-                        this.shortestDirectionFlags[next_row][next_column][i] = true;
+                        this.shortestDirectionMaps[next_row][next_column].set(d.reverse().keyName, true);
                     }
                     continue;
                 }
                 queue.push([next_row, next_column]);
                 dist[next_row][next_column] = dist[v[0]][v[1]] + 1;
-                pre[next_row][next_column] = i;
-                this.shortestDirectionFlags[next_row][next_column][i] = true;
+                this.shortestDirectionMaps[next_row][next_column].set(d.reverse().keyName, true);
             }
         }
     }
@@ -291,7 +295,7 @@ function create() {
 
 
 function update(time, delta) {
-    //console.log(delta);
+    console.log("update")
 
     // キーボードの情報を取得
     const cursors = this.input.keyboard.createCursorKeys();
@@ -324,10 +328,15 @@ function update(time, delta) {
     // フィールド評価
     this.fieldEvaluation.updateEvaluation(this.player.row, this.player.column);
 
-
     // 敵
-    //let enemyDist = this.enemyList[0].decideMoveDirection(this.fieldEvaluation.shortestDirectionFlags);
-    //console.log(enemyDist);
-    //this.enemyList[0].move(enemyDist);
-    //this.enemyList[0].draw();
+    const enemy = this.enemyList[0]
+    if(enemy.isChargeCompleted()) {
+        let enemyDist = enemy.decideMoveDirection(this.fieldEvaluation.shortestDirectionMaps);
+        console.log(enemyDist);
+        enemy.move(enemyDist);
+    } else {
+        enemy.charge();
+    }
+    
+    enemy.draw();
 }

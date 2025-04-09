@@ -1,0 +1,84 @@
+<!doctype html>
+<html class="no-js" lang="">
+
+<head>
+  <meta charset="utf-8">
+  <title>Escape!!</title>
+  <meta name="description" content="">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <meta property="og:title" content="">
+  <meta property="og:type" content="">
+  <meta property="og:url" content="">
+  <meta property="og:image" content="">
+
+  <link rel="icon" href="favicon.ico" />
+
+  <style>
+    .original-button {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      line-height: 1;
+      text-decoration: none;
+      color: #ffffff;
+      font-size: 18px;
+      border-radius: 10px;
+      width: 200px;
+      height: 40px;
+      font-weight: bold;
+      transition: 0.3s;
+      background-color: #1976D2;
+      cursor: pointer;
+    }
+
+    .original-button:hover {
+      opacity: .7;
+    }
+  </style>
+
+  <meta name="theme-color" content="#fafafa">
+</head>
+
+<body>
+  <script src="https://cdn.jsdelivr.net/npm/phaser@v3.88.2/dist/phaser.js"></script>
+  <h2>Escape!!</h2>
+  <div style="display: flex">
+    <canvas id="gameCanvas" width="600px" height="600px"></canvas>
+    <div style="margin-left: 30px">
+      <div><span>score:</span><span id="score"
+          style="display: inline-block; width: 50px; text-align: right"></span><span id="bonus"
+          style="display: none;">bonus +10!</span></div>
+      <div id="gameOver" style="visibility: hidden">Game Over!</div>
+      <div id="gameStart" class="original-button">Start!</div>
+      <div>
+        <ul>
+          <li>プレイヤーに近づいてくる敵からできるだけ逃げるゲームです。</li>
+          <li>カーソルキーでプレイヤー（青色）を操作して、敵（赤色）に接触しないで逃げてください。</li>
+          <li>プレイヤーが敵に接触するとGame Overです。</li>
+          <li>壁（黒色）は通ることができません。</li>
+          <li>宝（黄色）を通るとbonus scoreが加算されます。</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    var a = {};
+    setTimeout(function () {
+      a.hoge = "Hello world!";
+    }, 1000);
+
+    console.log("output a ->", a); // output-> { hoge:"Hello world" }
+    console.log("output a.hoge ->", a.hoge); // output-> undefined	
+  </script>
+
+  <!-- Google Analytics: change UA-XXXXX-Y to be your site's ID. -->
+  <script>
+    window.ga = function () { ga.q.push(arguments) }; ga.q = []; ga.l = +new Date;
+    ga('create', 'UA-XXXXX-Y', 'auto'); ga('set', 'anonymizeIp', true); ga('set', 'transport', 'beacon'); ga('send', 'pageview')
+  </script>
+  <script src="https://www.google-analytics.com/analytics.js" async></script>
+</body>
+
+</html>
