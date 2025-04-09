@@ -39,7 +39,7 @@ const field = [
     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 ];
 
-const playerPosInit = { row: 15, column: 15 };
+const playerPosInit = { row: 0, column: 0 };
 const enemiesPosInit = [
     { row: 15, column: 29 },
     { row: 23, column: 23 },
@@ -133,14 +133,17 @@ class Enemy {
 
     decideMoveDirection(shortestDirectionMaps) {
         for (const [key, d] of Object.entries(DIST)) {
-            console.log(shortestDirectionMaps[this.row][this.column]);
             if(shortestDirectionMaps[this.row][this.column].get(key)) {
                 return d;
             }
         }
+        return null;
     }
 
     move(dist) {
+        if(dist === null) {
+            return;
+        }
         if (this.chargeAmount >= 6) {
             this.row += dist.dr;
             this.column += dist.dc;
@@ -160,6 +163,7 @@ class FieldEvalution {
     constructor(scene) {
         this.shortestDirectionMaps = [...Array(H)].map(n => [...Array(W)].map(m => this.generateDirectionFlagMap()));
         this.graphics = scene.add.graphics();
+        this.graphics.depth = 99;
     }
 
     generateDirectionFlagMap() {
@@ -313,14 +317,16 @@ function create() {
     // 敵
     this.enemyList = [];
     for (let i = 0; i < 4; i++) {
-        this.enemyList.push(new Enemy(this, enemiesPosInit[i].row, enemiesPosInit[i].column));
-        this.enemyList[i].draw();
+        const enemy = new Enemy(this, enemiesPosInit[i].row, enemiesPosInit[i].column);
+        this.enemyList.push(enemy);
+        enemy.draw();
     }
 }
 
 
 function update(time, delta) {
     console.log("update")
+    console.log(delta)
 
     // キーボードの情報を取得
     const cursors = this.input.keyboard.createCursorKeys();
@@ -352,16 +358,16 @@ function update(time, delta) {
 
     // フィールド評価
     this.fieldEvaluation.updateEvaluation(this.player.row, this.player.column);
+    this.fieldEvaluation.draw();
 
     // 敵
-    const enemy = this.enemyList[0]
-    if(enemy.isChargeCompleted()) {
-        let enemyDist = enemy.decideMoveDirection(this.fieldEvaluation.shortestDirectionMaps);
-        enemy.move(enemyDist);
-    } else {
-        enemy.charge();
+    for(const enemy of this.enemyList) {
+        if(enemy.isChargeCompleted()) {
+            let enemyDist = enemy.decideMoveDirection(this.fieldEvaluation.shortestDirectionMaps);
+            enemy.move(enemyDist);
+        } else {
+            enemy.charge();
+        }
+        enemy.draw();
     }
-    
-    enemy.draw();
-    this.fieldEvaluation.draw();
 }
