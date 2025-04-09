@@ -47,11 +47,11 @@ const enemiesPosInit = [
     { row: 29, column: 29 }
 ];
 
-const DIST = {
-    LEFT: { keyName: "LEFT", dr: 0, dc: -1, reverse() { return DIST.RIGHT; } },
-    UP: { keyName: "UP", dr: -1, dc: 0, reverse() { return DIST.DOWN; } },
-    RIGHT: { keyName: "RIGHT", dr: 0, dc: 1, reverse() { return DIST.LEFT; } },
-    DOWN: { keyName: "DOWN", dr: 1, dc: 0, reverse() { return DIST.UP; } }
+const DIRECTION = {
+    LEFT: { keyName: "LEFT", dr: 0, dc: -1, reverse() { return DIRECTION.RIGHT; } },
+    UP: { keyName: "UP", dr: -1, dc: 0, reverse() { return DIRECTION.DOWN; } },
+    RIGHT: { keyName: "RIGHT", dr: 0, dc: 1, reverse() { return DIRECTION.LEFT; } },
+    DOWN: { keyName: "DOWN", dr: 1, dc: 0, reverse() { return DIRECTION.UP; } }
 };
 
 class Player {
@@ -73,9 +73,9 @@ class Player {
         return false;
     }
 
-    canMove(dist) {
-        const toRow = this.row + dist.dr;
-        const toCol = this.column + dist.dc;
+    canMove(direction) {
+        const toRow = this.row + direction.dr;
+        const toCol = this.column + direction.dc;
         if (toRow < 0) {
             return false;
         }
@@ -94,10 +94,10 @@ class Player {
         return true;
     }
 
-    move(dist) {
+    move(direction) {
         if (this.chargeAmount >= 3) {
-            this.row += dist.dr;
-            this.column += dist.dc;
+            this.row += direction.dr;
+            this.column += direction.dc;
             this.chargeAmount = 0;
         }
     }
@@ -132,7 +132,7 @@ class Enemy {
     }
 
     decideMoveDirection(shortestDirectionMaps) {
-        for (const [key, d] of Object.entries(DIST)) {
+        for (const [key, d] of Object.entries(DIRECTION)) {
             if(shortestDirectionMaps[this.row][this.column].get(key)) {
                 return d;
             }
@@ -140,13 +140,13 @@ class Enemy {
         return null;
     }
 
-    move(dist) {
-        if(dist === null) {
+    move(direction) {
+        if(direction === null) {
             return;
         }
         if (this.chargeAmount >= 6) {
-            this.row += dist.dr;
-            this.column += dist.dc;
+            this.row += direction.dr;
+            this.column += direction.dc;
             this.chargeAmount = 0;
         }
     }
@@ -167,7 +167,7 @@ class FieldEvalution {
     }
 
     generateDirectionFlagMap() {
-        const pairs = Object.keys(DIST).map(key => [key, false]);
+        const pairs = Object.keys(DIRECTION).map(key => [key, false]);
         return new Map(pairs);
     }
 
@@ -189,7 +189,7 @@ class FieldEvalution {
         while (queue.length > 0) {
             const v = queue.shift();
             // 左、上、右、下の順でチェック
-            for (const entry of Object.entries(DIST)) {
+            for (const entry of Object.entries(DIRECTION)) {
                 const [, d] = entry;
                 const next_row = v[0] + d.dr;
                 const next_column = v[1] + d.dc;
@@ -218,16 +218,16 @@ class FieldEvalution {
         this.graphics.fillStyle(0x00ff00);
         for (let i = 0; i < H; i++) {
             for (let j = 0; j < W; j++) {
-                if(this.shortestDirectionMaps[i][j].get(DIST.LEFT.keyName)) {
+                if(this.shortestDirectionMaps[i][j].get(DIRECTION.LEFT.keyName)) {
                     this.graphics.fillRect(j * GRID_SIZE, i * GRID_SIZE + GRID_SIZE/2 - GRID_SIZE/10, GRID_SIZE/5, GRID_SIZE/5);
                 }
-                if(this.shortestDirectionMaps[i][j].get(DIST.UP.keyName)) {
+                if(this.shortestDirectionMaps[i][j].get(DIRECTION.UP.keyName)) {
                     this.graphics.fillRect(j * GRID_SIZE + GRID_SIZE/2 - GRID_SIZE/10, i * GRID_SIZE, GRID_SIZE/5, GRID_SIZE/5);
                 }
-                if(this.shortestDirectionMaps[i][j].get(DIST.RIGHT.keyName)) {
+                if(this.shortestDirectionMaps[i][j].get(DIRECTION.RIGHT.keyName)) {
                     this.graphics.fillRect((j + 1) * GRID_SIZE - GRID_SIZE/5, i * GRID_SIZE + GRID_SIZE/2 - GRID_SIZE/10, GRID_SIZE/5, GRID_SIZE/5);
                 }
-                if(this.shortestDirectionMaps[i][j].get(DIST.DOWN.keyName)) {
+                if(this.shortestDirectionMaps[i][j].get(DIRECTION.DOWN.keyName)) {
                     this.graphics.fillRect(j * GRID_SIZE + GRID_SIZE/2 - GRID_SIZE/10, (i + 1) * GRID_SIZE - GRID_SIZE/5, GRID_SIZE/5, GRID_SIZE/5);
                 }
             }
@@ -333,16 +333,16 @@ function update(time, delta) {
     let input_dist = null;
     if (cursors.left.isDown) {
         console.log("Left!!");
-        input_dist = DIST.LEFT;
+        input_dist = DIRECTION.LEFT;
     } else if (cursors.up.isDown) {
         console.log("UP!!");
-        input_dist = DIST.UP;
+        input_dist = DIRECTION.UP;
     } else if (cursors.right.isDown) {
         console.log("Right!!");
-        input_dist = DIST.RIGHT;
+        input_dist = DIRECTION.RIGHT;
     } else if (cursors.down.isDown) {
         console.log("Down!!");
-        input_dist = DIST.DOWN;
+        input_dist = DIRECTION.DOWN;
     }
 
     // プレイヤー
