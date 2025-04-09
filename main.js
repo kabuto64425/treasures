@@ -39,7 +39,7 @@ const field = [
     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 ];
 
-const playerPosInit = { row: 0, column: 0 };
+const playerPosInit = { row: 15, column: 15 };
 const enemiesPosInit = [
     { row: 15, column: 29 },
     { row: 23, column: 23 },
@@ -152,13 +152,14 @@ class Enemy {
         this.graphics.clear();
         this.graphics.lineStyle(0xff0000);
         this.graphics.fillStyle(0xff0000);
-        this.graphics.fillRect(this.row * GRID_SIZE, this.column * GRID_SIZE, GRID_SIZE, GRID_SIZE);
+        this.graphics.fillRect(this.column * GRID_SIZE, this.row * GRID_SIZE, GRID_SIZE, GRID_SIZE);
     }
 }
 
 class FieldEvalution {
-    constructor() {
+    constructor(scene) {
         this.shortestDirectionMaps = [...Array(H)].map(n => [...Array(W)].map(m => this.generateDirectionFlagMap()));
+        this.graphics = scene.add.graphics();
     }
 
     generateDirectionFlagMap() {
@@ -203,6 +204,28 @@ class FieldEvalution {
                 queue.push([next_row, next_column]);
                 dist[next_row][next_column] = dist[v[0]][v[1]] + 1;
                 this.shortestDirectionMaps[next_row][next_column].set(d.reverse().keyName, true);
+            }
+        }
+    }
+
+    draw() {
+        this.graphics.clear();
+        this.graphics.lineStyle(0x00ff00);
+        this.graphics.fillStyle(0x00ff00);
+        for (let i = 0; i < H; i++) {
+            for (let j = 0; j < W; j++) {
+                if(this.shortestDirectionMaps[i][j].get(DIST.LEFT.keyName)) {
+                    this.graphics.fillRect(j * GRID_SIZE, i * GRID_SIZE + GRID_SIZE/2 - GRID_SIZE/10, GRID_SIZE/5, GRID_SIZE/5);
+                }
+                if(this.shortestDirectionMaps[i][j].get(DIST.UP.keyName)) {
+                    this.graphics.fillRect(j * GRID_SIZE + GRID_SIZE/2 - GRID_SIZE/10, i * GRID_SIZE, GRID_SIZE/5, GRID_SIZE/5);
+                }
+                if(this.shortestDirectionMaps[i][j].get(DIST.RIGHT.keyName)) {
+                    this.graphics.fillRect((j + 1) * GRID_SIZE - GRID_SIZE/5, i * GRID_SIZE + GRID_SIZE/2 - GRID_SIZE/10, GRID_SIZE/5, GRID_SIZE/5);
+                }
+                if(this.shortestDirectionMaps[i][j].get(DIST.DOWN.keyName)) {
+                    this.graphics.fillRect(j * GRID_SIZE + GRID_SIZE/2 - GRID_SIZE/10, (i + 1) * GRID_SIZE - GRID_SIZE/5, GRID_SIZE/5, GRID_SIZE/5);
+                }
             }
         }
     }
@@ -283,8 +306,9 @@ function create() {
     this.player.draw();
 
     // フィールド評価
-    this.fieldEvaluation = new FieldEvalution();
+    this.fieldEvaluation = new FieldEvalution(this);
     this.fieldEvaluation.updateEvaluation(this.player.row, this.player.column);
+    this.fieldEvaluation.draw();
 
     // 敵
     this.enemyList = [];
@@ -327,18 +351,17 @@ function update(time, delta) {
     this.player.draw();
 
     // フィールド評価
-    console.log(this.player.row);
     this.fieldEvaluation.updateEvaluation(this.player.row, this.player.column);
 
     // 敵
     const enemy = this.enemyList[0]
     if(enemy.isChargeCompleted()) {
         let enemyDist = enemy.decideMoveDirection(this.fieldEvaluation.shortestDirectionMaps);
-        console.log(enemyDist);
         enemy.move(enemyDist);
     } else {
         enemy.charge();
     }
     
     enemy.draw();
+    this.fieldEvaluation.draw();
 }
