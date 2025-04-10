@@ -39,20 +39,24 @@ const field = [
     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 ];
 
-const playerPosInit = { row: 0, column: 0 };
-const enemiesPosInit = [
-    { row: 15, column: 29 },
-    { row: 23, column: 23 },
-    { row: 29, column: 15 },
-    { row: 29, column: 29 }
-];
-
 const DIRECTION = {
     LEFT: { keyName: "LEFT", dr: 0, dc: -1, reverse() { return DIRECTION.RIGHT; } },
     UP: { keyName: "UP", dr: -1, dc: 0, reverse() { return DIRECTION.DOWN; } },
     RIGHT: { keyName: "RIGHT", dr: 0, dc: 1, reverse() { return DIRECTION.LEFT; } },
-    DOWN: { keyName: "DOWN", dr: 1, dc: 0, reverse() { return DIRECTION.UP; } }
+    DOWN: { keyName: "DOWN", dr: 1, dc: 0, reverse() { return DIRECTION.UP; } },
 };
+
+function getDirections() {
+    return [DIRECTION.LEFT, DIRECTION.UP, DIRECTION.RIGHT, DIRECTION.DOWN];
+}
+
+const parameterPlayer = { row: 0, column: 0 };
+const parametersOfEnemies = [
+    { row: 15, column: 29, priorityScanDirections: [DIRECTION.RIGHT, DIRECTION.DOWN, DIRECTION.LEFT, DIRECTION.UP] },
+    { row: 23, column: 23, priorityScanDirections: [DIRECTION.DOWN, DIRECTION.LEFT, DIRECTION.UP, DIRECTION.RIGHT] },
+    { row: 29, column: 15, priorityScanDirections: [DIRECTION.LEFT, DIRECTION.UP, DIRECTION.RIGHT, DIRECTION.DOWN] },
+    { row: 29, column: 29, priorityScanDirections: [DIRECTION.UP, DIRECTION.RIGHT, DIRECTION.DOWN, DIRECTION.LEFT] }
+];
 
 class Player {
     constructor(scene, iniRow, iniColumn) {
@@ -113,11 +117,12 @@ class Player {
 }
 
 class Enemy {
-    constructor(scene, iniRow, iniColumn) {
+    constructor(scene, iniRow, iniColumn, priorityScanDirections) {
         this.graphics = scene.add.graphics();
         this.row = iniRow;
         this.column = iniColumn;
         this.chargeAmount = 0;
+        this.priorityScanDirections = priorityScanDirections;
     }
 
     charge() {
@@ -132,8 +137,8 @@ class Enemy {
     }
 
     decideMoveDirection(shortestDirectionMaps) {
-        for (const [key, d] of Object.entries(DIRECTION)) {
-            if(shortestDirectionMaps[this.row][this.column].get(key)) {
+        for (const d of this.priorityScanDirections) {
+            if (shortestDirectionMaps[this.row][this.column].get(d.keyName)) {
                 return d;
             }
         }
@@ -141,7 +146,7 @@ class Enemy {
     }
 
     move(direction) {
-        if(direction === null) {
+        if (direction === null) {
             return;
         }
         if (this.chargeAmount >= 6) {
@@ -167,18 +172,18 @@ class FieldEvalution {
     }
 
     generateDirectionFlagMap() {
-        const pairs = Object.keys(DIRECTION).map(key => [key, false]);
+        const pairs = getDirections().map(d => [d.keyName, false]);
         return new Map(pairs);
     }
 
     resetMapValues(dir, value) {
-        Array.from(dir.entries()).forEach(([key, ]) => {
+        Array.from(dir.entries()).forEach(([key,]) => {
             dir.set(key, value);
         });
     }
 
     updateEvaluation(playerRow, playerColumn) {
-        this.shortestDirectionMaps.forEach(n => n.forEach(dir => {this.resetMapValues(dir, false)}));
+        this.shortestDirectionMaps.forEach(n => n.forEach(dir => { this.resetMapValues(dir, false) }));
 
         const queue = [];
         const dist = [...Array(H)].map(n => [...Array(W)].fill(-1));
@@ -188,9 +193,7 @@ class FieldEvalution {
 
         while (queue.length > 0) {
             const v = queue.shift();
-            // 左、上、右、下の順でチェック
-            for (const entry of Object.entries(DIRECTION)) {
-                const [, d] = entry;
+            for (const d of getDirections()) {
                 const next_row = v[0] + d.dr;
                 const next_column = v[1] + d.dc;
 
@@ -218,17 +221,17 @@ class FieldEvalution {
         this.graphics.fillStyle(0x00ff00);
         for (let i = 0; i < H; i++) {
             for (let j = 0; j < W; j++) {
-                if(this.shortestDirectionMaps[i][j].get(DIRECTION.LEFT.keyName)) {
-                    this.graphics.fillRect(j * GRID_SIZE, i * GRID_SIZE + GRID_SIZE/2 - GRID_SIZE/10, GRID_SIZE/5, GRID_SIZE/5);
+                if (this.shortestDirectionMaps[i][j].get(DIRECTION.LEFT.keyName)) {
+                    this.graphics.fillRect(j * GRID_SIZE, i * GRID_SIZE + GRID_SIZE / 2 - GRID_SIZE / 10, GRID_SIZE / 5, GRID_SIZE / 5);
                 }
-                if(this.shortestDirectionMaps[i][j].get(DIRECTION.UP.keyName)) {
-                    this.graphics.fillRect(j * GRID_SIZE + GRID_SIZE/2 - GRID_SIZE/10, i * GRID_SIZE, GRID_SIZE/5, GRID_SIZE/5);
+                if (this.shortestDirectionMaps[i][j].get(DIRECTION.UP.keyName)) {
+                    this.graphics.fillRect(j * GRID_SIZE + GRID_SIZE / 2 - GRID_SIZE / 10, i * GRID_SIZE, GRID_SIZE / 5, GRID_SIZE / 5);
                 }
-                if(this.shortestDirectionMaps[i][j].get(DIRECTION.RIGHT.keyName)) {
-                    this.graphics.fillRect((j + 1) * GRID_SIZE - GRID_SIZE/5, i * GRID_SIZE + GRID_SIZE/2 - GRID_SIZE/10, GRID_SIZE/5, GRID_SIZE/5);
+                if (this.shortestDirectionMaps[i][j].get(DIRECTION.RIGHT.keyName)) {
+                    this.graphics.fillRect((j + 1) * GRID_SIZE - GRID_SIZE / 5, i * GRID_SIZE + GRID_SIZE / 2 - GRID_SIZE / 10, GRID_SIZE / 5, GRID_SIZE / 5);
                 }
-                if(this.shortestDirectionMaps[i][j].get(DIRECTION.DOWN.keyName)) {
-                    this.graphics.fillRect(j * GRID_SIZE + GRID_SIZE/2 - GRID_SIZE/10, (i + 1) * GRID_SIZE - GRID_SIZE/5, GRID_SIZE/5, GRID_SIZE/5);
+                if (this.shortestDirectionMaps[i][j].get(DIRECTION.DOWN.keyName)) {
+                    this.graphics.fillRect(j * GRID_SIZE + GRID_SIZE / 2 - GRID_SIZE / 10, (i + 1) * GRID_SIZE - GRID_SIZE / 5, GRID_SIZE / 5, GRID_SIZE / 5);
                 }
             }
         }
@@ -277,8 +280,8 @@ function create() {
             continueCount: 0, // 通常モードのときに同一方向に連続して何回進んだかをカウント
             differentCount: 0, // 猛進モードのときに進行方向と最短方向が異なる状態が何回連続で続いているかをカウント
 
-            row: enemiesPosInit[i].row,
-            column: enemiesPosInit[i].column
+            row: parametersOfEnemies[i].row,
+            column: parametersOfEnemies[i].column
         }
     });
 
@@ -306,7 +309,7 @@ function create() {
     }
 
     // プレイヤー
-    this.player = new Player(this, playerPosInit.row, playerPosInit.column);
+    this.player = new Player(this, parameterPlayer.row, parameterPlayer.column);
     this.player.draw();
 
     // フィールド評価
@@ -317,7 +320,7 @@ function create() {
     // 敵
     this.enemyList = [];
     for (let i = 0; i < 4; i++) {
-        const enemy = new Enemy(this, enemiesPosInit[i].row, enemiesPosInit[i].column);
+        const enemy = new Enemy(this, parametersOfEnemies[i].row, parametersOfEnemies[i].column, parametersOfEnemies[i].priorityScanDirections);
         this.enemyList.push(enemy);
         enemy.draw();
     }
@@ -361,8 +364,8 @@ function update(time, delta) {
     this.fieldEvaluation.draw();
 
     // 敵
-    for(const enemy of this.enemyList) {
-        if(enemy.isChargeCompleted()) {
+    for (const enemy of this.enemyList) {
+        if (enemy.isChargeCompleted()) {
             let enemyDist = enemy.decideMoveDirection(this.fieldEvaluation.shortestDirectionMaps);
             enemy.move(enemyDist);
         } else {
