@@ -51,6 +51,8 @@ function getDirections() {
 }
 
 const parameterPlayer = { row: 0, column: 0 };
+
+const numberOfEnemyies = 4;
 const parametersOfEnemies = [
     { row: 15, column: 29, priorityScanDirections: [DIRECTION.RIGHT, DIRECTION.DOWN, DIRECTION.LEFT, DIRECTION.UP] },
     { row: 23, column: 23, priorityScanDirections: [DIRECTION.DOWN, DIRECTION.LEFT, DIRECTION.UP, DIRECTION.RIGHT] },
@@ -273,7 +275,7 @@ function preload() {
 function create() {
     console.log("create!!");
 
-    let enemies = [...Array(4)].map((n, i) => {
+    let enemies = [...Array(numberOfEnemyies)].map((n, i) => {
         return {
             mode: 0, // 0:通常モード 1:猛進モード
             preDirect: -1,
@@ -319,7 +321,7 @@ function create() {
 
     // 敵
     this.enemyList = [];
-    for (let i = 0; i < 4; i++) {
+    for (let i = 0; i < numberOfEnemyies; i++) {
         const enemy = new Enemy(this, parametersOfEnemies[i].row, parametersOfEnemies[i].column, parametersOfEnemies[i].priorityScanDirections);
         this.enemyList.push(enemy);
         enemy.draw();
@@ -372,5 +374,16 @@ function update(time, delta) {
             enemy.charge();
         }
         enemy.draw();
+    }
+
+    // 管理
+    let isGameOver = false;
+    for(const enemy of this.enemyList) {
+        if(this.player.row === enemy.row && this.player.column === enemy.column) {
+            isGameOver = true;
+        }
+    }
+    if(isGameOver) {
+        this.scene.pause();
     }
 }
