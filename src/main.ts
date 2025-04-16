@@ -183,17 +183,17 @@ class FieldEvalution {
 	graphics: Phaser.GameObjects.Graphics;
 	
 	constructor(scene: Phaser.Scene) {
-		this.shortestDirectionMaps = [...Array(H)].map(n => [...Array(W)].map(m => this.generateDirectionFlagMap()));
+		this.shortestDirectionMaps = [...Array(H)].map(n => [...Array(W)].map(m => this.generateDirectionFlagMap() as Map<string, boolean>));
 		this.graphics = scene.add.graphics();
 		this.graphics.depth = 99;
 	}
 
 	generateDirectionFlagMap() {
-		const pairs = getDirections().map(d => [d.keyName, false]);
-		return new Map(pairs);
+		const pairs = getDirections().map(d => [d.keyName, false] as [string, boolean]);
+		return new Map<string, boolean>(pairs);
 	}
 
-	resetMapValues(dir, value) {
+	resetMapValues<K, V>(dir: Map<K, V>, value: V) {
 		Array.from(dir.entries()).forEach(([key,]) => {
 			dir.set(key, value);
 		});
