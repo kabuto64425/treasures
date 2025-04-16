@@ -199,7 +199,7 @@ class FieldEvalution {
 		});
 	}
 
-	updateEvaluation(playerRow, playerColumn) {
+	updateEvaluation(playerRow: number, playerColumn: number) {
 		this.shortestDirectionMaps.forEach(n => n.forEach(dir => { this.resetMapValues(dir, false) }));
 
 		const queue = [];
