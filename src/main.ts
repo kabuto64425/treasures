@@ -196,6 +196,34 @@ class Enemy {
     }
 }
 
+class Treasure {
+    graphics: Phaser.GameObjects.Graphics;
+    row: number;
+    column: number;
+
+    constructor(scene: Phaser.Scene, iniRow: number, iniColumn: number) {
+        this.graphics = scene.add.graphics();
+        this.row = iniRow;
+        this.column = iniColumn;
+    }
+
+    place(row: number, column: number) {
+        this.row = row;
+        this.column = column;
+    }
+
+    draw() {
+        this.graphics.clear();
+        this.graphics.lineStyle(0, 0xffff00);
+        this.graphics.fillStyle(0xffff00);
+        this.graphics.fillRect(this.column * GRID_SIZE, this.row * GRID_SIZE, GRID_SIZE, GRID_SIZE);
+    }
+
+    clearDisplay() {
+        this.graphics.clear();
+    }
+}
+
 class FieldEvalution {
     shortestDirectionMaps: Map<string, boolean>[][];
     graphics: Phaser.GameObjects.Graphics;
@@ -279,6 +307,7 @@ class TestScene extends Phaser.Scene {
     player: Player | undefined;
     fieldEvaluation: FieldEvalution | undefined;
     enemyList: Enemy[] | undefined;
+    treasure: Treasure | undefined;
 
     constructor() {
         super('testScene');
@@ -342,6 +371,15 @@ class TestScene extends Phaser.Scene {
             this.enemyList.push(enemy);
             enemy.draw();
         }
+
+        // 宝
+        let treasurePos = { row: Math.floor(Math.random() * H), column: Math.floor(Math.random() * W) };
+        // 壁が存在するところに宝を配置しないようにする
+        while (field[treasurePos.row][treasurePos.column] === 1) {
+            treasurePos = { row: Math.floor(Math.random() * H), column: Math.floor(Math.random() * W) };
+        }
+        this.treasure = new Treasure(this, treasurePos.row, treasurePos.column);
+        this.treasure.draw();
     }
 
     update(_time: number, delta: number) {
@@ -406,6 +444,18 @@ class TestScene extends Phaser.Scene {
         }
         if (isGameOver) {
             this.scene.pause();
+        }
+        
+        // create内で確実に作成しているので、アサーションでもいけるはず
+        const treasure = this.treasure!;
+        if(player.row === treasure.row && player.column === treasure.column) {
+            let treasurePos = { row: Math.floor(Math.random() * H), column: Math.floor(Math.random() * W) };
+            // 壁が存在するところに宝を配置しないようにする
+            while (field[treasurePos.row][treasurePos.column] === 1) {
+                treasurePos = { row: Math.floor(Math.random() * H), column: Math.floor(Math.random() * W) };
+            }
+            treasure.place(treasurePos.row, treasurePos.column);
+            treasure.draw();
         }
     }
 }
