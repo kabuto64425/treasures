@@ -198,8 +198,17 @@ class Enemy {
     }
 }
 
+class RoundData {
+    treasures: Treasure[];
+
+    constructor() {
+        this.treasures = 
+    }
+}
+
 export class RoundFlow {
     private currentRound: number;
+
     constructor() {
         this.currentRound = 0;
     }
@@ -500,7 +509,7 @@ const config: Phaser.Types.Core.GameConfig = {
     scene: TestScene,
     fps: {
         target: 60,// フレームレート
-        forceSetTimeOut: true
+        forceSetTimeOut: false
     },
     physics: {
         default: "arcade",
