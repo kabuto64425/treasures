@@ -217,6 +217,14 @@ class Treasure {
         this.state = Treasure.TREASURE_STATE.NON_APPEARANCE;
     }
 
+    collected() {
+        this.state = Treasure.TREASURE_STATE.COLLECTED;
+    }
+
+    isCollected() {
+        return this.state === Treasure.TREASURE_STATE.COLLECTED;
+    }
+
     place(row: number, column: number) {
         this.row = row;
         this.column = column;
@@ -464,6 +472,7 @@ class TestScene extends Phaser.Scene {
         const treasureList = this.treasureList!;
         for (const treasure of treasureList) {
             if(player.row === treasure.row && player.column === treasure.column) {
+                treasure.collected();
                 treasure.clearDisplay();
             }
         }
