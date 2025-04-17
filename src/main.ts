@@ -198,6 +198,17 @@ class Enemy {
     }
 }
 
+export class RoundFlow {
+    private currentRound: number;
+    constructor() {
+        this.currentRound = 0;
+    }
+
+    round() {
+        return this.currentRound;
+    }
+}
+
 class Treasure {
     graphics: Phaser.GameObjects.Graphics;
     row: number;
