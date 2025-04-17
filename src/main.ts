@@ -79,6 +79,8 @@ const parametersOfEnemies = [
     { row: 29, column: 29, priorityScanDirections: [DIRECTION.UP, DIRECTION.RIGHT, DIRECTION.DOWN, DIRECTION.LEFT] }
 ];
 
+const numberOfTreasures = 10;
+
 class Player {
     graphics: Phaser.GameObjects.Graphics;
     row: number;
@@ -200,11 +202,19 @@ class Treasure {
     graphics: Phaser.GameObjects.Graphics;
     row: number;
     column: number;
+    state: number;
+
+    static readonly TREASURE_STATE = {
+        NON_APPEARANCE: 0,
+        APPEARANCE: 1,
+        COLLECTED: 2,
+    };
 
     constructor(scene: Phaser.Scene, iniRow: number, iniColumn: number) {
         this.graphics = scene.add.graphics();
         this.row = iniRow;
         this.column = iniColumn;
+        this.state = Treasure.TREASURE_STATE.NON_APPEARANCE;
     }
 
     place(row: number, column: number) {
@@ -307,7 +317,7 @@ class TestScene extends Phaser.Scene {
     player: Player | undefined;
     fieldEvaluation: FieldEvalution | undefined;
     enemyList: Enemy[] | undefined;
-    treasure: Treasure | undefined;
+    treasureList: Treasure[] | undefined;
 
     constructor() {
         super('testScene');
@@ -373,13 +383,17 @@ class TestScene extends Phaser.Scene {
         }
 
         // 宝
-        let treasurePos = { row: Math.floor(Math.random() * H), column: Math.floor(Math.random() * W) };
-        // 壁が存在するところに宝を配置しないようにする
-        while (field[treasurePos.row][treasurePos.column] === 1) {
-            treasurePos = { row: Math.floor(Math.random() * H), column: Math.floor(Math.random() * W) };
+        this.treasureList = [];
+        for (let i = 0; i < numberOfTreasures; i++) {
+            let treasurePos = { row: Math.floor(Math.random() * H), column: Math.floor(Math.random() * W) };
+            // 壁が存在するところに宝を配置しないようにする
+            while (field[treasurePos.row][treasurePos.column] === 1) {
+                treasurePos = { row: Math.floor(Math.random() * H), column: Math.floor(Math.random() * W) };
+            }
+            const treasure = new Treasure(this, treasurePos.row, treasurePos.column);
+            this.treasureList.push(treasure);
+            treasure.draw();
         }
-        this.treasure = new Treasure(this, treasurePos.row, treasurePos.column);
-        this.treasure.draw();
     }
 
     update(_time: number, delta: number) {
@@ -443,19 +457,15 @@ class TestScene extends Phaser.Scene {
             }
         }
         if (isGameOver) {
-            this.scene.pause();
+            //this.scene.pause();
         }
         
         // create内で確実に作成しているので、アサーションでもいけるはず
-        const treasure = this.treasure!;
-        if(player.row === treasure.row && player.column === treasure.column) {
-            let treasurePos = { row: Math.floor(Math.random() * H), column: Math.floor(Math.random() * W) };
-            // 壁が存在するところに宝を配置しないようにする
-            while (field[treasurePos.row][treasurePos.column] === 1) {
-                treasurePos = { row: Math.floor(Math.random() * H), column: Math.floor(Math.random() * W) };
+        const treasureList = this.treasureList!;
+        for (const treasure of treasureList) {
+            if(player.row === treasure.row && player.column === treasure.column) {
+                treasure.clearDisplay();
             }
-            treasure.place(treasurePos.row, treasurePos.column);
-            treasure.draw();
         }
     }
 }
