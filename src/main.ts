@@ -1,9 +1,9 @@
 import Phaser from 'phaser';
 
-const D_WIDTH = 660;
-const D_HEIGHT = 660;
+const D_WIDTH = 630;
+const D_HEIGHT = 630;
 
-const GRID_SIZE = 22;
+const GRID_SIZE = 21;
 
 const H = 30;
 const W = 30;
