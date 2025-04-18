@@ -204,7 +204,7 @@ class Enemy {
     }
 }
 
-export class RoundData {
+export class RoundSupervision {
     private treasureList: Treasure[];
 
     constructor() {
@@ -218,19 +218,19 @@ export class RoundData {
 
 export class RoundFlow {
     private currentRound: number;
-    private roundDataList: RoundData[];
+    private roundSupervisionList: RoundSupervision[];
 
     constructor(numberOfRound: number) {
         this.currentRound = 0;
-        this.roundDataList = new Array(numberOfRound);
+        this.roundSupervisionList = new Array(numberOfRound);
     }
 
     round() {
         return this.currentRound;
     }
 
-    setRoundData(round: number, roundData: RoundData) {
-        this.roundDataList[round] = roundData;
+    setRoundSupervision(round: number, roundSupervision: RoundSupervision) {
+        this.roundSupervisionList[round] = roundSupervision;
     }
 }
 
