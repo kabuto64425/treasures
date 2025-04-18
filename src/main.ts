@@ -204,7 +204,7 @@ class Enemy {
     }
 }
 
-export class RoundSupervision {
+class SingleRoundSupervision {
     private treasureList: Treasure[];
 
     constructor() {
@@ -214,23 +214,31 @@ export class RoundSupervision {
     addTreasure(treasure : Treasure) {
         this.treasureList.push(treasure);
     }
+
+    getTreasureList() {
+        return this.treasureList;
+    }
 }
 
-export class RoundFlow {
+export class RoundsSupervision {
     private currentRound: number;
-    private roundSupervisionList: RoundSupervision[];
+    private singleRoundSupervisionList: SingleRoundSupervision[];
 
     constructor(numberOfRound: number) {
         this.currentRound = 0;
-        this.roundSupervisionList = new Array(numberOfRound);
+        this.singleRoundSupervisionList = new Array(numberOfRound);
     }
 
     round() {
         return this.currentRound;
     }
 
-    setRoundSupervision(round: number, roundSupervision: RoundSupervision) {
-        this.roundSupervisionList[round] = roundSupervision;
+    getCurrentRoundSupervision() {
+        return this.singleRoundSupervisionList[this.currentRound];
+    }
+
+    setRoundSupervision(round: number, singleRoundSupervision: SingleRoundSupervision) {
+        this.singleRoundSupervisionList[round] = singleRoundSupervision;
     }
 }
 
@@ -369,7 +377,7 @@ class TestScene extends Phaser.Scene {
     private player: Player | undefined;
     private fieldEvaluation: FieldEvalution | undefined;
     private enemyList: Enemy[] | undefined;
-    private treasureList: Treasure[] | undefined;
+    private roundsSupervision: RoundsSupervision | undefined;
 
     constructor() {
         super('testScene');
@@ -434,8 +442,9 @@ class TestScene extends Phaser.Scene {
             enemy.draw();
         }
 
-        // 宝
-        this.treasureList = [];
+        // ラウンド進行監督
+        this.roundsSupervision = new RoundsSupervision(1);
+        const singleRoundSupervision = new SingleRoundSupervision();
         for (let i = 0; i < numberOfTreasures; i++) {
             let treasurePos = { row: Math.floor(Math.random() * H), column: Math.floor(Math.random() * W) };
             // 壁が存在するところに宝を配置しないようにする
@@ -443,9 +452,10 @@ class TestScene extends Phaser.Scene {
                 treasurePos = { row: Math.floor(Math.random() * H), column: Math.floor(Math.random() * W) };
             }
             const treasure = new Treasure(this, treasurePos.row, treasurePos.column);
-            this.treasureList.push(treasure);
+            singleRoundSupervision.addTreasure(treasure);
             treasure.draw();
         }
+        this.roundsSupervision.setRoundSupervision(0, singleRoundSupervision);
     }
 
     update(_time: number, _delta: number) {
@@ -511,10 +521,10 @@ class TestScene extends Phaser.Scene {
         if (isGameOver) {
             //this.scene.pause();
         }
-        
+
         // create内で確実に作成しているので、アサーションでもいけるはず
-        const treasureList = this.treasureList!;
-        for (const treasure of treasureList) {
+        const roundsSupervision = this.roundsSupervision!;
+        for (const treasure of roundsSupervision.getCurrentRoundSupervision().getTreasureList()) {
             if(player.position().row === treasure.position().row && player.position().column === treasure.position().column) {
                 treasure.collected();
                 treasure.clearDisplay();
