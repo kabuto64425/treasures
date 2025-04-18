@@ -207,25 +207,30 @@ class Enemy {
 export class RoundData {
     private treasureList: Treasure[];
 
-    constructor(treasureList : Treasure[]) {
-        this.treasureList = treasureList;
+    constructor() {
+        this.treasureList = [];
     }
 
-    aaa() {
-        return this.treasureList;
+    addTreasure(treasure : Treasure) {
+        this.treasureList.push(treasure);
     }
 }
 
 export class RoundFlow {
     private currentRound: number;
-    //private roundDataList: RoundData[];
+    private roundDataList: RoundData[];
 
-    constructor() {
+    constructor(numberOfRound: number) {
         this.currentRound = 0;
+        this.roundDataList = new Array(numberOfRound);
     }
 
     round() {
         return this.currentRound;
+    }
+
+    setRoundData(round: number, roundData: RoundData) {
+        this.roundDataList[round] = roundData;
     }
 }
 
