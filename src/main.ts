@@ -87,8 +87,8 @@ class Player {
     private column: number;
     private chargeAmount: number;
 
-    constructor(graphics: Phaser.GameObjects.Graphics, iniRow: number, iniColumn: number) {
-        this.graphics = graphics;
+    constructor(scene: TestScene, iniRow: number, iniColumn: number) {
+        this.graphics = scene.add.graphics();
         this.row = iniRow;
         this.column = iniColumn;
         this.chargeAmount = 0;
@@ -153,8 +153,8 @@ class Enemy {
     private chargeAmount: number;
     private priorityScanDirections: DIRECTION[];
 
-    constructor(graphics: Phaser.GameObjects.Graphics, iniRow: number, iniColumn: number, priorityScanDirections: DIRECTION[]) {
-        this.graphics = graphics;
+    constructor(scene: TestScene, iniRow: number, iniColumn: number, priorityScanDirections: DIRECTION[]) {
+        this.graphics = scene.add.graphics();
         this.row = iniRow;
         this.column = iniColumn;
         this.chargeAmount = 0;
@@ -241,8 +241,8 @@ class Treasure {
         COLLECTED: 2,
     };
 
-    constructor(graphics: Phaser.GameObjects.Graphics, iniRow: number, iniColumn: number) {
-        this.graphics = graphics;
+    constructor(scene: TestScene, iniRow: number, iniColumn: number) {
+        this.graphics = scene.add.graphics();
         this.row = iniRow;
         this.column = iniColumn;
         this.state = Treasure.TREASURE_STATE.NON_APPEARANCE;
@@ -281,9 +281,9 @@ class FieldEvalution {
     private shortestDirectionMaps: Map<string, boolean>[][];
     private graphics: Phaser.GameObjects.Graphics;
 
-    constructor(graphics: Phaser.GameObjects.Graphics) {
+    constructor(scene: TestScene) {
         this.shortestDirectionMaps = [...Array(H)].map(() => [...Array(W)].map(() => this.generateDirectionFlagMap() as Map<string, boolean>));
-        this.graphics = graphics;
+        this.graphics = scene.add.graphics();
         this.graphics.depth = 99;
     }
 
@@ -413,18 +413,18 @@ class TestScene extends Phaser.Scene {
         }
 
         // プレイヤー
-        this.player = new Player(this.add.graphics(), parameterPlayer.row, parameterPlayer.column);
+        this.player = new Player(this, parameterPlayer.row, parameterPlayer.column);
         this.player.draw();
 
         // フィールド評価
-        this.fieldEvaluation = new FieldEvalution(this.add.graphics());
+        this.fieldEvaluation = new FieldEvalution(this);
         this.fieldEvaluation.updateEvaluation(this.player.position().row, this.player.position().column);
         this.fieldEvaluation.draw();
 
         // 敵
         this.enemyList = [];
         for (let i = 0; i < numberOfEnemyies; i++) {
-            const enemy = new Enemy(this.add.graphics(), parametersOfEnemies[i].row, parametersOfEnemies[i].column, parametersOfEnemies[i].priorityScanDirections);
+            const enemy = new Enemy(this, parametersOfEnemies[i].row, parametersOfEnemies[i].column, parametersOfEnemies[i].priorityScanDirections);
             this.enemyList.push(enemy);
             enemy.draw();
         }
@@ -437,7 +437,7 @@ class TestScene extends Phaser.Scene {
             while (field[treasurePos.row][treasurePos.column] === 1) {
                 treasurePos = { row: Math.floor(Math.random() * H), column: Math.floor(Math.random() * W) };
             }
-            const treasure = new Treasure(this.add.graphics(), treasurePos.row, treasurePos.column);
+            const treasure = new Treasure(this, treasurePos.row, treasurePos.column);
             this.treasureList.push(treasure);
             treasure.draw();
         }
