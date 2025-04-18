@@ -219,6 +219,14 @@ class SingleRoundSupervision {
         return this.treasureList;
     }
 
+    setAllTreasuresStateAppearance() {
+        this.treasureList.forEach(t => t.setStateAppearance());
+    }
+
+    drawAllTreasures() {
+        this.treasureList.forEach(t => t.draw());
+    }
+
     areAllTreasuresCollected() {
         return this.treasureList.every(t => t.isCollected());
     }
@@ -275,6 +283,10 @@ class Treasure {
 
     position() {
         return {row: this.row, column: this.column};
+    }
+
+    setStateAppearance() {
+        this.state = Treasure.TREASURE_STATE.APPEARANCE;
     }
 
     setStateCollected() {
@@ -455,19 +467,24 @@ class TestScene extends Phaser.Scene {
         }
 
         // ラウンド進行監督
-        this.roundsSupervision = new RoundsSupervision(1);
-        const singleRoundSupervision = new SingleRoundSupervision();
-        for (let i = 0; i < numberOfTreasures; i++) {
-            let treasurePos = { row: Math.floor(Math.random() * H), column: Math.floor(Math.random() * W) };
-            // 壁が存在するところに宝を配置しないようにする
-            while (field[treasurePos.row][treasurePos.column] === 1) {
-                treasurePos = { row: Math.floor(Math.random() * H), column: Math.floor(Math.random() * W) };
+        this.roundsSupervision = new RoundsSupervision(2);
+        for(let i = 0; i < 2; i++) {
+            const singleRoundSupervision = new SingleRoundSupervision();
+            for (let j = 0; j < numberOfTreasures; j++) {
+                let treasurePos = { row: Math.floor(Math.random() * H), column: Math.floor(Math.random() * W) };
+                // 壁が存在するところに宝を配置しないようにする
+                while (field[treasurePos.row][treasurePos.column] === 1) {
+                    treasurePos = { row: Math.floor(Math.random() * H), column: Math.floor(Math.random() * W) };
+                }
+                const treasure = new Treasure(this, treasurePos.row, treasurePos.column);
+                singleRoundSupervision.addTreasure(treasure);
             }
-            const treasure = new Treasure(this, treasurePos.row, treasurePos.column);
-            singleRoundSupervision.addTreasure(treasure);
-            treasure.draw();
+
+            this.roundsSupervision.setRoundSupervision(i, singleRoundSupervision);
         }
-        this.roundsSupervision.setRoundSupervision(0, singleRoundSupervision);
+
+        this.roundsSupervision.getCurrentRoundSupervision().setAllTreasuresStateAppearance();
+        this.roundsSupervision.getCurrentRoundSupervision().drawAllTreasures();
     }
 
     update(_time: number, _delta: number) {
@@ -545,6 +562,8 @@ class TestScene extends Phaser.Scene {
 
         if(roundsSupervision.isCompletedCurrentRound()) {
             roundsSupervision.advanceRound();
+            roundsSupervision.getCurrentRoundSupervision().setAllTreasuresStateAppearance();
+            roundsSupervision.getCurrentRoundSupervision().drawAllTreasures();
         }
     }
 }
