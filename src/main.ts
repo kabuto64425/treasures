@@ -82,16 +82,26 @@ const parametersOfEnemies = [
 const numberOfTreasures = 10;
 
 class Player {
-    graphics: Phaser.GameObjects.Graphics;
-    row: number;
-    column: number;
-    chargeAmount: number;
+    private graphics: Phaser.GameObjects.Graphics;
+    private row: number;
+    private column: number;
+    private chargeAmount: number;
+    private aaaa: { aa: number; bb: number; };
 
     constructor(scene: Phaser.Scene, iniRow: number, iniColumn: number) {
         this.graphics = scene.add.graphics();
         this.row = iniRow;
         this.column = iniColumn;
         this.chargeAmount = 0;
+        this.aaaa = {aa: 0, bb: 2};
+    }
+
+    hoge() {
+        return this.aaaa;
+    }
+
+    position() {
+        return {row: this.row, column: this.column};
     }
 
     charge() {
@@ -145,11 +155,11 @@ class Player {
 }
 
 class Enemy {
-    graphics: Phaser.GameObjects.Graphics;
-    row: number;
-    column: number;
-    chargeAmount: number;
-    priorityScanDirections: DIRECTION[];
+    private graphics: Phaser.GameObjects.Graphics;
+    private row: number;
+    private column: number;
+    private chargeAmount: number;
+    private priorityScanDirections: DIRECTION[];
 
     constructor(scene: Phaser.Scene, iniRow: number, iniColumn: number, priorityScanDirections: DIRECTION[]) {
         this.graphics = scene.add.graphics();
@@ -157,6 +167,10 @@ class Enemy {
         this.column = iniColumn;
         this.chargeAmount = 0;
         this.priorityScanDirections = priorityScanDirections;
+    }
+
+    position() {
+        return {row: this.row, column: this.column};
     }
 
     charge() {
@@ -170,9 +184,9 @@ class Enemy {
         return false;
     }
 
-    decideMoveDirection(shortestDirectionMaps: Map<string, boolean>[][]) {
+    decideMoveDirection(fieldEvaluation: FieldEvalution) {
         for (const d of this.priorityScanDirections) {
-            if (shortestDirectionMaps[this.row][this.column].get(d.keyName)) {
+            if (fieldEvaluation.isShortestDirection(this.row, this.column, d)) {
                 return d;
             }
         }
@@ -198,16 +212,21 @@ class Enemy {
     }
 }
 
-class RoundData {
-    treasures: Treasure[];
+export class RoundData {
+    private treasureList: Treasure[];
 
-    constructor() {
-        this.treasures = 
+    constructor(treasureList : Treasure[]) {
+        this.treasureList = treasureList;
+    }
+
+    aaa() {
+        return this.treasureList;
     }
 }
 
 export class RoundFlow {
     private currentRound: number;
+
 
     constructor() {
         this.currentRound = 0;
@@ -219,10 +238,10 @@ export class RoundFlow {
 }
 
 class Treasure {
-    graphics: Phaser.GameObjects.Graphics;
-    row: number;
-    column: number;
-    state: number;
+    private graphics: Phaser.GameObjects.Graphics;
+    private row: number;
+    private column: number;
+    private state: number;
 
     static readonly TREASURE_STATE = {
         NON_APPEARANCE: 0,
@@ -235,6 +254,10 @@ class Treasure {
         this.row = iniRow;
         this.column = iniColumn;
         this.state = Treasure.TREASURE_STATE.NON_APPEARANCE;
+    }
+
+    position() {
+        return {row: this.row, column: this.column};
     }
 
     collected() {
@@ -263,8 +286,8 @@ class Treasure {
 }
 
 class FieldEvalution {
-    shortestDirectionMaps: Map<string, boolean>[][];
-    graphics: Phaser.GameObjects.Graphics;
+    private shortestDirectionMaps: Map<string, boolean>[][];
+    private graphics: Phaser.GameObjects.Graphics;
 
     constructor(scene: Phaser.Scene) {
         this.shortestDirectionMaps = [...Array(H)].map(() => [...Array(W)].map(() => this.generateDirectionFlagMap() as Map<string, boolean>));
@@ -272,15 +295,19 @@ class FieldEvalution {
         this.graphics.depth = 99;
     }
 
-    generateDirectionFlagMap() {
+    private generateDirectionFlagMap() {
         const pairs = DIRECTION.values().map(d => [d.keyName, false] as [string, boolean]);
         return new Map<string, boolean>(pairs);
     }
 
-    resetMapValues<K, V>(dir: Map<K, V>, value: V) {
+    private resetMapValues<K, V>(dir: Map<K, V>, value: V) {
         Array.from(dir.entries()).forEach(([key,]) => {
             dir.set(key, value);
         });
+    }
+
+    isShortestDirection(row: number, column: number, direction: DIRECTION) {
+        return this.shortestDirectionMaps[row][column].get(direction.keyName);
     }
 
     updateEvaluation(playerRow: number, playerColumn: number) {
@@ -341,11 +368,11 @@ class FieldEvalution {
 }
 
 class TestScene extends Phaser.Scene {
-    fieldGraphics: Phaser.GameObjects.Graphics | undefined;
-    player: Player | undefined;
-    fieldEvaluation: FieldEvalution | undefined;
-    enemyList: Enemy[] | undefined;
-    treasureList: Treasure[] | undefined;
+    private fieldGraphics: Phaser.GameObjects.Graphics | undefined;
+    private player: Player | undefined;
+    private fieldEvaluation: FieldEvalution | undefined;
+    private enemyList: Enemy[] | undefined;
+    private treasureList: Treasure[] | undefined;
 
     constructor() {
         super('testScene');
@@ -399,7 +426,7 @@ class TestScene extends Phaser.Scene {
 
         // フィールド評価
         this.fieldEvaluation = new FieldEvalution(this);
-        this.fieldEvaluation.updateEvaluation(this.player.row, this.player.column);
+        this.fieldEvaluation.updateEvaluation(this.player.position().row, this.player.position().column);
         this.fieldEvaluation.draw();
 
         // 敵
@@ -424,9 +451,9 @@ class TestScene extends Phaser.Scene {
         }
     }
 
-    update(_time: number, delta: number) {
+    update(_time: number, _delta: number) {
         console.log("update")
-        console.log(delta)
+        console.log(_delta)
 
         // キーボードの情報を取得
         const cursors = this.input.keyboard.createCursorKeys();
@@ -461,7 +488,7 @@ class TestScene extends Phaser.Scene {
         // フィールド評価
         // create内で確実に作成しているので、アサーションでもいけるはず
         const fieldEvaluation = this.fieldEvaluation!;
-        fieldEvaluation.updateEvaluation(player.row, player.column);
+        fieldEvaluation.updateEvaluation(player.position().row, player.position().column);
         fieldEvaluation.draw();
 
         // 敵
@@ -469,7 +496,7 @@ class TestScene extends Phaser.Scene {
         const enemyList = this.enemyList!;
         for (const enemy of enemyList) {
             if (enemy.isChargeCompleted()) {
-                let enemyDist = enemy.decideMoveDirection(fieldEvaluation.shortestDirectionMaps);
+                let enemyDist = enemy.decideMoveDirection(fieldEvaluation);
                 enemy.move(enemyDist);
             } else {
                 enemy.charge();
@@ -480,7 +507,7 @@ class TestScene extends Phaser.Scene {
         // 管理
         let isGameOver = false;
         for (const enemy of enemyList) {
-            if (player.row === enemy.row && player.column === enemy.column) {
+            if (player.position().row === enemy.position().row && player.position().column === enemy.position().column) {
                 isGameOver = true;
             }
         }
@@ -491,7 +518,7 @@ class TestScene extends Phaser.Scene {
         // create内で確実に作成しているので、アサーションでもいけるはず
         const treasureList = this.treasureList!;
         for (const treasure of treasureList) {
-            if(player.row === treasure.row && player.column === treasure.column) {
+            if(player.position().row === treasure.position().row && player.position().column === treasure.position().column) {
                 treasure.collected();
                 treasure.clearDisplay();
             }
