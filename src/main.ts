@@ -59,7 +59,7 @@ class DIRECTION {
             case DIRECTION.RIGHT: return DIRECTION.LEFT;
             case DIRECTION.UP: return DIRECTION.DOWN;
             case DIRECTION.DOWN: return DIRECTION.UP;
-            // 念のため
+            // ビルドエラー防止のため
             default: return DIRECTION.RIGHT;
         }
     }
@@ -86,18 +86,12 @@ class Player {
     private row: number;
     private column: number;
     private chargeAmount: number;
-    private aaaa: { aa: number; bb: number; };
 
     constructor(scene: Phaser.Scene, iniRow: number, iniColumn: number) {
         this.graphics = scene.add.graphics();
         this.row = iniRow;
         this.column = iniColumn;
         this.chargeAmount = 0;
-        this.aaaa = {aa: 0, bb: 2};
-    }
-
-    hoge() {
-        return this.aaaa;
     }
 
     position() {
