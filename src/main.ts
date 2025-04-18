@@ -218,6 +218,10 @@ class SingleRoundSupervision {
     getTreasureList() {
         return this.treasureList;
     }
+
+    areAllTreasuresCollected() {
+        return this.treasureList.every(t => t.isCollected());
+    }
 }
 
 export class RoundsSupervision {
@@ -229,8 +233,16 @@ export class RoundsSupervision {
         this.singleRoundSupervisionList = new Array(numberOfRound);
     }
 
-    round() {
+    getCurrentRound() {
         return this.currentRound;
+    }
+
+    isCompletedCurrentRound() {
+        return this.getCurrentRoundSupervision().areAllTreasuresCollected();
+    }
+
+    advanceRound() {
+        this.currentRound++;
     }
 
     getCurrentRoundSupervision() {
@@ -265,7 +277,7 @@ class Treasure {
         return {row: this.row, column: this.column};
     }
 
-    collected() {
+    setStateCollected() {
         this.state = Treasure.TREASURE_STATE.COLLECTED;
     }
 
@@ -526,9 +538,13 @@ class TestScene extends Phaser.Scene {
         const roundsSupervision = this.roundsSupervision!;
         for (const treasure of roundsSupervision.getCurrentRoundSupervision().getTreasureList()) {
             if(player.position().row === treasure.position().row && player.position().column === treasure.position().column) {
-                treasure.collected();
+                treasure.setStateCollected();
                 treasure.clearDisplay();
             }
+        }
+
+        if(roundsSupervision.isCompletedCurrentRound()) {
+            roundsSupervision.advanceRound();
         }
     }
 }
