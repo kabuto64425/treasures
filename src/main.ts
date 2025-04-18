@@ -408,7 +408,23 @@ class FieldEvalution {
     }
 }
 
+class TestSceneSupervision {
+    private scene: TestScene;
+    
+    constructor(scene : TestScene) {
+        this.scene = scene;
+    }
+
+    hoge() {
+        return this.scene;   
+    }
+
+    updatePerFrame() {
+    }
+}
+
 class TestScene extends Phaser.Scene {
+    private testSceneSupervision: TestSceneSupervision | undefined;
     private fieldGraphics: Phaser.GameObjects.Graphics | undefined;
     private player: Player | undefined;
     private fieldEvaluation: FieldEvalution | undefined;
@@ -425,6 +441,7 @@ class TestScene extends Phaser.Scene {
 
     create() {
         console.log("create!!");
+        this.testSceneSupervision = new TestSceneSupervision(this);
 
         /*let enemies = [...Array(numberOfEnemyies)].map((n, i) => {
             return {
@@ -502,6 +519,8 @@ class TestScene extends Phaser.Scene {
     update(_time: number, _delta: number) {
         console.log("update")
         //console.log(_delta)
+        // create内で確実に作成しているので、アサーションでもいけるはず
+        this.testSceneSupervision!.updatePerFrame();
 
         // キーボードの情報を取得
         const cursors = this.input.keyboard.createCursorKeys();
