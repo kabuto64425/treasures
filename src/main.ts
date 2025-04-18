@@ -95,7 +95,7 @@ class Player {
     }
 
     position() {
-        return {row: this.row, column: this.column};
+        return { row: this.row, column: this.column };
     }
 
     charge() {
@@ -162,7 +162,7 @@ class Enemy {
     }
 
     position() {
-        return {row: this.row, column: this.column};
+        return { row: this.row, column: this.column };
     }
 
     charge() {
@@ -211,7 +211,7 @@ class TreasuresSupervision {
         this.treasureList = [];
     }
 
-    addTreasure(treasure : Treasure) {
+    addTreasure(treasure: Treasure) {
         this.treasureList.push(treasure);
     }
 
@@ -294,7 +294,7 @@ class Treasure {
     }
 
     position() {
-        return {row: this.row, column: this.column};
+        return { row: this.row, column: this.column };
     }
 
     setStateAppearance() {
@@ -410,13 +410,13 @@ class FieldEvalution {
 
 class TestSceneSupervision {
     private scene: TestScene;
-    
-    constructor(scene : TestScene) {
+
+    constructor(scene: TestScene) {
         this.scene = scene;
     }
 
     hoge() {
-        return this.scene;   
+        return this.scene;
     }
 
     updatePerFrame() {
@@ -497,7 +497,7 @@ class TestScene extends Phaser.Scene {
 
         // ラウンド進行監督
         this.roundsSupervision = new RoundsSupervision(2);
-        for(let i = 0; i < 2; i++) {
+        for (let i = 0; i < 2; i++) {
             const singleRoundSupervision = new SingleRoundSupervision();
             for (let j = 0; j < numberOfTreasures; j++) {
                 let treasurePos = { row: Math.floor(Math.random() * H), column: Math.floor(Math.random() * W) };
@@ -585,13 +585,13 @@ class TestScene extends Phaser.Scene {
         // create内で確実に作成しているので、アサーションでもいけるはず
         const roundsSupervision = this.roundsSupervision!;
         for (const treasure of roundsSupervision.getCurrentRoundSupervision().getTreasuresSupervision().getTreasureList()) {
-            if(player.position().row === treasure.position().row && player.position().column === treasure.position().column) {
+            if (player.position().row === treasure.position().row && player.position().column === treasure.position().column) {
                 treasure.setStateCollected();
                 treasure.clearDisplay();
             }
         }
 
-        if(roundsSupervision.isCompletedCurrentRound()) {
+        if (roundsSupervision.isCompletedCurrentRound()) {
             roundsSupervision.advanceRound();
             roundsSupervision.getCurrentRoundSupervision().getTreasuresSupervision().setAllTreasuresStateAppearance();
             roundsSupervision.getCurrentRoundSupervision().getTreasuresSupervision().drawAllTreasures();
