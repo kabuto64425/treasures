@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
 
-const D_WIDTH = 630;
+const D_WIDTH = 1000;
 const D_HEIGHT = 630;
 
 const GRID_SIZE = 21;
@@ -89,7 +89,7 @@ class Player {
     private column: number;
     private chargeAmount: number;
 
-    constructor(scene: TestScene, iniRow: number, iniColumn: number) {
+    constructor(scene: GameScene, iniRow: number, iniColumn: number) {
         this.graphics = scene.add.graphics();
         this.row = iniRow;
         this.column = iniColumn;
@@ -155,7 +155,7 @@ class Enemy {
     private chargeAmount: number;
     private priorityScanDirections: DIRECTION[];
 
-    constructor(scene: TestScene, iniRow: number, iniColumn: number, priorityScanDirections: DIRECTION[]) {
+    constructor(scene: GameScene, iniRow: number, iniColumn: number, priorityScanDirections: DIRECTION[]) {
         this.graphics = scene.add.graphics();
         this.row = iniRow;
         this.column = iniColumn;
@@ -295,7 +295,7 @@ class Treasure {
         COLLECTED: 2,
     };
 
-    constructor(scene: TestScene, color: number, iniRow: number, iniColumn: number) {
+    constructor(scene: GameScene, color: number, iniRow: number, iniColumn: number) {
         this.graphics = scene.add.graphics();
         this.color = color;
         this.row = iniRow;
@@ -340,7 +340,7 @@ class FieldEvalution {
     private shortestDirectionMaps: Map<string, boolean>[][];
     private graphics: Phaser.GameObjects.Graphics;
 
-    constructor(scene: TestScene) {
+    constructor(scene: GameScene) {
         this.shortestDirectionMaps = [...Array(H)].map(() => [...Array(W)].map(() => this.generateDirectionFlagMap() as Map<string, boolean>));
         this.graphics = scene.add.graphics();
         this.graphics.depth = 99;
@@ -418,61 +418,73 @@ class FieldEvalution {
     }
 }
 
-class TestSceneSupervision {
-    private scene: TestScene;
+class GameSceneGeneralSupervision {
+    private scene: GameScene;
+    private player: Player;
+    private fieldEvaluation: FieldEvalution;
+    private enemyList: Enemy[];
+    private roundsSupervision: RoundsSupervision;
+    private gameState: number;
 
-    constructor(scene: TestScene) {
+    private startTime: number | undefined;
+    private timeText: Phaser.GameObjects.Text | undefined;
+
+    static readonly GAME_STATE = {
+        INITIALIZED: -1,
+        PLAYING: 0,
+        GAME_CLEAR: 1,
+        GAME_OVER: 2,
+    };
+
+    constructor(scene: GameScene) {
         this.scene = scene;
+
+        this.gameState = GameSceneGeneralSupervision.GAME_STATE.INITIALIZED;
+
+        // プレイヤー
+        this.player = new Player(this.scene, parameterPlayer.row, parameterPlayer.column);
+
+        //フィールド評価
+        this.fieldEvaluation = new FieldEvalution(this.scene);
+
+        // 敵
+        this.enemyList = [];
+        for (let i = 0; i < numberOfEnemyies; i++) {
+            const enemy = new Enemy(this.scene, parametersOfEnemies[i].row, parametersOfEnemies[i].column, parametersOfEnemies[i].priorityScanDirections);
+            this.enemyList.push(enemy);
+        }
+
+        // ラウンド進行監督
+        this.roundsSupervision = new RoundsSupervision(2);
     }
 
-    hoge() {
-        return this.scene;
-    }
+    startSupervision() {
+        this.gameState = GameSceneGeneralSupervision.GAME_STATE.PLAYING;
+        this.startTime = this.scene.time.now;
 
-    updatePerFrame() {
-    }
-}
+        // 経過時間表示用テキスト
+        this.timeText = this.scene.add.text(700, 50, '0:00.000', {
+            fontSize: '24px',
+            color: '#000000'
+        });
+        const elapsed = (this.startTime - this.startTime);
+        const minutes = Math.floor(elapsed / 60000);
+        const seconds = Math.floor((elapsed % 60000) / 1000);
+        const milliseconds = Math.floor(elapsed % 1000);
 
-class TestScene extends Phaser.Scene {
-    private testSceneSupervision: TestSceneSupervision | undefined;
-    private fieldGraphics: Phaser.GameObjects.Graphics | undefined;
-    private player: Player | undefined;
-    private fieldEvaluation: FieldEvalution | undefined;
-    private enemyList: Enemy[] | undefined;
-    private roundsSupervision: RoundsSupervision | undefined;
+        // 2桁・3桁表示にフォーマット
+        const formatted = `${minutes.toString()}:${seconds.toString()}.${milliseconds.toString()}`;
 
-    constructor() {
-        super('testScene');
-    }
-
-    preload() {
-        console.log("preload!!");
-    }
-
-    create() {
-        console.log("create!!");
-        this.testSceneSupervision = new TestSceneSupervision(this);
-
-        /*let enemies = [...Array(numberOfEnemyies)].map((n, i) => {
-            return {
-                mode: 0, // 0:通常モード 1:猛進モード
-                preDirect: -1,
-                continueCount: 0, // 通常モードのときに同一方向に連続して何回進んだかをカウント
-                differentCount: 0, // 猛進モードのときに進行方向と最短方向が異なる状態が何回連続で続いているかをカウント
-
-                row: parametersOfEnemies[i].row,
-                column: parametersOfEnemies[i].column
-            }
-        });*/
+        this.timeText.setText(`${formatted}`);
 
         // フィールド描画
-        this.fieldGraphics = this.add.graphics({
+        const fieldGraphics = this.scene.add.graphics({
             lineStyle: { width: 1, color: 0x000000, alpha: 1 },
             fillStyle: { color: 0xffffff, alpha: 1 }
         });
         for (let i = 0; i < H; i++) {
             for (let j = 0; j < W; j++) {
-                this.fieldGraphics.strokeRect(j * GRID_SIZE, i * GRID_SIZE, GRID_SIZE, GRID_SIZE);
+                fieldGraphics.strokeRect(j * GRID_SIZE, i * GRID_SIZE, GRID_SIZE, GRID_SIZE);
             }
         }
 
@@ -480,7 +492,7 @@ class TestScene extends Phaser.Scene {
         for (let i = 0; i < H; i++) {
             for (let j = 0; j < W; j++) {
                 if (field[i][j] === 1) {
-                    this.add.graphics({
+                    this.scene.add.graphics({
                         lineStyle: { width: 1, color: 0x000000, alpha: 1 },
                         fillStyle: { color: 0x000000, alpha: 1 }
                     }).fillRect(j * GRID_SIZE, i * GRID_SIZE, GRID_SIZE, GRID_SIZE);
@@ -488,20 +500,15 @@ class TestScene extends Phaser.Scene {
             }
         }
 
-        // プレイヤー
-        this.player = new Player(this, parameterPlayer.row, parameterPlayer.column);
+        // プレイヤー描画
         this.player.draw();
 
         // フィールド評価
-        this.fieldEvaluation = new FieldEvalution(this);
         this.fieldEvaluation.updateEvaluation(this.player.position().row, this.player.position().column);
         this.fieldEvaluation.draw();
 
-        // 敵
-        this.enemyList = [];
-        for (let i = 0; i < numberOfEnemyies; i++) {
-            const enemy = new Enemy(this, parametersOfEnemies[i].row, parametersOfEnemies[i].column, parametersOfEnemies[i].priorityScanDirections);
-            this.enemyList.push(enemy);
+        // 敵描画
+        for (const enemy of this.enemyList) {
             enemy.draw();
         }
 
@@ -515,7 +522,7 @@ class TestScene extends Phaser.Scene {
                 while (field[treasurePos.row][treasurePos.column] === 1) {
                     treasurePos = { row: Math.floor(Math.random() * H), column: Math.floor(Math.random() * W) };
                 }
-                const treasure = new Treasure(this, 0xffff00, treasurePos.row, treasurePos.column);
+                const treasure = new Treasure(this.scene, 0xffff00, treasurePos.row, treasurePos.column);
                 singleRoundSupervision.getTreasuresSupervision().addTreasure(treasure);
             }
 
@@ -525,24 +532,31 @@ class TestScene extends Phaser.Scene {
         const singleRoundSupervision = new SingleRoundSupervision();
         for (let j = 0; j < numberOfTreasures; j++) {
             let treasurePos = { row: 0, column: 0 };
-            const treasure = new Treasure(this, 0xffa500, treasurePos.row, treasurePos.column);
+            const treasure = new Treasure(this.scene, 0xffa500, treasurePos.row, treasurePos.column);
             singleRoundSupervision.getTreasuresSupervision().addTreasure(treasure);
         }
 
         this.roundsSupervision.setRoundSupervision(numberOfRounds - 1, singleRoundSupervision);
 
         this.roundsSupervision.getCurrentRoundSupervision().getTreasuresSupervision().setAllTreasuresStateAppearance();
+        // 最初のラウンドの宝描画
         this.roundsSupervision.getCurrentRoundSupervision().getTreasuresSupervision().drawAllTreasures();
     }
 
-    update(_time: number, _delta: number) {
-        console.log("update")
-        //console.log(_delta)
+    updatePerFrame(cursors: Phaser.Types.Input.Keyboard.CursorKeys) {
         // create内で確実に作成しているので、アサーションでもいけるはず
-        this.testSceneSupervision!.updatePerFrame();
+        const startTime = this.startTime!;
+        const elapsed = (this.scene.time.now - startTime);
 
+        const minutes = Math.floor(elapsed / 60000);
+        const seconds = Math.floor((elapsed % 60000) / 1000);
+        const milliseconds = Math.floor(elapsed % 1000);
+
+        const formatted = `${minutes.toString()}:${seconds.toString().padStart(2, "0")}.${milliseconds.toString().padStart(3, "0")}`;
+        // create内で確実に作成しているので、アサーションでもいけるはず
+        this.timeText!.setText(`${formatted}`);
+        
         // キーボードの情報を取得
-        const cursors = this.input.keyboard.createCursorKeys();
         let input_dist = null;
         if (cursors.left.isDown) {
             console.log("Left!!");
@@ -559,28 +573,25 @@ class TestScene extends Phaser.Scene {
         }
 
         // プレイヤー
-        // create内で確実に作成しているので、アサーションでもいけるはず
-        const player = this.player!;
-        if (player.isChargeCompleted()) {
-            if (input_dist !== null && player.canMove(input_dist)) {
-                player.move(input_dist);
+        if (this.player.isChargeCompleted()) {
+            if (input_dist !== null && this.player.canMove(input_dist)) {
+                this.player.move(input_dist);
             }
         } else {
-            player.charge();
+            this.player.charge();
         }
 
-        player.draw();
+        this.player.draw();
 
         // フィールド評価
         // create内で確実に作成しているので、アサーションでもいけるはず
         const fieldEvaluation = this.fieldEvaluation!;
-        fieldEvaluation.updateEvaluation(player.position().row, player.position().column);
+        fieldEvaluation.updateEvaluation(this.player.position().row, this.player.position().column);
         fieldEvaluation.draw();
 
         // 敵
         // create内で確実に作成しているので、アサーションでもいけるはず
-        const enemyList = this.enemyList!;
-        for (const enemy of enemyList) {
+        for (const enemy of this.enemyList) {
             if (enemy.isChargeCompleted()) {
                 let enemyDist = enemy.decideMoveDirection(fieldEvaluation);
                 enemy.move(enemyDist);
@@ -590,32 +601,70 @@ class TestScene extends Phaser.Scene {
             enemy.draw();
         }
 
-        // 管理
-        let isGameOver = false;
-        for (const enemy of enemyList) {
-            if (player.position().row === enemy.position().row && player.position().column === enemy.position().column) {
-                isGameOver = true;
+        // 敵との接触判定・ゲームオーバー更新
+        for (const enemy of this.enemyList) {
+            if (this.player.position().row === enemy.position().row && this.player.position().column === enemy.position().column) {
+                this.gameState = GameSceneGeneralSupervision.GAME_STATE.GAME_OVER;
             }
         }
-        if (isGameOver) {
-            //this.scene.pause();
-        }
 
-        // create内で確実に作成しているので、アサーションでもいけるはず
-        const roundsSupervision = this.roundsSupervision!;
-        for (const treasure of roundsSupervision.getCurrentRoundSupervision().getTreasuresSupervision().getTreasureList()) {
-            if (player.position().row === treasure.position().row && player.position().column === treasure.position().column) {
+        // 現在の宝との回収判定・回収
+        for (const treasure of this.roundsSupervision.getCurrentRoundSupervision().getTreasuresSupervision().getTreasureList()) {
+            if (this.player.position().row === treasure.position().row && this.player.position().column === treasure.position().column) {
                 treasure.setStateCollected();
                 treasure.clearDisplay();
             }
         }
 
-        if (roundsSupervision.isCompletedCurrentRound()) {
-            if (!roundsSupervision.isFinalRound()) {
-                roundsSupervision.advanceRound();
-                roundsSupervision.getCurrentRoundSupervision().getTreasuresSupervision().setAllTreasuresStateAppearance();
-                roundsSupervision.getCurrentRoundSupervision().getTreasuresSupervision().drawAllTreasures();
+        // 次ラウンド進行判断・次ラウンド進行
+        if (this.roundsSupervision.isCompletedCurrentRound()) {
+            if (!this.roundsSupervision.isFinalRound()) {
+                this.roundsSupervision.advanceRound();
+                this.roundsSupervision.getCurrentRoundSupervision().getTreasuresSupervision().setAllTreasuresStateAppearance();
+                this.roundsSupervision.getCurrentRoundSupervision().getTreasuresSupervision().drawAllTreasures();
             }
+        }
+    }
+
+    isGameOver() {
+        return this.gameState === GameSceneGeneralSupervision.GAME_STATE.GAME_OVER;
+    }
+
+    isGameClear() {
+        return this.gameState === GameSceneGeneralSupervision.GAME_STATE.GAME_CLEAR;
+    }
+}
+
+class GameScene extends Phaser.Scene {
+    private gameSceneGeneralSupervision: GameSceneGeneralSupervision | undefined;
+
+    private cursors: Phaser.Types.Input.Keyboard.CursorKeys | undefined;
+
+    constructor() {
+        super('gameScene');
+    }
+
+    preload() {
+        console.log("preload!!");
+    }
+
+    create() {
+        console.log("create!!");
+
+        this.cursors = this.input.keyboard.createCursorKeys();
+        this.gameSceneGeneralSupervision = new GameSceneGeneralSupervision(this);
+        this.gameSceneGeneralSupervision.startSupervision();
+    }
+
+    update(_time: number, _delta: number) {
+        console.log("update")
+        console.log(_delta)
+        // create内で確実に作成しているので、アサーションでもいけるはず
+        const gameSceneGeneralSupervision = this.gameSceneGeneralSupervision!;
+        gameSceneGeneralSupervision.updatePerFrame(this.cursors!);
+
+        if(gameSceneGeneralSupervision.isGameOver()) {
+            //this.scene.pause();
         }
     }
 }
@@ -627,7 +676,7 @@ const config: Phaser.Types.Core.GameConfig = {
     height: D_HEIGHT,// ゲーム画面の高さ
     backgroundColor: '#FFFFFF', // 背景色を設定
     antialias: false,
-    scene: TestScene,
+    scene: GameScene,
     fps: {
         target: 60,// フレームレート
         forceSetTimeOut: false
