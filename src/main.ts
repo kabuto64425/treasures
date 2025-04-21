@@ -79,9 +79,9 @@ const parametersOfEnemies = [
     { row: 29, column: 29, priorityScanDirections: [DIRECTION.UP, DIRECTION.RIGHT, DIRECTION.DOWN, DIRECTION.LEFT] }
 ];
 
-const numberOfTreasures = 10;
+const numberOfTreasures = 5;
 
-const numberOfRounds = 6;
+const numberOfRounds = 7;
 
 class Player {
     private graphics: Phaser.GameObjects.Graphics;
@@ -268,7 +268,7 @@ export class RoundsSupervision {
     }
 
     advanceRound() {
-        if(!this.isFinalRound()) {
+        if (!this.isFinalRound()) {
             this.currentRound++;
         }
     }
@@ -284,6 +284,7 @@ export class RoundsSupervision {
 
 class Treasure {
     private graphics: Phaser.GameObjects.Graphics;
+    private color: number;
     private row: number;
     private column: number;
     private state: number;
@@ -294,8 +295,9 @@ class Treasure {
         COLLECTED: 2,
     };
 
-    constructor(scene: TestScene, iniRow: number, iniColumn: number) {
+    constructor(scene: TestScene, color: number, iniRow: number, iniColumn: number) {
         this.graphics = scene.add.graphics();
+        this.color = color;
         this.row = iniRow;
         this.column = iniColumn;
         this.state = Treasure.TREASURE_STATE.NON_APPEARANCE;
@@ -324,8 +326,8 @@ class Treasure {
 
     draw() {
         this.graphics.clear();
-        this.graphics.lineStyle(0, 0xffff00);
-        this.graphics.fillStyle(0xffff00);
+        this.graphics.lineStyle(0, this.color);
+        this.graphics.fillStyle(this.color);
         this.graphics.fillRect(this.column * GRID_SIZE, this.row * GRID_SIZE, GRID_SIZE, GRID_SIZE);
     }
 
@@ -505,7 +507,7 @@ class TestScene extends Phaser.Scene {
 
         // ラウンド進行監督
         this.roundsSupervision = new RoundsSupervision(numberOfRounds);
-        for (let i = 0; i < numberOfRounds; i++) {
+        for (let i = 0; i < numberOfRounds - 1; i++) {
             const singleRoundSupervision = new SingleRoundSupervision();
             for (let j = 0; j < numberOfTreasures; j++) {
                 let treasurePos = { row: Math.floor(Math.random() * H), column: Math.floor(Math.random() * W) };
@@ -513,12 +515,21 @@ class TestScene extends Phaser.Scene {
                 while (field[treasurePos.row][treasurePos.column] === 1) {
                     treasurePos = { row: Math.floor(Math.random() * H), column: Math.floor(Math.random() * W) };
                 }
-                const treasure = new Treasure(this, treasurePos.row, treasurePos.column);
+                const treasure = new Treasure(this, 0xffff00, treasurePos.row, treasurePos.column);
                 singleRoundSupervision.getTreasuresSupervision().addTreasure(treasure);
             }
 
             this.roundsSupervision.setRoundSupervision(i, singleRoundSupervision);
         }
+
+        const singleRoundSupervision = new SingleRoundSupervision();
+        for (let j = 0; j < numberOfTreasures; j++) {
+            let treasurePos = { row: 0, column: 0 };
+            const treasure = new Treasure(this, 0xffa500, treasurePos.row, treasurePos.column);
+            singleRoundSupervision.getTreasuresSupervision().addTreasure(treasure);
+        }
+
+        this.roundsSupervision.setRoundSupervision(numberOfRounds - 1, singleRoundSupervision);
 
         this.roundsSupervision.getCurrentRoundSupervision().getTreasuresSupervision().setAllTreasuresStateAppearance();
         this.roundsSupervision.getCurrentRoundSupervision().getTreasuresSupervision().drawAllTreasures();
@@ -600,7 +611,7 @@ class TestScene extends Phaser.Scene {
         }
 
         if (roundsSupervision.isCompletedCurrentRound()) {
-            if(!roundsSupervision.isFinalRound()) {
+            if (!roundsSupervision.isFinalRound()) {
                 roundsSupervision.advanceRound();
                 roundsSupervision.getCurrentRoundSupervision().getTreasuresSupervision().setAllTreasuresStateAppearance();
                 roundsSupervision.getCurrentRoundSupervision().getTreasuresSupervision().drawAllTreasures();
