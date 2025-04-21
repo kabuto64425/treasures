@@ -81,6 +81,8 @@ const parametersOfEnemies = [
 
 const numberOfTreasures = 10;
 
+const numberOfRounds = 6;
+
 class Player {
     private graphics: Phaser.GameObjects.Graphics;
     private row: number;
@@ -257,12 +259,18 @@ export class RoundsSupervision {
         return this.currentRound;
     }
 
+    isFinalRound() {
+        return this.currentRound === (numberOfRounds - 1);
+    }
+
     isCompletedCurrentRound() {
         return this.getCurrentRoundSupervision().getTreasuresSupervision().areAllTreasuresCollected();
     }
 
     advanceRound() {
-        this.currentRound++;
+        if(!this.isFinalRound()) {
+            this.currentRound++;
+        }
     }
 
     getCurrentRoundSupervision() {
@@ -496,8 +504,8 @@ class TestScene extends Phaser.Scene {
         }
 
         // ラウンド進行監督
-        this.roundsSupervision = new RoundsSupervision(2);
-        for (let i = 0; i < 2; i++) {
+        this.roundsSupervision = new RoundsSupervision(numberOfRounds);
+        for (let i = 0; i < numberOfRounds; i++) {
             const singleRoundSupervision = new SingleRoundSupervision();
             for (let j = 0; j < numberOfTreasures; j++) {
                 let treasurePos = { row: Math.floor(Math.random() * H), column: Math.floor(Math.random() * W) };
@@ -592,9 +600,11 @@ class TestScene extends Phaser.Scene {
         }
 
         if (roundsSupervision.isCompletedCurrentRound()) {
-            roundsSupervision.advanceRound();
-            roundsSupervision.getCurrentRoundSupervision().getTreasuresSupervision().setAllTreasuresStateAppearance();
-            roundsSupervision.getCurrentRoundSupervision().getTreasuresSupervision().drawAllTreasures();
+            if(!roundsSupervision.isFinalRound()) {
+                roundsSupervision.advanceRound();
+                roundsSupervision.getCurrentRoundSupervision().getTreasuresSupervision().setAllTreasuresStateAppearance();
+                roundsSupervision.getCurrentRoundSupervision().getTreasuresSupervision().drawAllTreasures();
+            }
         }
     }
 }
