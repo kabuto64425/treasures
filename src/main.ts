@@ -670,6 +670,12 @@ class GameScene extends Phaser.Scene {
         this.gameSceneGeneralSupervision.startSupervision();
     }
 
+    // デバッグ用
+    busyWait(ms: number) {
+        const start = performance.now();
+        while (performance.now() - start < ms) {}
+    }
+
     update(_time: number, _delta: number) {
         console.log("update")
         console.log(_delta)
