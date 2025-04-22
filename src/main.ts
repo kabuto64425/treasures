@@ -423,10 +423,11 @@ class GameSceneGeneralSupervision {
     private player: Player;
     private fieldEvaluation: FieldEvalution;
     private enemyList: Enemy[];
-    private roundsSupervision: RoundsSupervision;
+    private roundsSupervision: RoundsSupervision | undefined;
     private gameState: number;
 
     private startTime: number | undefined;
+    private currentTime: number | undefined;
     private timeText: Phaser.GameObjects.Text | undefined;
 
     static readonly GAME_STATE = {
@@ -453,29 +454,47 @@ class GameSceneGeneralSupervision {
             const enemy = new Enemy(this.scene, parametersOfEnemies[i].row, parametersOfEnemies[i].column, parametersOfEnemies[i].priorityScanDirections);
             this.enemyList.push(enemy);
         }
-
-        // ラウンド進行監督
-        this.roundsSupervision = new RoundsSupervision(2);
     }
 
-    startSupervision() {
-        this.gameState = GameSceneGeneralSupervision.GAME_STATE.PLAYING;
+    initTime() {
         this.startTime = this.scene.time.now;
+        this.currentTime = this.startTime;
+    }
 
-        // 経過時間表示用テキスト
+    initTimeText() {
         this.timeText = this.scene.add.text(700, 50, '0:00.000', {
             fontSize: '24px',
             color: '#000000'
         });
-        const elapsed = (this.startTime - this.startTime);
+    }
+
+    updateTimeText() {
+        this.timeText!.setText(`${this.createFormattedTime()}`);
+    }
+
+    updateCurrentTime() {
+        this.currentTime = this.scene.time.now;
+    }
+
+    calculateElapsedTime() {
+        const curretTime = this.currentTime!;
+        const startTime = this.startTime!;
+        return curretTime - startTime;
+    }
+
+    createFormattedTime() {
+        const elapsed = this.calculateElapsedTime();
         const minutes = Math.floor(elapsed / 60000);
         const seconds = Math.floor((elapsed % 60000) / 1000);
         const milliseconds = Math.floor(elapsed % 1000);
 
-        // 2桁・3桁表示にフォーマット
-        const formatted = `${minutes.toString()}:${seconds.toString()}.${milliseconds.toString()}`;
+        return `${minutes.toString()}:${seconds.toString().padStart(2, "0")}.${milliseconds.toString().padStart(3, "0")}`;
+    }
 
-        this.timeText.setText(`${formatted}`);
+    startSupervision() {
+        this.gameState = GameSceneGeneralSupervision.GAME_STATE.PLAYING;
+        this.initTime();
+        this.initTimeText();
 
         // フィールド描画
         const fieldGraphics = this.scene.add.graphics({
@@ -544,18 +563,9 @@ class GameSceneGeneralSupervision {
     }
 
     updatePerFrame(cursors: Phaser.Types.Input.Keyboard.CursorKeys) {
-        // create内で確実に作成しているので、アサーションでもいけるはず
-        const startTime = this.startTime!;
-        const elapsed = (this.scene.time.now - startTime);
+        this.updateCurrentTime();
+        this.updateTimeText();
 
-        const minutes = Math.floor(elapsed / 60000);
-        const seconds = Math.floor((elapsed % 60000) / 1000);
-        const milliseconds = Math.floor(elapsed % 1000);
-
-        const formatted = `${minutes.toString()}:${seconds.toString().padStart(2, "0")}.${milliseconds.toString().padStart(3, "0")}`;
-        // create内で確実に作成しているので、アサーションでもいけるはず
-        this.timeText!.setText(`${formatted}`);
-        
         // キーボードの情報を取得
         let input_dist = null;
         if (cursors.left.isDown) {
@@ -605,11 +615,13 @@ class GameSceneGeneralSupervision {
         for (const enemy of this.enemyList) {
             if (this.player.position().row === enemy.position().row && this.player.position().column === enemy.position().column) {
                 this.gameState = GameSceneGeneralSupervision.GAME_STATE.GAME_OVER;
+                return;
             }
         }
 
         // 現在の宝との回収判定・回収
-        for (const treasure of this.roundsSupervision.getCurrentRoundSupervision().getTreasuresSupervision().getTreasureList()) {
+        const roundsSupervision = this.roundsSupervision!;
+        for (const treasure of roundsSupervision.getCurrentRoundSupervision().getTreasuresSupervision().getTreasureList()) {
             if (this.player.position().row === treasure.position().row && this.player.position().column === treasure.position().column) {
                 treasure.setStateCollected();
                 treasure.clearDisplay();
@@ -617,12 +629,14 @@ class GameSceneGeneralSupervision {
         }
 
         // 次ラウンド進行判断・次ラウンド進行
-        if (this.roundsSupervision.isCompletedCurrentRound()) {
-            if (!this.roundsSupervision.isFinalRound()) {
-                this.roundsSupervision.advanceRound();
-                this.roundsSupervision.getCurrentRoundSupervision().getTreasuresSupervision().setAllTreasuresStateAppearance();
-                this.roundsSupervision.getCurrentRoundSupervision().getTreasuresSupervision().drawAllTreasures();
+        if (roundsSupervision.isCompletedCurrentRound()) {
+            if (roundsSupervision.isFinalRound()) {
+                this.gameState = GameSceneGeneralSupervision.GAME_STATE.GAME_CLEAR;
+                return;
             }
+            roundsSupervision.advanceRound();
+            roundsSupervision.getCurrentRoundSupervision().getTreasuresSupervision().setAllTreasuresStateAppearance();
+            roundsSupervision.getCurrentRoundSupervision().getTreasuresSupervision().drawAllTreasures();
         }
     }
 
@@ -663,7 +677,7 @@ class GameScene extends Phaser.Scene {
         const gameSceneGeneralSupervision = this.gameSceneGeneralSupervision!;
         gameSceneGeneralSupervision.updatePerFrame(this.cursors!);
 
-        if(gameSceneGeneralSupervision.isGameOver()) {
+        if (gameSceneGeneralSupervision.isGameOver()) {
             //this.scene.pause();
         }
     }
