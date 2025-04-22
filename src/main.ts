@@ -8,6 +8,12 @@ const GRID_SIZE = 21;
 const H = 30;
 const W = 30;
 
+/*
+requestAnimationFameを使用しているので、60しか設定できないと思っていて良い。
+ディスプレイのフレッシュレートに依存しているみたいで、多くのフレッシュレートが60のため60固定
+*/
+const FPS = 60;
+
 const field = [
     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
@@ -426,8 +432,7 @@ class GameSceneGeneralSupervision {
     private roundsSupervision: RoundsSupervision | undefined;
     private gameState: number;
 
-    private startTime: number | undefined;
-    private currentTime: number | undefined;
+    private elapsedFrame: number;
     private timeText: Phaser.GameObjects.Text | undefined;
 
     static readonly GAME_STATE = {
@@ -438,6 +443,7 @@ class GameSceneGeneralSupervision {
     };
 
     constructor(scene: GameScene) {
+        this.elapsedFrame = 0;
         this.scene = scene;
 
         this.gameState = GameSceneGeneralSupervision.GAME_STATE.INITIALIZED;
@@ -456,11 +462,6 @@ class GameSceneGeneralSupervision {
         }
     }
 
-    initTime() {
-        this.startTime = this.scene.time.now;
-        this.currentTime = this.startTime;
-    }
-
     initTimeText() {
         this.timeText = this.scene.add.text(700, 50, '0:00.000', {
             fontSize: '24px',
@@ -472,14 +473,12 @@ class GameSceneGeneralSupervision {
         this.timeText!.setText(`${this.createFormattedTime()}`);
     }
 
-    updateCurrentTime() {
-        this.currentTime = this.scene.time.now;
+    updateElapsedFrame() {
+        this.elapsedFrame++;
     }
 
     calculateElapsedTime() {
-        const curretTime = this.currentTime!;
-        const startTime = this.startTime!;
-        return curretTime - startTime;
+        return Math.floor((this.elapsedFrame * 1000) / 60);
     }
 
     createFormattedTime() {
@@ -493,7 +492,6 @@ class GameSceneGeneralSupervision {
 
     startSupervision() {
         this.gameState = GameSceneGeneralSupervision.GAME_STATE.PLAYING;
-        this.initTime();
         this.initTimeText();
 
         // フィールド描画
@@ -563,7 +561,7 @@ class GameSceneGeneralSupervision {
     }
 
     updatePerFrame(cursors: Phaser.Types.Input.Keyboard.CursorKeys) {
-        this.updateCurrentTime();
+        this.updateElapsedFrame();
         this.updateTimeText();
 
         // キーボードの情報を取得
@@ -703,7 +701,7 @@ const config: Phaser.Types.Core.GameConfig = {
     antialias: false,
     scene: GameScene,
     fps: {
-        target: 60,// フレームレート
+        target: FPS,// フレームレート
         forceSetTimeOut: false
     },
     physics: {
