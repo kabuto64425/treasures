@@ -435,6 +435,8 @@ class GameSceneGeneralSupervision {
     private elapsedFrame: number;
     private timeText: Phaser.GameObjects.Text | undefined;
 
+    private overlay: Phaser.GameObjects.Graphics | undefined;
+
     static readonly GAME_STATE = {
         INITIALIZED: -1,
         PLAYING: 0,
@@ -491,7 +493,6 @@ class GameSceneGeneralSupervision {
     }
 
     startSupervision() {
-        this.scene.cameras.main.setTint(0x0000ff); // 青系のトーン
         this.gameState = GameSceneGeneralSupervision.GAME_STATE.PLAYING;
         this.initTimeText();
 
@@ -517,6 +518,14 @@ class GameSceneGeneralSupervision {
                 }
             }
         }
+
+        // ゲームオーバー時に表示するオーバレイ
+        this.overlay = this.scene.add.graphics();
+        this.overlay.fillStyle(0xd20a13, 0.5).fillRect(0, 0, D_WIDTH, D_HEIGHT);
+        this.overlay.depth = 99;
+        this.overlay.setVisible(false);
+
+        this.scene.add.bitmapText(0, 200, 'font', "aaaaa");
 
         // プレイヤー描画
         this.player.draw();
@@ -613,8 +622,8 @@ class GameSceneGeneralSupervision {
         // 敵との接触判定・ゲームオーバー更新
         for (const enemy of this.enemyList) {
             if (this.player.position().row === enemy.position().row && this.player.position().column === enemy.position().column) {
-                const overlay = this.scene.add.graphics();
-                overlay.fillStyle(0xd20a13, 0.5).fillRect(0, 0, D_WIDTH, D_HEIGHT);
+                // create内で確実に作成しているので、アサーションでもいけるはず
+                this.overlay!.setVisible(true);
 
                 this.gameState = GameSceneGeneralSupervision.GAME_STATE.GAME_OVER;
                 return;
@@ -662,10 +671,16 @@ class GameScene extends Phaser.Scene {
 
     preload() {
         console.log("preload!!");
+        this.load.setBaseURL('https://cdn.phaserfiles.com/v385');
+        this.load.atlas('fontatlas', 'assets/atlas/bitmap-fonts-debug.png', 'assets/atlas/bitmap-fonts.json');
+
+        this.load.xml('azoXML', 'assets/fonts/bitmap/azo-fire.xml');
     }
 
     create() {
         console.log("create!!");
+
+        Phaser.GameObjects.BitmapText.ParseFromAtlas(this, 'font', 'fontatlas', 'azo-fire', 'azoXML');
 
         this.cursors = this.input.keyboard.createCursorKeys();
         this.gameSceneGeneralSupervision = new GameSceneGeneralSupervision(this);
