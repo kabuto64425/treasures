@@ -491,6 +491,7 @@ class GameSceneGeneralSupervision {
     }
 
     startSupervision() {
+        this.scene.cameras.main.setTint(0x0000ff); // 青系のトーン
         this.gameState = GameSceneGeneralSupervision.GAME_STATE.PLAYING;
         this.initTimeText();
 
@@ -612,6 +613,9 @@ class GameSceneGeneralSupervision {
         // 敵との接触判定・ゲームオーバー更新
         for (const enemy of this.enemyList) {
             if (this.player.position().row === enemy.position().row && this.player.position().column === enemy.position().column) {
+                const overlay = this.scene.add.graphics();
+                overlay.fillStyle(0xd20a13, 0.5).fillRect(0, 0, D_WIDTH, D_HEIGHT);
+
                 this.gameState = GameSceneGeneralSupervision.GAME_STATE.GAME_OVER;
                 return;
             }
@@ -679,6 +683,7 @@ class GameScene extends Phaser.Scene {
         console.log(_delta)
         // create内で確実に作成しているので、アサーションでもいけるはず
         const gameSceneGeneralSupervision = this.gameSceneGeneralSupervision!;
+        gameSceneGeneralSupervision.updatePerFrame(this.cursors!);
         if(gameSceneGeneralSupervision.isGameClear()) {
             this.scene.pause();
             return;
@@ -687,8 +692,6 @@ class GameScene extends Phaser.Scene {
             this.scene.pause();
             return;
         }
-
-        gameSceneGeneralSupervision.updatePerFrame(this.cursors!);
     }
 }
 
