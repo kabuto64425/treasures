@@ -671,14 +671,15 @@ class GameScene extends Phaser.Scene {
 
     preload() {
         console.log("preload!!");
-        this.load.setBaseURL('https://cdn.phaserfiles.com/v385');
-        this.load.atlas('fontatlas', 'assets/atlas/bitmap-fonts-debug.png', 'assets/atlas/bitmap-fonts.json');
+        this.load.atlas('fontatlas', '/treasures/bitmap-fonts-debug.png', '/treasures/bitmap-fonts.json');
 
-        this.load.xml('azoXML', 'assets/fonts/bitmap/azo-fire.xml');
+        this.load.xml('azoXML', '/treasures/azo-fire.xml');
     }
 
     create() {
         console.log("create!!");
+        console.log(this.textures.get('fontatlas'));
+        console.log(this.cache.xml.get('azoXML'));
 
         Phaser.GameObjects.BitmapText.ParseFromAtlas(this, 'font', 'fontatlas', 'azo-fire', 'azoXML');
 
