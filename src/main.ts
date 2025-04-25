@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
 
-const D_WIDTH = 1000;
+const D_WIDTH = 1700;
 const D_HEIGHT = 630;
 
 const GRID_SIZE = 21;
@@ -433,9 +433,12 @@ class GameSceneGeneralSupervision {
     private gameState: number;
 
     private elapsedFrame: number;
-    private timeText: Phaser.GameObjects.Text | undefined;
+    private timeText: Phaser.GameObjects.BitmapText | undefined;
 
     private overlay: Phaser.GameObjects.Graphics | undefined;
+    private gameOverText: Phaser.GameObjects.BitmapText | undefined;
+
+    private congratulationsText: Phaser.GameObjects.BitmapText | undefined;
 
     static readonly GAME_STATE = {
         INITIALIZED: -1,
@@ -465,10 +468,7 @@ class GameSceneGeneralSupervision {
     }
 
     initTimeText() {
-        this.timeText = this.scene.add.text(700, 50, '0:00.000', {
-            fontSize: '24px',
-            color: '#000000'
-        });
+        this.timeText = this.scene.add.bitmapText(645, 50, 'font', "0:00.000");
     }
 
     updateTimeText() {
@@ -525,7 +525,13 @@ class GameSceneGeneralSupervision {
         this.overlay.depth = 99;
         this.overlay.setVisible(false);
 
-        this.scene.add.bitmapText(0, 200, 'font', "aaaaa");
+        // ゲームオーバーテキスト
+        this.gameOverText = this.scene.add.bitmapText(645, 132, 'font', "GAME OVER!");
+        this.gameOverText.setVisible(false);
+
+        // クリアおめでとうテキスト
+        this.congratulationsText = this.scene.add.bitmapText(645, 132, 'font', "CONGRATULATIONS!");
+        this.congratulationsText.setVisible(false);
 
         // プレイヤー描画
         this.player.draw();
@@ -623,9 +629,10 @@ class GameSceneGeneralSupervision {
         for (const enemy of this.enemyList) {
             if (this.player.position().row === enemy.position().row && this.player.position().column === enemy.position().column) {
                 // create内で確実に作成しているので、アサーションでもいけるはず
-                this.overlay!.setVisible(true);
+                //this.overlay!.setVisible(true);
+                //this.gameOverText!.setVisible(true);
 
-                this.gameState = GameSceneGeneralSupervision.GAME_STATE.GAME_OVER;
+                //this.gameState = GameSceneGeneralSupervision.GAME_STATE.GAME_OVER;
                 return;
             }
         }
@@ -642,6 +649,8 @@ class GameSceneGeneralSupervision {
         // 次ラウンド進行判断・次ラウンド進行
         if (roundsSupervision.isCompletedCurrentRound()) {
             if (roundsSupervision.isFinalRound()) {
+                this.congratulationsText!.setVisible(true);
+
                 this.gameState = GameSceneGeneralSupervision.GAME_STATE.GAME_CLEAR;
                 return;
             }
