@@ -163,6 +163,7 @@ class Enemy {
 
     constructor(scene: GameScene, iniRow: number, iniColumn: number, priorityScanDirections: DIRECTION[]) {
         this.graphics = scene.add.graphics();
+        this.graphics.depth = 10;
         this.row = iniRow;
         this.column = iniColumn;
         this.chargeAmount = 0;
@@ -625,18 +626,6 @@ class GameSceneGeneralSupervision {
             enemy.draw();
         }
 
-        // 敵との接触判定・ゲームオーバー更新
-        for (const enemy of this.enemyList) {
-            if (this.player.position().row === enemy.position().row && this.player.position().column === enemy.position().column) {
-                // create内で確実に作成しているので、アサーションでもいけるはず
-                //this.overlay!.setVisible(true);
-                //this.gameOverText!.setVisible(true);
-
-                //this.gameState = GameSceneGeneralSupervision.GAME_STATE.GAME_OVER;
-                return;
-            }
-        }
-
         // 現在の宝との回収判定・回収
         const roundsSupervision = this.roundsSupervision!;
         for (const treasure of roundsSupervision.getCurrentRoundSupervision().getTreasuresSupervision().getTreasureList()) {
@@ -652,11 +641,22 @@ class GameSceneGeneralSupervision {
                 this.congratulationsText!.setVisible(true);
 
                 this.gameState = GameSceneGeneralSupervision.GAME_STATE.GAME_CLEAR;
-                return;
+            } else {
+                roundsSupervision.advanceRound();
+                roundsSupervision.getCurrentRoundSupervision().getTreasuresSupervision().setAllTreasuresStateAppearance();
+                roundsSupervision.getCurrentRoundSupervision().getTreasuresSupervision().drawAllTreasures();
             }
-            roundsSupervision.advanceRound();
-            roundsSupervision.getCurrentRoundSupervision().getTreasuresSupervision().setAllTreasuresStateAppearance();
-            roundsSupervision.getCurrentRoundSupervision().getTreasuresSupervision().drawAllTreasures();
+        }
+
+        // 敵との接触判定・ゲームオーバー更新
+        for (const enemy of this.enemyList) {
+            if (this.player.position().row === enemy.position().row && this.player.position().column === enemy.position().column) {
+                // create内で確実に作成しているので、アサーションでもいけるはず
+                //this.overlay!.setVisible(true);
+                //this.gameOverText!.setVisible(true);
+
+                //this.gameState = GameSceneGeneralSupervision.GAME_STATE.GAME_OVER;
+            }
         }
     }
 
@@ -670,6 +670,7 @@ class GameSceneGeneralSupervision {
 }
 
 class GameScene extends Phaser.Scene {
+    private params: any;
     private gameSceneGeneralSupervision: GameSceneGeneralSupervision | undefined;
 
     private cursors: Phaser.Types.Input.Keyboard.CursorKeys | undefined;
@@ -687,6 +688,8 @@ class GameScene extends Phaser.Scene {
 
     create() {
         console.log("create!!");
+        this.params = globalParams;
+        console.log(this.params);
         console.log(this.textures.get('fontatlas'));
         console.log(this.cache.xml.get('azoXML'));
 
@@ -700,7 +703,7 @@ class GameScene extends Phaser.Scene {
     // デバッグ用
     busyWait(ms: number) {
         const start = performance.now();
-        while (performance.now() - start < ms) {}
+        while (performance.now() - start < ms) { }
     }
 
     update(_time: number, _delta: number) {
@@ -709,37 +712,47 @@ class GameScene extends Phaser.Scene {
         // create内で確実に作成しているので、アサーションでもいけるはず
         const gameSceneGeneralSupervision = this.gameSceneGeneralSupervision!;
         gameSceneGeneralSupervision.updatePerFrame(this.cursors!);
-        if(gameSceneGeneralSupervision.isGameClear()) {
+        if (gameSceneGeneralSupervision.isGameClear()) {
             this.scene.pause();
             return;
         }
-        if(gameSceneGeneralSupervision.isGameOver()) {
+        if (gameSceneGeneralSupervision.isGameOver()) {
             this.scene.pause();
             return;
         }
     }
 }
 
-// Phaser3の設定データ
-const config: Phaser.Types.Core.GameConfig = {
-    type: Phaser.AUTO,
-    width: D_WIDTH,// ゲーム画面の横幅
-    height: D_HEIGHT,// ゲーム画面の高さ
-    backgroundColor: '#FFFFFF', // 背景色を設定
-    antialias: false,
-    scene: GameScene,
-    fps: {
-        target: FPS,// フレームレート
-        forceSetTimeOut: false
-    },
-    physics: {
-        default: "arcade",
-        arcade: {
-            debug: true,// スプライトに緑の枠を表示します
-            gravity: { y: 300 }// 重力の方向とその強さ
-        }
-    }
-}
+let globalParams: any = null;
+
+fetch('/treasures//params.json')
+    .then(res => res.json())
+    .then(data => {
+        globalParams = data;
+        startGameWithParams(globalParams);
+    });
 
 // Phaser3オブジェクトを作る
-new Phaser.Game(config);
+function startGameWithParams(_params: any) {
+    // Phaser3の設定データ
+    const config: Phaser.Types.Core.GameConfig = {
+        type: Phaser.AUTO,
+        width: D_WIDTH,// ゲーム画面の横幅
+        height: D_HEIGHT,// ゲーム画面の高さ
+        backgroundColor: '#FFFFFF', // 背景色を設定
+        antialias: false,
+        scene: GameScene,
+        fps: {
+            target: FPS,// フレームレート
+            forceSetTimeOut: false
+        },
+        physics: {
+            default: "arcade",
+            arcade: {
+                debug: true,// スプライトに緑の枠を表示します
+                gravity: { y: 300 }// 重力の方向とその強さ
+            }
+        }
+    }
+    new Phaser.Game(config);
+}
