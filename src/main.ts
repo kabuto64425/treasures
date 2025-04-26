@@ -347,10 +347,11 @@ class FieldEvalution {
     private shortestDirectionMaps: Map<string, boolean>[][];
     private graphics: Phaser.GameObjects.Graphics;
 
-    constructor(scene: GameScene) {
+    constructor(scene: GameScene, isVisible: boolean) {
         this.shortestDirectionMaps = [...Array(H)].map(() => [...Array(W)].map(() => this.generateDirectionFlagMap() as Map<string, boolean>));
         this.graphics = scene.add.graphics();
         this.graphics.depth = 99;
+        this.graphics.setVisible(isVisible);
     }
 
     private generateDirectionFlagMap() {
@@ -427,6 +428,8 @@ class FieldEvalution {
 
 class GameSceneGeneralSupervision {
     private scene: GameScene;
+    private params: any;
+
     private player: Player;
     private fieldEvaluation: FieldEvalution;
     private enemyList: Enemy[];
@@ -448,7 +451,8 @@ class GameSceneGeneralSupervision {
         GAME_OVER: 2,
     };
 
-    constructor(scene: GameScene) {
+    constructor(scene: GameScene, params: any) {
+        this.params = params;
         this.elapsedFrame = 0;
         this.scene = scene;
 
@@ -458,7 +462,7 @@ class GameSceneGeneralSupervision {
         this.player = new Player(this.scene, parameterPlayer.row, parameterPlayer.column);
 
         //フィールド評価
-        this.fieldEvaluation = new FieldEvalution(this.scene);
+        this.fieldEvaluation = new FieldEvalution(this.scene, this.params.visibleFieldEvaluation);
 
         // 敵
         this.enemyList = [];
@@ -652,10 +656,11 @@ class GameSceneGeneralSupervision {
         for (const enemy of this.enemyList) {
             if (this.player.position().row === enemy.position().row && this.player.position().column === enemy.position().column) {
                 // create内で確実に作成しているので、アサーションでもいけるはず
-                //this.overlay!.setVisible(true);
-                //this.gameOverText!.setVisible(true);
-
-                //this.gameState = GameSceneGeneralSupervision.GAME_STATE.GAME_OVER;
+                if(!this.params.noGameOverMode) {
+                    this.overlay!.setVisible(true);
+                    this.gameOverText!.setVisible(true);
+                    this.gameState = GameSceneGeneralSupervision.GAME_STATE.GAME_OVER;
+                }
             }
         }
     }
@@ -696,7 +701,7 @@ class GameScene extends Phaser.Scene {
         Phaser.GameObjects.BitmapText.ParseFromAtlas(this, 'font', 'fontatlas', 'azo-fire', 'azoXML');
 
         this.cursors = this.input.keyboard.createCursorKeys();
-        this.gameSceneGeneralSupervision = new GameSceneGeneralSupervision(this);
+        this.gameSceneGeneralSupervision = new GameSceneGeneralSupervision(this, this.params);
         this.gameSceneGeneralSupervision.startSupervision();
     }
 
