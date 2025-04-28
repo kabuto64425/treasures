@@ -94,12 +94,14 @@ class Player {
     private row: number;
     private column: number;
     private chargeAmount: number;
+    private numberOfCollectedTreasures: number;
 
     constructor(scene: GameScene, iniRow: number, iniColumn: number) {
         this.graphics = scene.add.graphics();
         this.row = iniRow;
         this.column = iniColumn;
         this.chargeAmount = 0;
+        this.numberOfCollectedTreasures = 0;
     }
 
     position() {
@@ -144,6 +146,14 @@ class Player {
             this.column += direction.dc;
             this.chargeAmount = 0;
         }
+    }
+
+    addNumberOfCollectedTreasures() {
+        this.numberOfCollectedTreasures++;
+    }
+
+    getNumberOfCollectedTreasures() {
+        return this.numberOfCollectedTreasures;
     }
 
     draw() {
@@ -215,17 +225,28 @@ class Enemy {
 
 class TreasuresSupervision {
     private treasureList: Treasure[];
+    private numberOfTreasures: number;
 
     constructor() {
         this.treasureList = [];
+        this.numberOfTreasures = 0;
     }
 
     addTreasure(treasure: Treasure) {
         this.treasureList.push(treasure);
+        this.numberOfTreasures++;
     }
 
     getTreasureList() {
         return this.treasureList;
+    }
+
+    extractAppearanceTreasureList() {
+        return this.treasureList.filter(t => t.isAppearance());
+    }
+
+    getNumberOfTreasures() {
+        return this.numberOfTreasures;
     }
 
     setAllTreasuresStateAppearance() {
@@ -254,10 +275,12 @@ class SingleRoundSupervision {
 }
 
 export class RoundsSupervision {
+    private numberOfRounds: number;
     private currentRound: number;
     private singleRoundSupervisionList: SingleRoundSupervision[];
 
     constructor(numberOfRound: number) {
+        this.numberOfRounds = numberOfRound;
         this.currentRound = 0;
         this.singleRoundSupervisionList = new Array(numberOfRound);
     }
@@ -267,7 +290,7 @@ export class RoundsSupervision {
     }
 
     isFinalRound() {
-        return this.currentRound === (numberOfRounds - 1);
+        return this.currentRound === (this.numberOfRounds - 1);
     }
 
     isCompletedCurrentRound() {
@@ -286,6 +309,17 @@ export class RoundsSupervision {
 
     setRoundSupervision(round: number, singleRoundSupervision: SingleRoundSupervision) {
         this.singleRoundSupervisionList[round] = singleRoundSupervision;
+    }
+
+    queryNumberOfTreasuresInSingleRound(round: number) {
+        return this.singleRoundSupervisionList[round].getTreasuresSupervision().getNumberOfTreasures();
+    }
+
+    queryNumberOfTreasuresInALLRounds() {
+        return Array.from({ length: this.numberOfRounds }, (_, i) =>{
+            console.log(this.queryNumberOfTreasuresInSingleRound(i));
+            return this.queryNumberOfTreasuresInSingleRound(i);
+        }).reduce((sum, treasures) => sum + treasures, 0);
     }
 }
 
@@ -320,6 +354,10 @@ class Treasure {
 
     setStateCollected() {
         this.state = Treasure.TREASURE_STATE.COLLECTED;
+    }
+
+    isAppearance() {
+        return this.state === Treasure.TREASURE_STATE.APPEARANCE;
     }
 
     isCollected() {
@@ -439,6 +477,8 @@ class GameSceneGeneralSupervision {
     private elapsedFrame: number;
     private timeText: Phaser.GameObjects.BitmapText | undefined;
 
+    private collectedTreasuresText: Phaser.GameObjects.BitmapText | undefined;
+
     private overlay: Phaser.GameObjects.Graphics | undefined;
     private gameOverText: Phaser.GameObjects.BitmapText | undefined;
 
@@ -497,6 +537,14 @@ class GameSceneGeneralSupervision {
         return `${minutes.toString()}:${seconds.toString().padStart(2, "0")}.${milliseconds.toString().padStart(3, "0")}`;
     }
 
+    initCollectedTreasuresText() {
+        this.collectedTreasuresText = this.scene.add.bitmapText(645, 132, 'font', `${this.player.getNumberOfCollectedTreasures()}/${this.roundsSupervision!.queryNumberOfTreasuresInALLRounds()}`);
+    }
+
+    updateCollectedTreasuresText() {
+        this.collectedTreasuresText!.setText(`${this.player.getNumberOfCollectedTreasures()}/${this.roundsSupervision!.queryNumberOfTreasuresInALLRounds()}`);
+    }
+
     startSupervision() {
         this.gameState = GameSceneGeneralSupervision.GAME_STATE.PLAYING;
         this.initTimeText();
@@ -531,11 +579,11 @@ class GameSceneGeneralSupervision {
         this.overlay.setVisible(false);
 
         // ゲームオーバーテキスト
-        this.gameOverText = this.scene.add.bitmapText(645, 132, 'font', "GAME OVER!");
+        this.gameOverText = this.scene.add.bitmapText(645, 214, 'font', "GAME OVER!");
         this.gameOverText.setVisible(false);
 
         // クリアおめでとうテキスト
-        this.congratulationsText = this.scene.add.bitmapText(645, 132, 'font', "CONGRATULATIONS!");
+        this.congratulationsText = this.scene.add.bitmapText(645, 214, 'font', "CONGRATULATIONS!");
         this.congratulationsText.setVisible(false);
 
         // プレイヤー描画
@@ -568,17 +616,17 @@ class GameSceneGeneralSupervision {
         }
 
         const singleRoundSupervision = new SingleRoundSupervision();
-        for (let j = 0; j < numberOfTreasures; j++) {
-            let treasurePos = { row: 0, column: 0 };
-            const treasure = new Treasure(this.scene, 0xffa500, treasurePos.row, treasurePos.column);
-            singleRoundSupervision.getTreasuresSupervision().addTreasure(treasure);
-        }
+        let treasurePos = { row: 0, column: 0 };
+        const treasure = new Treasure(this.scene, 0xffa500, treasurePos.row, treasurePos.column);
+        singleRoundSupervision.getTreasuresSupervision().addTreasure(treasure);
 
         this.roundsSupervision.setRoundSupervision(numberOfRounds - 1, singleRoundSupervision);
 
         this.roundsSupervision.getCurrentRoundSupervision().getTreasuresSupervision().setAllTreasuresStateAppearance();
         // 最初のラウンドの宝描画
         this.roundsSupervision.getCurrentRoundSupervision().getTreasuresSupervision().drawAllTreasures();
+
+        this.initCollectedTreasuresText();
     }
 
     updatePerFrame(cursors: Phaser.Types.Input.Keyboard.CursorKeys) {
@@ -632,12 +680,15 @@ class GameSceneGeneralSupervision {
 
         // 現在の宝との回収判定・回収
         const roundsSupervision = this.roundsSupervision!;
-        for (const treasure of roundsSupervision.getCurrentRoundSupervision().getTreasuresSupervision().getTreasureList()) {
+        for (const treasure of roundsSupervision.getCurrentRoundSupervision().getTreasuresSupervision().extractAppearanceTreasureList()) {
             if (this.player.position().row === treasure.position().row && this.player.position().column === treasure.position().column) {
                 treasure.setStateCollected();
                 treasure.clearDisplay();
+                this.player.addNumberOfCollectedTreasures();
             }
         }
+
+        this.updateCollectedTreasuresText();
 
         // 次ラウンド進行判断・次ラウンド進行
         if (roundsSupervision.isCompletedCurrentRound()) {
@@ -694,9 +745,6 @@ class GameScene extends Phaser.Scene {
     create() {
         console.log("create!!");
         this.params = globalParams;
-        console.log(this.params);
-        console.log(this.textures.get('fontatlas'));
-        console.log(this.cache.xml.get('azoXML'));
 
         Phaser.GameObjects.BitmapText.ParseFromAtlas(this, 'font', 'fontatlas', 'azo-fire', 'azoXML');
 
@@ -713,7 +761,6 @@ class GameScene extends Phaser.Scene {
 
     update(_time: number, _delta: number) {
         console.log("update")
-        console.log(_delta)
         // create内で確実に作成しているので、アサーションでもいけるはず
         const gameSceneGeneralSupervision = this.gameSceneGeneralSupervision!;
         gameSceneGeneralSupervision.updatePerFrame(this.cursors!);
