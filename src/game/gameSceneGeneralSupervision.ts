@@ -30,9 +30,10 @@ export class GameSceneGeneralSupervision {
 
     static readonly GAME_STATE = {
         INITIALIZED: -1,
-        PLAYING: 0,
-        GAME_CLEAR: 1,
-        GAME_OVER: 2,
+        STANDBY: 0,
+        PLAYING: 1,
+        GAME_CLEAR: 2,
+        GAME_OVER: 3,
     };
 
     constructor(scene: GameScene, params: any) {
@@ -90,7 +91,7 @@ export class GameSceneGeneralSupervision {
     }
 
     startSupervision() {
-        this.gameState = GameSceneGeneralSupervision.GAME_STATE.PLAYING;
+        this.gameState = GameSceneGeneralSupervision.GAME_STATE.STANDBY;
         this.initTimeText();
 
         // フィールド描画
@@ -115,6 +116,17 @@ export class GameSceneGeneralSupervision {
                 }
             }
         }
+
+        const play = this.scene.add.image(214, 214, 'play');
+        play.setInteractive();
+
+        play.on('pointerover', () => play.setTint(0x44ff44));
+        play.on('pointerout', () => play.clearTint());
+
+        play.on('pointerdown', () => {
+            play.destroy();
+            this.gameState = GameSceneGeneralSupervision.GAME_STATE.PLAYING;
+        });
 
         // ゲームオーバー時に表示するオーバレイ
         this.overlay = this.scene.add.graphics();
@@ -258,6 +270,10 @@ export class GameSceneGeneralSupervision {
                 }
             }
         }
+    }
+
+    isPlaying() {
+        return this.gameState === GameSceneGeneralSupervision.GAME_STATE.PLAYING;
     }
 
     isGameOver() {

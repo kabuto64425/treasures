@@ -15,8 +15,11 @@ export class GameScene extends Phaser.Scene {
     preload() {
         console.log("preload!!");
         this.load.atlas('fontatlas', '/treasures/bitmap-fonts-debug.png', '/treasures/bitmap-fonts.json');
-
         this.load.xml('azoXML', '/treasures/azo-fire.xml');
+
+        this.load.image('play', '/treasures/play.svg');
+        this.load.image('retry', '/treasures/retry.svg');
+        
     }
 
     create() {
@@ -36,10 +39,12 @@ export class GameScene extends Phaser.Scene {
     }
 
     update(_time: number, _delta: number) {
-        console.log("update")
+        console.log("update");
         // create内で確実に作成しているので、アサーションでもいけるはず
         const gameSceneGeneralSupervision = this.gameSceneGeneralSupervision!;
-        gameSceneGeneralSupervision.updatePerFrame(this.cursors!);
+        if(gameSceneGeneralSupervision.isPlaying()) {
+            gameSceneGeneralSupervision.updatePerFrame(this.cursors!);
+        }
         if (gameSceneGeneralSupervision.isGameClear()) {
             this.scene.pause();
             return;
