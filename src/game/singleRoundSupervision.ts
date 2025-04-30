@@ -1,4 +1,4 @@
-import { TreasuresSupervision } from "./TreasuresSupervision";
+import { TreasuresSupervision } from "./treasuresSupervision";
 
 export class SingleRoundSupervision {
     private treasuresSupervision: TreasuresSupervision;

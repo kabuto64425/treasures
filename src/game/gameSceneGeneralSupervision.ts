@@ -6,7 +6,7 @@ import { FieldEvalution } from "./fieldEvalution";
 import { Enemy } from "./enemy";
 import { RoundsSupervision } from "../roundsSupervision";
 import { SingleRoundSupervision } from "./singleRoundSupervision";
-import { Treasure } from "./Treasure";
+import { Treasure } from "./treasure";
 
 export class GameSceneGeneralSupervision {
     private scene: GameScene;

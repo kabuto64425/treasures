@@ -1,4 +1,4 @@
-import { Treasure } from "./Treasure";
+import { Treasure } from "./treasure";
 
 export class TreasuresSupervision {
     private treasureList: Treasure[];
