@@ -117,6 +117,17 @@ export class GameSceneGeneralSupervision {
             }
         }
 
+        // ゲームオーバー時に表示するオーバレイ
+        this.overlay = this.scene.add.graphics();
+        this.overlay.fillStyle(0xd20a13, 0.5).fillRect(0, 0, GameConstants.D_WIDTH, GameConstants.D_HEIGHT);
+        this.overlay.depth = 99;
+
+        // ゲームオーバーテキスト
+        this.gameOverText = this.scene.add.bitmapText(645, 214, 'font', "GAME OVER!");
+
+        // クリアおめでとうテキスト
+        this.congratulationsText = this.scene.add.bitmapText(645, 214, 'font', "CONGRATULATIONS!");
+
         const play = this.scene.add.image(214, 214, 'play');
         play.setInteractive();
 
@@ -126,21 +137,28 @@ export class GameSceneGeneralSupervision {
         play.on('pointerdown', () => {
             play.destroy();
             this.gameState = GameSceneGeneralSupervision.GAME_STATE.PLAYING;
+            this.gameStart();
         });
 
-        // ゲームオーバー時に表示するオーバレイ
-        this.overlay = this.scene.add.graphics();
-        this.overlay.fillStyle(0xd20a13, 0.5).fillRect(0, 0, GameConstants.D_WIDTH, GameConstants.D_HEIGHT);
-        this.overlay.depth = 99;
-        this.overlay.setVisible(false);
+        const retry = this.scene.add.image(428, 214, 'retry');
+        retry.setInteractive();
 
-        // ゲームオーバーテキスト
-        this.gameOverText = this.scene.add.bitmapText(645, 214, 'font', "GAME OVER!");
-        this.gameOverText.setVisible(false);
+        retry.on('pointerover', () => retry.setTint(0x44ff44));
+        retry.on('pointerout', () => retry.clearTint());
 
-        // クリアおめでとうテキスト
-        this.congratulationsText = this.scene.add.bitmapText(645, 214, 'font', "CONGRATULATIONS!");
-        this.congratulationsText.setVisible(false);
+        retry.on('pointerdown', () => {
+            if(this.isGamePlayed()) {
+                this.gameState = GameSceneGeneralSupervision.GAME_STATE.PLAYING;
+                this.gameStart();
+            }
+        });
+    }
+
+    gameStart() {
+        // 確実に作成しているはず
+        this.overlay!.setVisible(false);
+        this.gameOverText!.setVisible(false);
+        this.congratulationsText!.setVisible(false);
 
         // プレイヤー描画
         this.player.draw();
@@ -186,6 +204,9 @@ export class GameSceneGeneralSupervision {
     }
 
     updatePerFrame(cursors: Phaser.Types.Input.Keyboard.CursorKeys) {
+        if(!this.isPlaying()) {
+            return;
+        }
         this.updateElapsedFrame();
         this.updateTimeText();
 
@@ -282,5 +303,9 @@ export class GameSceneGeneralSupervision {
 
     isGameClear() {
         return this.gameState === GameSceneGeneralSupervision.GAME_STATE.GAME_CLEAR;
+    }
+
+    isGamePlayed() {
+        return this.isPlaying() || this.isGameOver() || this.isGameClear();
     }
 }
