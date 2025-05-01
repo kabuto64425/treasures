@@ -42,6 +42,16 @@ export class GameScene extends Phaser.Scene {
         console.log("update");
         // create内で確実に作成しているので、アサーションでもいけるはず
         const gameSceneGeneralSupervision = this.gameSceneGeneralSupervision!;
-        gameSceneGeneralSupervision.updatePerFrame(this.cursors!);
+        if(gameSceneGeneralSupervision.isPlaying()) {
+            gameSceneGeneralSupervision.updatePerFrame(this.cursors!);
+        }
+        if (gameSceneGeneralSupervision.isGameClear()) {
+            this.scene.pause();
+            return;
+        }
+        if (gameSceneGeneralSupervision.isGameOver()) {
+            this.scene.pause();
+            return;
+        }
     }
 }
