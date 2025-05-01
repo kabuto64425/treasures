@@ -1,5 +1,5 @@
-import {GameScene} from "./gameScene"
-import {Player} from "./player"
+import { GameScene } from "./gameScene"
+import { Player } from "./player"
 import * as GameConstants from "./gameConstants"
 import { DIRECTION } from "./drection";
 import { FieldEvalution } from "./fieldEvalution";
@@ -128,6 +128,20 @@ export class GameSceneGeneralSupervision {
             this.gameState = GameSceneGeneralSupervision.GAME_STATE.PLAYING;
         });
 
+        const retry = this.scene.add.image(428, 214, 'retry');
+        retry.setInteractive();
+
+        retry.on('pointerover', () => retry.setTint(0x44ff44));
+        retry.on('pointerout', () => retry.clearTint());
+
+
+        retry.on('pointerdown', () => {
+            if (this.isGamePlayed()) {
+                this.scene.restart();
+            }
+        });
+
+
         // ゲームオーバー時に表示するオーバレイ
         this.overlay = this.scene.add.graphics();
         this.overlay.fillStyle(0xd20a13, 0.5).fillRect(0, 0, GameConstants.D_WIDTH, GameConstants.D_HEIGHT);
@@ -186,6 +200,9 @@ export class GameSceneGeneralSupervision {
     }
 
     updatePerFrame(cursors: Phaser.Types.Input.Keyboard.CursorKeys) {
+        if(!this.isPlaying()) {
+            return;
+        }
         this.updateElapsedFrame();
         this.updateTimeText();
 
@@ -263,7 +280,7 @@ export class GameSceneGeneralSupervision {
         for (const enemy of this.enemyList) {
             if (this.player.position().row === enemy.position().row && this.player.position().column === enemy.position().column) {
                 // create内で確実に作成しているので、アサーションでもいけるはず
-                if(!this.params.noGameOverMode) {
+                if (!this.params.noGameOverMode) {
                     this.overlay!.setVisible(true);
                     this.gameOverText!.setVisible(true);
                     this.gameState = GameSceneGeneralSupervision.GAME_STATE.GAME_OVER;
@@ -282,5 +299,9 @@ export class GameSceneGeneralSupervision {
 
     isGameClear() {
         return this.gameState === GameSceneGeneralSupervision.GAME_STATE.GAME_CLEAR;
+    }
+
+    isGamePlayed() {
+        return this.isPlaying() || this.isGameOver() || this.isGameClear();
     }
 }
