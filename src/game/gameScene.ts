@@ -45,13 +45,5 @@ export class GameScene extends Phaser.Scene {
         if(gameSceneGeneralSupervision.isPlaying()) {
             gameSceneGeneralSupervision.updatePerFrame(this.cursors!);
         }
-        if (gameSceneGeneralSupervision.isGameClear()) {
-            this.scene.pause();
-            return;
-        }
-        if (gameSceneGeneralSupervision.isGameOver()) {
-            this.scene.pause();
-            return;
-        }
     }
 }

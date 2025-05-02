@@ -128,12 +128,15 @@ export class GameSceneGeneralSupervision {
             this.gameState = GameSceneGeneralSupervision.GAME_STATE.PLAYING;
         });
 
-        const retry = this.scene.add.image(428, 214, 'retry');
+        const uiLayer = this.scene.add.layer();
+        uiLayer.setDepth(100);
+
+        const retry = this.scene.make.image({x: 428, y: 214, key: 'retry'}, false);
+        uiLayer.add(retry);
         retry.setInteractive();
 
         retry.on('pointerover', () => retry.setTint(0x44ff44));
         retry.on('pointerout', () => retry.clearTint());
-
 
         retry.on('pointerdown', () => {
             if (this.isGamePlayed()) {
@@ -141,11 +144,10 @@ export class GameSceneGeneralSupervision {
             }
         });
 
-
         // ゲームオーバー時に表示するオーバレイ
         this.overlay = this.scene.add.graphics();
         this.overlay.fillStyle(0xd20a13, 0.5).fillRect(0, 0, GameConstants.D_WIDTH, GameConstants.D_HEIGHT);
-        this.overlay.depth = 99;
+        this.overlay.setDepth(99);
         this.overlay.setVisible(false);
 
         // ゲームオーバーテキスト
