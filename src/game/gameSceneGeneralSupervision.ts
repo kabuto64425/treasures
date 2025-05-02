@@ -137,7 +137,7 @@ export class GameSceneGeneralSupervision {
 
         retry.on('pointerdown', () => {
             if (this.isGamePlayed()) {
-                this.scene.restart();
+                this.scene.scene.restart();
             }
         });
 
