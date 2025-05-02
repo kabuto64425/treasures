@@ -131,7 +131,7 @@ export class GameSceneGeneralSupervision {
         const uiLayer = this.scene.add.layer();
         uiLayer.setDepth(100);
 
-        const retry = this.scene.make.image({x: 428, y: 214, key: 'retry'}, false);
+        const retry = this.scene.make.image({x: 800, y: 378, key: 'retry'}, false);
         uiLayer.add(retry);
         retry.setInteractive();
 
