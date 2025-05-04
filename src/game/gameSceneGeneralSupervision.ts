@@ -1,16 +1,19 @@
 import { GameScene } from "./gameScene"
 import { Player } from "./player"
 import * as GameConstants from "./gameConstants"
+import * as Utils from "./utils"
 import { DIRECTION } from "./drection";
 import { FieldEvalution } from "./fieldEvalution";
 import { Enemy } from "./enemy";
 import { RoundsSupervision } from "../roundsSupervision";
 import { SingleRoundSupervision } from "./singleRoundSupervision";
 import { Treasure } from "./treasure";
+import { BestRecord } from "./bestRecord";
 
 export class GameSceneGeneralSupervision {
     private scene: GameScene;
     private params: any;
+    private bestRecord: BestRecord;
 
     private player: Player;
     private fieldEvaluation: FieldEvalution;
@@ -22,9 +25,6 @@ export class GameSceneGeneralSupervision {
     private timeText: Phaser.GameObjects.BitmapText | undefined;
 
     private collectedTreasuresText: Phaser.GameObjects.BitmapText | undefined;
-
-    private bestNumberOfCollectedTreasures: number;
-    private fastestClearElapsedFrame: number | undefined;
 
     private bestRecordText: Phaser.GameObjects.BitmapText | undefined;
 
@@ -41,12 +41,11 @@ export class GameSceneGeneralSupervision {
         GAME_OVER: 3,
     };
 
-    constructor(scene: GameScene, params: any) {
+    constructor(scene: GameScene, params: any, bestRecord : BestRecord) {
         this.params = params;
+        this.bestRecord = bestRecord;
         this.elapsedFrame = 0;
         this.scene = scene;
-
-        this.bestNumberOfCollectedTreasures = 0;
 
         this.gameState = GameSceneGeneralSupervision.GAME_STATE.INITIALIZED;
 
@@ -69,24 +68,11 @@ export class GameSceneGeneralSupervision {
     }
 
     updateTimeText() {
-        this.timeText!.setText(`${this.createFormattedTimeFromFrame(this.elapsedFrame)}`);
+        this.timeText!.setText(`${Utils.createFormattedTimeFromFrame(this.elapsedFrame)}`);
     }
 
     updateElapsedFrame() {
         this.elapsedFrame++;
-    }
-
-    caluculateTimeFromFrame(frame: number) {
-        return Math.floor((frame * 1000) / 60);
-    }
-
-    createFormattedTimeFromFrame(frame: number) {
-        const elapsed = this.caluculateTimeFromFrame(frame);
-        const minutes = Math.floor(elapsed / 60000);
-        const seconds = Math.floor((elapsed % 60000) / 1000);
-        const milliseconds = Math.floor(elapsed % 1000);
-
-        return `${minutes.toString()}:${seconds.toString().padStart(2, "0")}.${milliseconds.toString().padStart(3, "0")}`;
     }
 
     initCollectedTreasuresText() {
@@ -97,35 +83,13 @@ export class GameSceneGeneralSupervision {
         this.collectedTreasuresText!.setText(`${this.player.getNumberOfCollectedTreasures()}/${this.roundsSupervision!.queryNumberOfTreasuresInALLRounds()}`);
     }
 
-    createBestRecordStr() {
-        let fastestClearTimeStr = "--:--.---"
-        if (this.fastestClearElapsedFrame) {
-            fastestClearTimeStr = this.createFormattedTimeFromFrame(this.fastestClearElapsedFrame);
-        }
-        return `${this.bestNumberOfCollectedTreasures}/${this.roundsSupervision!.queryNumberOfTreasuresInALLRounds()}  ${fastestClearTimeStr}`;
-    }
-
     initBestRecordText() {
         this.scene.add.bitmapText(645, 296, 'font', "BEST");
-        this.bestRecordText = this.scene.add.bitmapText(645, 378, 'font', this.createBestRecordStr());
+        this.bestRecordText = this.scene.add.bitmapText(645, 378, 'font', this.bestRecord.createBestRecordStr(this.roundsSupervision!.queryNumberOfTreasuresInALLRounds()));
     }
 
     updateBestRecordText() {
-        this.bestRecordText!.setText(this.createBestRecordStr());
-    }
-
-    isNewRecord() {
-        if (this.isGameClear()) {
-            // ゲームクリアなので、獲得宝数はベストレコードと並ぶはずだが、念の為確認
-            if (this.player.getNumberOfCollectedTreasures() >= this.bestNumberOfCollectedTreasures) {
-                if (!this.fastestClearElapsedFrame) {
-                    return true;
-                }
-                return this.elapsedFrame < this.fastestClearElapsedFrame;
-            }
-            return false;
-        }
-        return this.player.getNumberOfCollectedTreasures() >= this.bestNumberOfCollectedTreasures;
+        this.bestRecordText!.setText(this.bestRecord.createBestRecordStr(this.roundsSupervision!.queryNumberOfTreasuresInALLRounds()));
     }
 
     startSupervision() {
@@ -180,6 +144,18 @@ export class GameSceneGeneralSupervision {
             if (this.isGamePlayed()) {
                 this.scene.scene.restart();
             }
+        });
+
+        const clearRecord = this.scene.make.image({ x: 1000, y: 550, key: 'retry' }, false);
+        uiLayer.add(clearRecord);
+        clearRecord.setInteractive();
+
+        clearRecord.on('pointerover', () => clearRecord.setTint(0x44ff44));
+        clearRecord.on('pointerout', () => clearRecord.clearTint());
+
+        clearRecord.on('pointerdown', () => {
+            this.bestRecord.deleteBestRecord();
+            this.updateBestRecordText();
         });
 
         // ゲームオーバー時に表示するオーバレイ
@@ -238,21 +214,6 @@ export class GameSceneGeneralSupervision {
 
         this.initCollectedTreasuresText();
 
-        // ベストレコード
-        try {
-            const bestRecordJSON = localStorage.getItem('bestRecord');
-            if(bestRecordJSON) {
-                const bestRecordData = JSON.parse(bestRecordJSON);
-                if(bestRecordData.bestNumberOfCollectedTreasures) {
-                    this.bestNumberOfCollectedTreasures = bestRecordData.bestNumberOfCollectedTreasures;
-                }
-                if(bestRecordData.fastestClearElapsedFrame) {
-                    this.fastestClearElapsedFrame = bestRecordData.fastestClearElapsedFrame;
-                }
-            }
-        }catch(e){
-
-        }
         this.initBestRecordText();
     }
 
@@ -349,23 +310,8 @@ export class GameSceneGeneralSupervision {
     }
 
     handleRecordUpdate() {
-        if (this.isNewRecord()) {
-            this.bestNumberOfCollectedTreasures = this.player.getNumberOfCollectedTreasures();
-            if (this.isGameClear()) {
-                this.fastestClearElapsedFrame = this.elapsedFrame;
-            }
-
-            // ローカルストレージに保存
-            try {
-                localStorage.setItem('bestRecord', JSON.stringify({
-                    "bestNumberOfCollectedTreasures": this.bestNumberOfCollectedTreasures,
-                    "fastestClearElapsedFrame": this.fastestClearElapsedFrame,
-                }));
-            } catch (e) {
-            }
-
-            this.updateBestRecordText();
-        }
+        this.bestRecord.updateBestRecord(this.isGameClear(), this.player.getNumberOfCollectedTreasures(), this.elapsedFrame);
+        this.updateBestRecordText();
     }
 
     isPlaying() {

@@ -14,6 +14,10 @@ requestAnimationFameを使用しているので、60しか設定できないと�
 */
 export const FPS = 60;
 
+export const MS_PER_SECOND = 1000;
+
+export const SECONDS_PER_MINUTE = 60;
+
 export const parameterPlayer = { row: 0, column: 0 };
 
 export const numberOfEnemyies = 4;

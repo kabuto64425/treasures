@@ -4,11 +4,12 @@ import * as Game from './game';
 fetch('/treasures//params.json')
     .then(res => res.json())
     .then(data => {
-        startGameWithParams(data);
+        startGame(data);
     });
 
 // Phaser3オブジェクトを作る
-function startGameWithParams(params: any) {
+function startGame(params: any) {
+    const bestRecord = new Game.BestRecord(params.enableUsingLocalstorage);
     // Phaser3の設定データ
     const config: Phaser.Types.Core.GameConfig = {
         type: Phaser.AUTO,
@@ -16,7 +17,7 @@ function startGameWithParams(params: any) {
         height: Game.D_HEIGHT,// ゲーム画面の高さ
         backgroundColor: '#FFFFFF', // 背景色を設定
         antialias: false,
-        scene: new Game.GameScene(params),
+        scene: new Game.GameScene(params, bestRecord),
         fps: {
             target: Game.FPS,// フレームレート
             forceSetTimeOut: false

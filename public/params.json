@@ -1,4 +1,5 @@
 {
     "noGameOverMode": false,
-    "visibleFieldEvaluation": false
+    "visibleFieldEvaluation": false,
+    "enableUsingLocalstorage": true
 }
