@@ -1,3 +1,4 @@
+import * as GameConstants from "./gameConstants";
 import * as Utils from "./utils"
 
 export class BestRecord {
@@ -35,7 +36,9 @@ export class BestRecord {
         return this.elapsedFrame;
     }
 
-    createBestRecordStr(numberOfTreasuresInALLRounds: number) {
+    createBestRecordStr() {
+        // 総宝数の取得方法は暫定
+        const numberOfTreasuresInALLRounds = GameConstants.numberOfTreasures *(GameConstants.numberOfRounds - 1) + 1;
         let clearTimeStr = "--:--.---";
         if (this.elapsedFrame) {
             clearTimeStr = Utils.createFormattedTimeFromFrame(this.elapsedFrame);

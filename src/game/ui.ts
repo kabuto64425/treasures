@@ -1,4 +1,3 @@
-import * as GameConstants from "./gameConstants"
 import { GameScene } from "./gameScene";
 
 export class Ui {
@@ -8,7 +7,7 @@ export class Ui {
     private retry: Phaser.GameObjects.Image;
     private deleteRecord: Phaser.GameObjects.Image;
 
-    private bestRecordText: Phaser.GameObjects.BitmapText | undefined;
+    private bestRecordText: Phaser.GameObjects.BitmapText;
 
     constructor(scene: GameScene) {
         this.scene = scene;
@@ -20,6 +19,9 @@ export class Ui {
 
         this.deleteRecord = scene.make.image({ x: 1000, y: 550, key: 'retry' }, false);
         this.uiLayer.add(this.deleteRecord);
+
+        this.bestRecordText = scene.make.bitmapText({ x: 645, y: 296, font: "font", text: this.scene.getBestRecord().createBestRecordStr() }, false);
+        this.uiLayer.add(this.bestRecordText);
     }
 
     setupRetryButton() {
@@ -50,10 +52,6 @@ export class Ui {
     }
 
     updateBestRecordText() {
-        const bestRecord = this.scene.getBestRecord();
-
-        // 総宝数の取得方法は暫定
-        const numberOfTreasuresInALLRounds = GameConstants.numberOfTreasures *(GameConstants.numberOfRounds - 1) + 1;
-        this.bestRecordText!.setText(bestRecord.createBestRecordStr(numberOfTreasuresInALLRounds));
+        this.bestRecordText.setText(this.scene.getBestRecord().createBestRecordStr());
     }
 }

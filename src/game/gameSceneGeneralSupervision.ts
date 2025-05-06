@@ -28,8 +28,6 @@ export class GameSceneGeneralSupervision {
 
     private collectedTreasuresText: Phaser.GameObjects.BitmapText | undefined;
 
-    private bestRecordText: Phaser.GameObjects.BitmapText | undefined;
-
     private overlay: Phaser.GameObjects.Graphics | undefined;
     private gameOverText: Phaser.GameObjects.BitmapText | undefined;
 
@@ -86,15 +84,6 @@ export class GameSceneGeneralSupervision {
         this.collectedTreasuresText!.setText(`${this.player.getNumberOfCollectedTreasures()}/${this.roundsSupervision!.queryNumberOfTreasuresInALLRounds()}`);
     }
 
-    initBestRecordText(scene: GameScene) {
-        scene.add.bitmapText(645, 296, 'font', "BEST");
-        this.bestRecordText = scene.add.bitmapText(645, 378, 'font', this.bestRecord.createBestRecordStr(this.roundsSupervision!.queryNumberOfTreasuresInALLRounds()));
-    }
-
-    updateBestRecordText() {
-        this.bestRecordText!.setText(this.bestRecord.createBestRecordStr(this.roundsSupervision!.queryNumberOfTreasuresInALLRounds()));
-    }
-
     startSupervision(scene: GameScene) {
         this.gameState = GameSceneGeneralSupervision.GAME_STATE.STANDBY;
         this.initTimeText(scene);
@@ -147,7 +136,7 @@ export class GameSceneGeneralSupervision {
 
         clearRecord.on('pointerdown', () => {
             this.bestRecord.deleteBestRecord();
-            this.updateBestRecordText();
+            this.ui.updateBestRecordText();
         });
 
         // ゲームオーバー時に表示するオーバレイ
@@ -205,8 +194,6 @@ export class GameSceneGeneralSupervision {
         this.roundsSupervision.getCurrentRoundSupervision().getTreasuresSupervision().drawAllTreasures();
 
         this.initCollectedTreasuresText(scene);
-
-        this.initBestRecordText(scene);
     }
 
     updatePerFrame(cursors: Phaser.Types.Input.Keyboard.CursorKeys) {
@@ -280,7 +267,7 @@ export class GameSceneGeneralSupervision {
 
                 this.gameState = GameSceneGeneralSupervision.GAME_STATE.GAME_CLEAR;
                 this.bestRecord.updateBestRecord(this.isGameClear(), this.player.getNumberOfCollectedTreasures(), this.elapsedFrame);
-                this.updateBestRecordText();
+                this.ui.updateBestRecordText();
             } else {
                 roundsSupervision.advanceRound();
                 roundsSupervision.getCurrentRoundSupervision().getTreasuresSupervision().setAllTreasuresStateAppearance();
@@ -297,7 +284,7 @@ export class GameSceneGeneralSupervision {
                     this.gameOverText!.setVisible(true);
                     this.gameState = GameSceneGeneralSupervision.GAME_STATE.GAME_OVER;
                     this.bestRecord.updateBestRecord(this.isGameClear(), this.player.getNumberOfCollectedTreasures(), this.elapsedFrame);
-                    this.updateBestRecordText();
+                    this.ui.updateBestRecordText();
                 }
             }
         }
