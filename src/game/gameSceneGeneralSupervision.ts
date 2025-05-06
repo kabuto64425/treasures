@@ -287,7 +287,8 @@ export class GameSceneGeneralSupervision {
                 this.congratulationsText!.setVisible(true);
 
                 this.gameState = GameSceneGeneralSupervision.GAME_STATE.GAME_CLEAR;
-                this.handleRecordUpdate();
+                this.bestRecord.updateBestRecord(this.isGameClear(), this.player.getNumberOfCollectedTreasures(), this.elapsedFrame);
+                this.updateBestRecordText();
             } else {
                 roundsSupervision.advanceRound();
                 roundsSupervision.getCurrentRoundSupervision().getTreasuresSupervision().setAllTreasuresStateAppearance();
@@ -303,15 +304,11 @@ export class GameSceneGeneralSupervision {
                     this.overlay!.setVisible(true);
                     this.gameOverText!.setVisible(true);
                     this.gameState = GameSceneGeneralSupervision.GAME_STATE.GAME_OVER;
-                    this.handleRecordUpdate();
+                    this.bestRecord.updateBestRecord(this.isGameClear(), this.player.getNumberOfCollectedTreasures(), this.elapsedFrame);
+                    this.updateBestRecordText();
                 }
             }
         }
-    }
-
-    handleRecordUpdate() {
-        this.bestRecord.updateBestRecord(this.isGameClear(), this.player.getNumberOfCollectedTreasures(), this.elapsedFrame);
-        this.updateBestRecordText();
     }
 
     isPlaying() {
