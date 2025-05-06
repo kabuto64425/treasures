@@ -32,7 +32,7 @@ export class GameScene extends Phaser.Scene {
 
         this.cursors = this.input.keyboard.createCursorKeys();
         this.gameSceneGeneralSupervision = new GameSceneGeneralSupervision(this, this.params, this.bestRecoed);
-        this.gameSceneGeneralSupervision.startSupervision();
+        this.gameSceneGeneralSupervision.startSupervision(this);
     }
 
     // デバッグ用
@@ -48,5 +48,14 @@ export class GameScene extends Phaser.Scene {
         if(gameSceneGeneralSupervision.isPlaying()) {
             gameSceneGeneralSupervision.updatePerFrame(this.cursors!);
         }
+    }
+
+    getBestRecord() {
+        return this.bestRecoed;
+    }
+
+    getGeneralSupervision() {
+        // create内で確実に作成しているので、アサーションでもいけるはず
+        return this.gameSceneGeneralSupervision!;
     }
 }

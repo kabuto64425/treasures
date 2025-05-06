@@ -12,7 +12,6 @@ import { BestRecord } from "./bestRecord";
 import { Ui } from "./ui";
 
 export class GameSceneGeneralSupervision {
-    private scene: GameScene;
     private params: any;
     private bestRecord: BestRecord;
 
@@ -48,28 +47,27 @@ export class GameSceneGeneralSupervision {
         this.params = params;
         this.bestRecord = bestRecord;
         this.elapsedFrame = 0;
-        this.scene = scene;
 
         this.gameState = GameSceneGeneralSupervision.GAME_STATE.INITIALIZED;
 
-        this.ui = new Ui(this.scene);
+        this.ui = new Ui(scene);
 
         // プレイヤー
-        this.player = new Player(this.scene, GameConstants.parameterPlayer.row, GameConstants.parameterPlayer.column);
+        this.player = new Player(scene, GameConstants.parameterPlayer.row, GameConstants.parameterPlayer.column);
 
         //フィールド評価
-        this.fieldEvaluation = new FieldEvalution(this.scene, this.params.visibleFieldEvaluation);
+        this.fieldEvaluation = new FieldEvalution(scene, this.params.visibleFieldEvaluation);
 
         // 敵
         this.enemyList = [];
         for (let i = 0; i < GameConstants.numberOfEnemyies; i++) {
-            const enemy = new Enemy(this.scene, GameConstants.parametersOfEnemies[i].row, GameConstants.parametersOfEnemies[i].column, GameConstants.parametersOfEnemies[i].priorityScanDirections);
+            const enemy = new Enemy(scene, GameConstants.parametersOfEnemies[i].row, GameConstants.parametersOfEnemies[i].column, GameConstants.parametersOfEnemies[i].priorityScanDirections);
             this.enemyList.push(enemy);
         }
     }
 
-    initTimeText() {
-        this.timeText = this.scene.add.bitmapText(645, 50, 'font', "0:00.000");
+    initTimeText(scene: GameScene) {
+        this.timeText = scene.add.bitmapText(645, 50, 'font', "0:00.000");
     }
 
     updateTimeText() {
@@ -80,30 +78,31 @@ export class GameSceneGeneralSupervision {
         this.elapsedFrame++;
     }
 
-    initCollectedTreasuresText() {
-        this.collectedTreasuresText = this.scene.add.bitmapText(645, 132, 'font', `${this.player.getNumberOfCollectedTreasures()}/${this.roundsSupervision!.queryNumberOfTreasuresInALLRounds()}`);
+    initCollectedTreasuresText(scene: GameScene) {
+        this.collectedTreasuresText = scene.add.bitmapText(645, 132, 'font', `${this.player.getNumberOfCollectedTreasures()}/${this.roundsSupervision!.queryNumberOfTreasuresInALLRounds()}`);
     }
 
     updateCollectedTreasuresText() {
         this.collectedTreasuresText!.setText(`${this.player.getNumberOfCollectedTreasures()}/${this.roundsSupervision!.queryNumberOfTreasuresInALLRounds()}`);
     }
 
-    initBestRecordText() {
-        this.scene.add.bitmapText(645, 296, 'font', "BEST");
-        this.bestRecordText = this.scene.add.bitmapText(645, 378, 'font', this.bestRecord.createBestRecordStr(this.roundsSupervision!.queryNumberOfTreasuresInALLRounds()));
+    initBestRecordText(scene: GameScene) {
+        scene.add.bitmapText(645, 296, 'font', "BEST");
+        this.bestRecordText = scene.add.bitmapText(645, 378, 'font', this.bestRecord.createBestRecordStr(this.roundsSupervision!.queryNumberOfTreasuresInALLRounds()));
     }
 
     updateBestRecordText() {
         this.bestRecordText!.setText(this.bestRecord.createBestRecordStr(this.roundsSupervision!.queryNumberOfTreasuresInALLRounds()));
     }
 
-    startSupervision() {
+    startSupervision(scene: GameScene) {
         this.gameState = GameSceneGeneralSupervision.GAME_STATE.STANDBY;
-        this.initTimeText();
-        this.ui.setupRetryButton(this);
+        this.initTimeText(scene);
+        this.ui.setupRetryButton();
+        this.ui.setupDeleteRecordButton();
 
         // フィールド描画
-        const fieldGraphics = this.scene.add.graphics({
+        const fieldGraphics = scene.add.graphics({
             lineStyle: { width: 1, color: 0x000000, alpha: 1 },
             fillStyle: { color: 0xffffff, alpha: 1 }
         });
@@ -117,7 +116,7 @@ export class GameSceneGeneralSupervision {
         for (let i = 0; i < GameConstants.H; i++) {
             for (let j = 0; j < GameConstants.W; j++) {
                 if (GameConstants.FIELD[i][j] === 1) {
-                    this.scene.add.graphics({
+                    scene.add.graphics({
                         lineStyle: { width: 1, color: 0x000000, alpha: 1 },
                         fillStyle: { color: 0x000000, alpha: 1 }
                     }).fillRect(j * GameConstants.GRID_SIZE, i * GameConstants.GRID_SIZE, GameConstants.GRID_SIZE, GameConstants.GRID_SIZE);
@@ -125,7 +124,7 @@ export class GameSceneGeneralSupervision {
             }
         }
 
-        const play = this.scene.add.image(214, 214, 'play');
+        const play = scene.add.image(214, 214, 'play');
         play.setInteractive();
 
         play.on('pointerover', () => play.setTint(0x44ff44));
@@ -136,10 +135,10 @@ export class GameSceneGeneralSupervision {
             this.gameState = GameSceneGeneralSupervision.GAME_STATE.PLAYING;
         });
 
-        const uiLayer = this.scene.add.layer();
+        const uiLayer = scene.add.layer();
         uiLayer.setDepth(100);
 
-        const clearRecord = this.scene.make.image({ x: 1000, y: 550, key: 'retry' }, false);
+        const clearRecord = scene.make.image({ x: 1000, y: 550, key: 'retry' }, false);
         uiLayer.add(clearRecord);
         clearRecord.setInteractive();
 
@@ -152,17 +151,17 @@ export class GameSceneGeneralSupervision {
         });
 
         // ゲームオーバー時に表示するオーバレイ
-        this.overlay = this.scene.add.graphics();
+        this.overlay = scene.add.graphics();
         this.overlay.fillStyle(0xd20a13, 0.5).fillRect(0, 0, GameConstants.D_WIDTH, GameConstants.D_HEIGHT);
         this.overlay.setDepth(99);
         this.overlay.setVisible(false);
 
         // ゲームオーバーテキスト
-        this.gameOverText = this.scene.add.bitmapText(645, 214, 'font', "GAME OVER!");
+        this.gameOverText = scene.add.bitmapText(645, 214, 'font', "GAME OVER!");
         this.gameOverText.setVisible(false);
 
         // クリアおめでとうテキスト
-        this.congratulationsText = this.scene.add.bitmapText(645, 214, 'font', "CONGRATULATIONS!");
+        this.congratulationsText = scene.add.bitmapText(645, 214, 'font', "CONGRATULATIONS!");
         this.congratulationsText.setVisible(false);
 
         // プレイヤー描画
@@ -187,7 +186,7 @@ export class GameSceneGeneralSupervision {
                 while (GameConstants.FIELD[treasurePos.row][treasurePos.column] === 1) {
                     treasurePos = { row: Math.floor(Math.random() * GameConstants.H), column: Math.floor(Math.random() * GameConstants.W) };
                 }
-                const treasure = new Treasure(this.scene, 0xffff00, treasurePos.row, treasurePos.column);
+                const treasure = new Treasure(scene, 0xffff00, treasurePos.row, treasurePos.column);
                 singleRoundSupervision.getTreasuresSupervision().addTreasure(treasure);
             }
 
@@ -196,7 +195,7 @@ export class GameSceneGeneralSupervision {
 
         const singleRoundSupervision = new SingleRoundSupervision();
         let treasurePos = { row: 0, column: 0 };
-        const treasure = new Treasure(this.scene, 0xffa500, treasurePos.row, treasurePos.column);
+        const treasure = new Treasure(scene, 0xffa500, treasurePos.row, treasurePos.column);
         singleRoundSupervision.getTreasuresSupervision().addTreasure(treasure);
 
         this.roundsSupervision.setRoundSupervision(GameConstants.numberOfRounds - 1, singleRoundSupervision);
@@ -205,9 +204,9 @@ export class GameSceneGeneralSupervision {
         // 最初のラウンドの宝描画
         this.roundsSupervision.getCurrentRoundSupervision().getTreasuresSupervision().drawAllTreasures();
 
-        this.initCollectedTreasuresText();
+        this.initCollectedTreasuresText(scene);
 
-        this.initBestRecordText();
+        this.initBestRecordText(scene);
     }
 
     updatePerFrame(cursors: Phaser.Types.Input.Keyboard.CursorKeys) {
@@ -302,10 +301,6 @@ export class GameSceneGeneralSupervision {
                 }
             }
         }
-    }
-
-    getScene() {
-        return this.scene;
     }
 
     isPlaying() {
