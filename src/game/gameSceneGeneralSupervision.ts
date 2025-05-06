@@ -1,7 +1,6 @@
 import { GameScene } from "./gameScene"
 import { Player } from "./player"
 import * as GameConstants from "./gameConstants"
-import * as Utils from "./utils"
 import { DIRECTION } from "./drection";
 import { FieldEvalution } from "./fieldEvalution";
 import { Enemy } from "./enemy";
@@ -24,14 +23,8 @@ export class GameSceneGeneralSupervision {
     private gameState: number;
 
     private elapsedFrame: number;
-    private timeText: Phaser.GameObjects.BitmapText | undefined;
-
-    private collectedTreasuresText: Phaser.GameObjects.BitmapText | undefined;
 
     private overlay: Phaser.GameObjects.Graphics | undefined;
-    private gameOverText: Phaser.GameObjects.BitmapText | undefined;
-
-    private congratulationsText: Phaser.GameObjects.BitmapText | undefined;
 
     static readonly GAME_STATE = {
         INITIALIZED: -1,
@@ -64,29 +57,13 @@ export class GameSceneGeneralSupervision {
         }
     }
 
-    initTimeText(scene: GameScene) {
-        this.timeText = scene.add.bitmapText(645, 50, 'font', "0:00.000");
-    }
-
-    updateTimeText() {
-        this.timeText!.setText(`${Utils.createFormattedTimeFromFrame(this.elapsedFrame)}`);
-    }
-
     updateElapsedFrame() {
         this.elapsedFrame++;
     }
 
-    initCollectedTreasuresText(scene: GameScene) {
-        this.collectedTreasuresText = scene.add.bitmapText(645, 132, 'font', `${this.player.getNumberOfCollectedTreasures()}/${this.roundsSupervision!.queryNumberOfTreasuresInALLRounds()}`);
-    }
-
-    updateCollectedTreasuresText() {
-        this.collectedTreasuresText!.setText(`${this.player.getNumberOfCollectedTreasures()}/${this.roundsSupervision!.queryNumberOfTreasuresInALLRounds()}`);
-    }
-
     startSupervision(scene: GameScene) {
         this.gameState = GameSceneGeneralSupervision.GAME_STATE.STANDBY;
-        this.initTimeText(scene);
+        this.ui.setupPlayButton();
         this.ui.setupRetryButton();
         this.ui.setupDeleteRecordButton();
 
@@ -113,45 +90,11 @@ export class GameSceneGeneralSupervision {
             }
         }
 
-        const play = scene.add.image(214, 214, 'play');
-        play.setInteractive();
-
-        play.on('pointerover', () => play.setTint(0x44ff44));
-        play.on('pointerout', () => play.clearTint());
-
-        play.on('pointerdown', () => {
-            play.destroy();
-            this.gameState = GameSceneGeneralSupervision.GAME_STATE.PLAYING;
-        });
-
-        const uiLayer = scene.add.layer();
-        uiLayer.setDepth(100);
-
-        const clearRecord = scene.make.image({ x: 1000, y: 550, key: 'retry' }, false);
-        uiLayer.add(clearRecord);
-        clearRecord.setInteractive();
-
-        clearRecord.on('pointerover', () => clearRecord.setTint(0x44ff44));
-        clearRecord.on('pointerout', () => clearRecord.clearTint());
-
-        clearRecord.on('pointerdown', () => {
-            this.bestRecord.deleteBestRecord();
-            this.ui.updateBestRecordText();
-        });
-
         // ゲームオーバー時に表示するオーバレイ
         this.overlay = scene.add.graphics();
         this.overlay.fillStyle(0xd20a13, 0.5).fillRect(0, 0, GameConstants.D_WIDTH, GameConstants.D_HEIGHT);
         this.overlay.setDepth(99);
         this.overlay.setVisible(false);
-
-        // ゲームオーバーテキスト
-        this.gameOverText = scene.add.bitmapText(645, 214, 'font', "GAME OVER!");
-        this.gameOverText.setVisible(false);
-
-        // クリアおめでとうテキスト
-        this.congratulationsText = scene.add.bitmapText(645, 214, 'font', "CONGRATULATIONS!");
-        this.congratulationsText.setVisible(false);
 
         // プレイヤー描画
         this.player.draw();
@@ -192,8 +135,6 @@ export class GameSceneGeneralSupervision {
         this.roundsSupervision.getCurrentRoundSupervision().getTreasuresSupervision().setAllTreasuresStateAppearance();
         // 最初のラウンドの宝描画
         this.roundsSupervision.getCurrentRoundSupervision().getTreasuresSupervision().drawAllTreasures();
-
-        this.initCollectedTreasuresText(scene);
     }
 
     updatePerFrame(cursors: Phaser.Types.Input.Keyboard.CursorKeys) {
@@ -201,7 +142,7 @@ export class GameSceneGeneralSupervision {
             return;
         }
         this.updateElapsedFrame();
-        this.updateTimeText();
+        this.ui.updateTimeText();
 
         // キーボードの情報を取得
         let input_dist = null;
@@ -258,12 +199,12 @@ export class GameSceneGeneralSupervision {
             }
         }
 
-        this.updateCollectedTreasuresText();
+        this.ui.updateCollectedTreasuresText();
 
         // 次ラウンド進行判断・次ラウンド進行
         if (roundsSupervision.isCompletedCurrentRound()) {
             if (roundsSupervision.isFinalRound()) {
-                this.congratulationsText!.setVisible(true);
+                this.ui.showCongratulationsText();
 
                 this.gameState = GameSceneGeneralSupervision.GAME_STATE.GAME_CLEAR;
                 this.bestRecord.updateBestRecord(this.isGameClear(), this.player.getNumberOfCollectedTreasures(), this.elapsedFrame);
@@ -281,13 +222,25 @@ export class GameSceneGeneralSupervision {
                 // create内で確実に作成しているので、アサーションでもいけるはず
                 if (!this.params.noGameOverMode) {
                     this.overlay!.setVisible(true);
-                    this.gameOverText!.setVisible(true);
+                    this.ui.showGameOverText();
                     this.gameState = GameSceneGeneralSupervision.GAME_STATE.GAME_OVER;
                     this.bestRecord.updateBestRecord(this.isGameClear(), this.player.getNumberOfCollectedTreasures(), this.elapsedFrame);
                     this.ui.updateBestRecordText();
                 }
             }
         }
+    }
+
+    getElapsedFrame() {
+        return this.elapsedFrame;
+    }
+
+    queryNumberOfCollectedTreasures() {
+        return this.player.getNumberOfCollectedTreasures();
+    }
+
+    changeStatePlaying() {
+        this.gameState = GameSceneGeneralSupervision.GAME_STATE.PLAYING;
     }
 
     isPlaying() {

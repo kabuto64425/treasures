@@ -15,3 +15,8 @@ export function createFormattedTimeFromFrame(frame: number) {
 
     return `${minutes.toString()}:${seconds.toString().padStart(2, "0")}.${milliseconds.toString().padStart(3, "0")}`;
 }
+
+export function calculateNumberOfTreasuresInALLRounds() {
+    // 総宝数の取得方法は暫定
+    return GameConstants.numberOfTreasures *(GameConstants.numberOfRounds - 1) + 1;
+}
