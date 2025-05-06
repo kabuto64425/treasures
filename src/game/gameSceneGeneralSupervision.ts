@@ -9,11 +9,14 @@ import { RoundsSupervision } from "../roundsSupervision";
 import { SingleRoundSupervision } from "./singleRoundSupervision";
 import { Treasure } from "./treasure";
 import { BestRecord } from "./bestRecord";
+import { Ui } from "./ui";
 
 export class GameSceneGeneralSupervision {
     private scene: GameScene;
     private params: any;
     private bestRecord: BestRecord;
+
+    private ui: Ui;
 
     private player: Player;
     private fieldEvaluation: FieldEvalution;
@@ -41,13 +44,15 @@ export class GameSceneGeneralSupervision {
         GAME_OVER: 3,
     };
 
-    constructor(scene: GameScene, params: any, bestRecord : BestRecord) {
+    constructor(scene: GameScene, params: any, bestRecord: BestRecord) {
         this.params = params;
         this.bestRecord = bestRecord;
         this.elapsedFrame = 0;
         this.scene = scene;
 
         this.gameState = GameSceneGeneralSupervision.GAME_STATE.INITIALIZED;
+
+        this.ui = new Ui(this.scene);
 
         // プレイヤー
         this.player = new Player(this.scene, GameConstants.parameterPlayer.row, GameConstants.parameterPlayer.column);
@@ -95,6 +100,7 @@ export class GameSceneGeneralSupervision {
     startSupervision() {
         this.gameState = GameSceneGeneralSupervision.GAME_STATE.STANDBY;
         this.initTimeText();
+        this.ui.setupRetryButton(this);
 
         // フィールド描画
         const fieldGraphics = this.scene.add.graphics({
@@ -132,19 +138,6 @@ export class GameSceneGeneralSupervision {
 
         const uiLayer = this.scene.add.layer();
         uiLayer.setDepth(100);
-
-        const retry = this.scene.make.image({ x: 800, y: 550, key: 'retry' }, false);
-        uiLayer.add(retry);
-        retry.setInteractive();
-
-        retry.on('pointerover', () => retry.setTint(0x44ff44));
-        retry.on('pointerout', () => retry.clearTint());
-
-        retry.on('pointerdown', () => {
-            if (this.isGamePlayed()) {
-                this.scene.scene.restart();
-            }
-        });
 
         const clearRecord = this.scene.make.image({ x: 1000, y: 550, key: 'retry' }, false);
         uiLayer.add(clearRecord);
@@ -309,6 +302,10 @@ export class GameSceneGeneralSupervision {
                 }
             }
         }
+    }
+
+    getScene() {
+        return this.scene;
     }
 
     isPlaying() {
