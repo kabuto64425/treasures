@@ -1,4 +1,4 @@
-import { defineConfig } from 'vite';
+import { defineConfig } from "vite";
 
 export default defineConfig({
     build: {
@@ -7,7 +7,7 @@ export default defineConfig({
         assetsInlineLimit: 0,
     },
 
-    base: '/treasures/',
+    base: "/treasures/",
 
 });
 
