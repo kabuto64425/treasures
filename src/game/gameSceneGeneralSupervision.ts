@@ -61,7 +61,7 @@ export class GameSceneGeneralSupervision {
         this.elapsedFrame++;
     }
 
-    startSupervision(scene: GameScene) {
+    setupSupervision(scene: GameScene) {
         this.gameState = GameSceneGeneralSupervision.GAME_STATE.STANDBY;
         this.ui.setupPlayButton();
         this.ui.setupRetryButton();
@@ -133,8 +133,14 @@ export class GameSceneGeneralSupervision {
         this.roundsSupervision.setRoundSupervision(GameConstants.numberOfRounds - 1, singleRoundSupervision);
 
         this.roundsSupervision.getCurrentRoundSupervision().getTreasuresSupervision().setAllTreasuresStateAppearance();
+        
+    }
+
+    startGame() {
+        this.gameState = GameSceneGeneralSupervision.GAME_STATE.PLAYING;
         // 最初のラウンドの宝描画
-        this.roundsSupervision.getCurrentRoundSupervision().getTreasuresSupervision().drawAllTreasures();
+        // setup内で確実に作成しているので、アサーションでもいけるはず
+        this.roundsSupervision!.getCurrentRoundSupervision().getTreasuresSupervision().drawAllTreasures();
     }
 
     updatePerFrame(cursors: Phaser.Types.Input.Keyboard.CursorKeys) {
@@ -172,13 +178,13 @@ export class GameSceneGeneralSupervision {
         this.player.draw();
 
         // フィールド評価
-        // create内で確実に作成しているので、アサーションでもいけるはず
+        // setup内で確実に作成しているので、アサーションでもいけるはず
         const fieldEvaluation = this.fieldEvaluation!;
         fieldEvaluation.updateEvaluation(this.player.position().row, this.player.position().column);
         fieldEvaluation.draw();
 
         // 敵
-        // create内で確実に作成しているので、アサーションでもいけるはず
+        // setup内で確実に作成しているので、アサーションでもいけるはず
         for (const enemy of this.enemyList) {
             if (enemy.isChargeCompleted()) {
                 let enemyDist = enemy.decideMoveDirection(fieldEvaluation);
@@ -219,7 +225,7 @@ export class GameSceneGeneralSupervision {
         // 敵との接触判定・ゲームオーバー更新
         for (const enemy of this.enemyList) {
             if (this.player.position().row === enemy.position().row && this.player.position().column === enemy.position().column) {
-                // create内で確実に作成しているので、アサーションでもいけるはず
+                // setup内で確実に作成しているので、アサーションでもいけるはず
                 if (!this.params.noGameOverMode) {
                     this.overlay!.setVisible(true);
                     this.ui.showGameOverText();
@@ -237,10 +243,6 @@ export class GameSceneGeneralSupervision {
 
     queryNumberOfCollectedTreasures() {
         return this.player.getNumberOfCollectedTreasures();
-    }
-
-    changeStatePlaying() {
-        this.gameState = GameSceneGeneralSupervision.GAME_STATE.PLAYING;
     }
 
     isPlaying() {

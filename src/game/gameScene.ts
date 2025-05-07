@@ -22,7 +22,6 @@ export class GameScene extends Phaser.Scene {
 
         this.load.image('play', '/treasures/play.svg');
         this.load.image('retry', '/treasures/retry.svg');
-        
     }
 
     create() {
@@ -32,7 +31,7 @@ export class GameScene extends Phaser.Scene {
 
         this.cursors = this.input.keyboard.createCursorKeys();
         this.gameSceneGeneralSupervision = new GameSceneGeneralSupervision(this, this.params, this.bestRecoed);
-        this.gameSceneGeneralSupervision.startSupervision(this);
+        this.gameSceneGeneralSupervision.setupSupervision(this);
     }
 
     // デバッグ用

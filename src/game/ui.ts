@@ -60,7 +60,7 @@ export class Ui {
 
         this.play.on('pointerdown', () => {
             this.play.destroy();
-            this.scene.getGeneralSupervision().changeStatePlaying();
+            this.scene.getGeneralSupervision().startGame();
         });
     }
 
