@@ -1,6 +1,6 @@
 import { DIRECTION } from "./drection";
 import { GameScene } from "./gameScene";
-import * as GameConstants from './gameConstants';
+import * as GameConstants from "./gameConstants";
 
 export class FieldEvalution {
     private shortestDirectionMaps: Map<string, boolean>[][];

@@ -4,7 +4,7 @@ import * as GameConstants from "./gameConstants"
 import { DIRECTION } from "./drection";
 import { FieldEvalution } from "./fieldEvalution";
 import { Enemy } from "./enemy";
-import { RoundsSupervision } from "../roundsSupervision";
+import { RoundsSupervision } from "./roundsSupervision";
 import { SingleRoundSupervision } from "./singleRoundSupervision";
 import { Treasure } from "./treasure";
 import { BestRecord } from "./bestRecord";

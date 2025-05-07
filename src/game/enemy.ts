@@ -1,5 +1,5 @@
 import { DIRECTION } from "./drection";
-import * as GameConstants from './gameConstants';
+import * as GameConstants from "./gameConstants";
 import { GameScene } from "./gameScene";
 import { FieldEvalution } from "./fieldEvalution";
 

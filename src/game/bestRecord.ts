@@ -14,7 +14,7 @@ export class BestRecord {
             return;
         }
 
-        const bestRecordJSON = localStorage.getItem('bestRecord');
+        const bestRecordJSON = localStorage.getItem("bestRecord");
 
         if (bestRecordJSON) {
             const bestRecordData = JSON.parse(bestRecordJSON);
@@ -68,7 +68,7 @@ export class BestRecord {
 
         if (this.enableUsingLocalstorage) {
             try {
-                localStorage.setItem('bestRecord', JSON.stringify({
+                localStorage.setItem("bestRecord", JSON.stringify({
                     "bestNumberOfCollectedTreasures": this.numberOfCollectedTreasures,
                     "fastestClearElapsedFrame": this.elapsedFrame,
                 }));

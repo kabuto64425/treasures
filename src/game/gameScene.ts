@@ -1,6 +1,6 @@
-import Phaser from 'phaser';
-import { GameSceneGeneralSupervision } from './gameSceneGeneralSupervision';
-import { BestRecord } from './bestRecord';
+import Phaser from "phaser";
+import { GameSceneGeneralSupervision } from "./gameSceneGeneralSupervision";
+import { BestRecord } from "./bestRecord";
 
 export class GameScene extends Phaser.Scene {
     private params: any;
@@ -10,24 +10,24 @@ export class GameScene extends Phaser.Scene {
     private cursors: Phaser.Types.Input.Keyboard.CursorKeys | undefined;
 
     constructor(params: any, bestRecord: BestRecord) {
-        super('gameScene');
+        super("gameScene");
         this.params = params;
         this.bestRecoed = bestRecord;
     }
 
     preload() {
         console.log("preload!!");
-        this.load.atlas('fontatlas', '/treasures/bitmap-fonts-debug.png', '/treasures/bitmap-fonts.json');
-        this.load.xml('azoXML', '/treasures/azo-fire.xml');
+        this.load.atlas("fontatlas", "/treasures/bitmap-fonts-debug.png", "/treasures/bitmap-fonts.json");
+        this.load.xml("azoXML", "/treasures/azo-fire.xml");
 
-        this.load.image('play', '/treasures/play.svg');
-        this.load.image('retry', '/treasures/retry.svg');
+        this.load.image("play", "/treasures/play.svg");
+        this.load.image("retry", "/treasures/retry.svg");
     }
 
     create() {
         console.log("create!!");
 
-        Phaser.GameObjects.BitmapText.ParseFromAtlas(this, 'font', 'fontatlas', 'azo-fire', 'azoXML');
+        Phaser.GameObjects.BitmapText.ParseFromAtlas(this, "font", "fontatlas", "azo-fire", "azoXML");
 
         this.cursors = this.input.keyboard.createCursorKeys();
         this.gameSceneGeneralSupervision = new GameSceneGeneralSupervision(this, this.params, this.bestRecoed);

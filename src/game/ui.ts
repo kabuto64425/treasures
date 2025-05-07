@@ -23,13 +23,13 @@ export class Ui {
         this.uiLayer = scene.add.layer();
         this.uiLayer.setDepth(100);
 
-        this.play = scene.make.image({ x: 214, y: 214, key: 'play' }, false);
+        this.play = scene.make.image({ x: 214, y: 214, key: "play" }, false);
         this.uiLayer.add(this.play);
 
-        this.retry = scene.make.image({ x: 800, y: 550, key: 'retry' }, false);
+        this.retry = scene.make.image({ x: 800, y: 550, key: "retry" }, false);
         this.uiLayer.add(this.retry);
 
-        this.deleteRecord = scene.make.image({ x: 1000, y: 550, key: 'retry' }, false);
+        this.deleteRecord = scene.make.image({ x: 1000, y: 550, key: "retry" }, false);
         this.uiLayer.add(this.deleteRecord);
 
         this.timeText = scene.make.bitmapText({ x: 645, y: 50, font: "font", text: "0:00.000" }, false);
@@ -55,10 +55,10 @@ export class Ui {
     setupPlayButton() {
         this.play.setInteractive();
 
-        this.play.on('pointerover', () => this.play.setTint(0x44ff44));
-        this.play.on('pointerout', () => this.play.clearTint());
+        this.play.on("pointerover", () => this.play.setTint(0x44ff44));
+        this.play.on("pointerout", () => this.play.clearTint());
 
-        this.play.on('pointerdown', () => {
+        this.play.on("pointerdown", () => {
             this.play.destroy();
             this.scene.getGeneralSupervision().startGame();
         });
@@ -67,12 +67,12 @@ export class Ui {
     setupRetryButton() {
         this.retry.setInteractive();
 
-        this.retry.on('pointerover', () => this.retry.setTint(0x44ff44));
-        this.retry.on('pointerout', () => this.retry.clearTint());
+        this.retry.on("pointerover", () => this.retry.setTint(0x44ff44));
+        this.retry.on("pointerout", () => this.retry.clearTint());
 
         const gameSceneGeneralSupervision = this.scene.getGeneralSupervision();
 
-        this.retry.on('pointerdown', () => {
+        this.retry.on("pointerdown", () => {
             if (gameSceneGeneralSupervision.isGamePlayed()) {
                 this.scene.scene.restart();
             }
@@ -82,10 +82,10 @@ export class Ui {
     setupDeleteRecordButton() {
         this.deleteRecord.setInteractive();
 
-        this.deleteRecord.on('pointerover', () => this.deleteRecord.setTint(0x44ff44));
-        this.deleteRecord.on('pointerout', () => this.deleteRecord.clearTint());
+        this.deleteRecord.on("pointerover", () => this.deleteRecord.setTint(0x44ff44));
+        this.deleteRecord.on("pointerout", () => this.deleteRecord.clearTint());
 
-        this.deleteRecord.on('pointerdown', () => {
+        this.deleteRecord.on("pointerdown", () => {
             this.scene.getBestRecord().deleteBestRecord();
             this.updateBestRecordText();
         });

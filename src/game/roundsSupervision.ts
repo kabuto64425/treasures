@@ -1,4 +1,4 @@
-import { SingleRoundSupervision } from "./game/singleRoundSupervision";
+import { SingleRoundSupervision } from "./singleRoundSupervision";
 
 export class RoundsSupervision {
     private numberOfRounds: number;

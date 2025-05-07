@@ -1,7 +1,7 @@
-import Phaser from 'phaser';
-import * as Game from './game';
+import Phaser from "phaser";
+import * as Game from "./game";
 
-fetch('/treasures//params.json')
+fetch("/treasures//params.json")
     .then(res => res.json())
     .then(data => {
         startGame(data);
@@ -15,7 +15,7 @@ function startGame(params: any) {
         type: Phaser.AUTO,
         width: Game.D_WIDTH,// ゲーム画面の横幅
         height: Game.D_HEIGHT,// ゲーム画面の高さ
-        backgroundColor: '#FFFFFF', // 背景色を設定
+        backgroundColor: "#FFFFFF", // 背景色を設定
         antialias: false,
         scene: new Game.GameScene(params, bestRecord),
         fps: {

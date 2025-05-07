@@ -1,5 +1,5 @@
 import { GameScene } from "./gameScene";
-import * as GameConstants from './gameConstants';
+import * as GameConstants from "./gameConstants";
 
 export class Treasure {
     private graphics: Phaser.GameObjects.Graphics;
