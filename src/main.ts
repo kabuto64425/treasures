@@ -4,11 +4,11 @@ import * as Game from "./game";
 fetch("/treasures//params.json")
     .then(res => res.json())
     .then(data => {
-        startGame(data);
+        initGame(data);
     });
 
 // Phaser3オブジェクトを作る
-function startGame(params: any) {
+function initGame(params: any) {
     const bestRecord = new Game.BestRecord(params.enableUsingLocalstorage);
     // Phaser3の設定データ
     const config: Phaser.Types.Core.GameConfig = {
