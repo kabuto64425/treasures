@@ -225,8 +225,8 @@ export class GameSceneGeneralSupervision {
         // 敵との接触判定・ゲームオーバー更新
         for (const enemy of this.enemyList) {
             if (this.player.position().row === enemy.position().row && this.player.position().column === enemy.position().column) {
-                // setup内で確実に作成しているので、アサーションでもいけるはず
                 if (!this.params.noGameOverMode) {
+                    // setup内で確実に作成しているので、アサーションでもいけるはず
                     this.overlay!.setVisible(true);
                     this.ui.showGameOverText();
                     this.gameState = GameSceneGeneralSupervision.GAME_STATE.GAME_OVER;
