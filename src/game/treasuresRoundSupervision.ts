@@ -1,29 +1,20 @@
+import { ISingleRoundSupervision } from "./iSingleRoundSupervision";
 import { Treasure } from "./treasure";
 
-export class TreasuresSupervision {
+export class TreasuresRoundSupervision implements ISingleRoundSupervision {
+
     private treasureList: Treasure[];
-    private numberOfTreasures: number;
 
-    constructor() {
-        this.treasureList = [];
-        this.numberOfTreasures = 0;
+    constructor(treasureList: readonly Treasure[]) {
+        this.treasureList = [...treasureList];
     }
 
-    addTreasure(treasure: Treasure) {
-        this.treasureList.push(treasure);
-        this.numberOfTreasures++;
-    }
-
-    getTreasureList() {
-        return this.treasureList;
+    isObjectiveMet(): boolean {
+        return this.treasureList.every(t => t.isCollected());
     }
 
     extractAppearanceTreasureList() {
         return this.treasureList.filter(t => t.isAppearance());
-    }
-
-    getNumberOfTreasures() {
-        return this.numberOfTreasures;
     }
 
     setAllTreasuresStateAppearance() {

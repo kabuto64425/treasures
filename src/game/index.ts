@@ -5,10 +5,10 @@ export * from "./fieldEvalution";
 export * from "./gameConstants";
 export * from "./gameScene";
 export * from "./gameSceneGeneralSupervision";
+export * from "./iSingleRoundSupervision";
 export * from "./player";
 export * from "./roundsSupervision"
-export * from "./singleRoundSupervision";
+export * from "./treasuresRoundSupervision";
 export * from "./treasure";
-export * from "./treasuresSupervision";
 export * from "./bestRecord"
 export * from "./ui"

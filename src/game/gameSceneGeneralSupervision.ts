@@ -5,10 +5,11 @@ import { DIRECTION } from "./drection";
 import { FieldEvalution } from "./fieldEvalution";
 import { Enemy } from "./enemy";
 import { RoundsSupervision } from "./roundsSupervision";
-import { SingleRoundSupervision } from "./singleRoundSupervision";
+import { TreasuresRoundSupervision } from "./treasuresRoundSupervision";
 import { Treasure } from "./treasure";
 import { BestRecord } from "./bestRecord";
 import { Ui } from "./ui";
+import { FinalRoundSupervision } from "./finalRoundSupervision";
 
 export class GameSceneGeneralSupervision {
     private params: any;
@@ -111,7 +112,7 @@ export class GameSceneGeneralSupervision {
         // ラウンド進行監督
         this.roundsSupervision = new RoundsSupervision(GameConstants.numberOfRounds);
         for (let i = 0; i < GameConstants.numberOfRounds - 1; i++) {
-            const singleRoundSupervision = new SingleRoundSupervision();
+            const treasureList = [];
             for (let j = 0; j < GameConstants.numberOfTreasures; j++) {
                 let treasurePos = { row: Math.floor(Math.random() * GameConstants.H), column: Math.floor(Math.random() * GameConstants.W) };
                 // 壁が存在するところに宝を配置しないようにする
@@ -119,18 +120,14 @@ export class GameSceneGeneralSupervision {
                     treasurePos = { row: Math.floor(Math.random() * GameConstants.H), column: Math.floor(Math.random() * GameConstants.W) };
                 }
                 const treasure = new Treasure(scene, 0xffff00, treasurePos.row, treasurePos.column);
-                singleRoundSupervision.getTreasuresSupervision().addTreasure(treasure);
+                treasureList.push(treasure);
             }
 
-            this.roundsSupervision.setRoundSupervision(i, singleRoundSupervision);
+            this.roundsSupervision.setRoundSupervision(i, new TreasuresRoundSupervision(treasureList));
         }
 
-        const singleRoundSupervision = new SingleRoundSupervision();
-        let treasurePos = { row: 0, column: 0 };
-        const treasure = new Treasure(scene, 0xffa500, treasurePos.row, treasurePos.column);
-        singleRoundSupervision.getTreasuresSupervision().addTreasure(treasure);
-
-        this.roundsSupervision.setRoundSupervision(GameConstants.numberOfRounds - 1, singleRoundSupervision);
+        let goalPos = { row: 0, column: 0 };
+        this.roundsSupervision.setRoundSupervision(GameConstants.numberOfRounds - 1, new FinalRoundSupervision(scene, goalPos.row, goalPos.column));
 
         this.roundsSupervision.getCurrentRoundSupervision().getTreasuresSupervision().setAllTreasuresStateAppearance();
         
