@@ -1,12 +1,10 @@
 import { ISingleRoundSupervision } from "./iSingleRoundSupervision";
 
 export class RoundsSupervision {
-    private numberOfRounds: number;
     private currentRound: number;
     private singleRoundSupervisionList: ISingleRoundSupervision[];
 
     constructor(numberOfRound: number) {
-        this.numberOfRounds = numberOfRound;
         this.currentRound = 0;
         this.singleRoundSupervisionList = new Array(numberOfRound);
     }
@@ -16,7 +14,7 @@ export class RoundsSupervision {
     }
 
     isFinalRound() {
-        return this.currentRound === (this.numberOfRounds - 1);
+        return this.getCurrentRoundSupervision().isFinalRound();
     }
 
     isCompletedCurrentRound() {

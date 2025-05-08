@@ -17,9 +17,13 @@ export class GameScene extends Phaser.Scene {
 
     preload() {
         console.log("preload!!");
+        //https://cdn.phaserfiles.com/v385/assets/atlas/bitmap-fonts-debug.png
+        //https://cdn.phaserfiles.com/v385/assets/atlas/bitmap-fonts.json
+        //https://cdn.phaserfiles.com/v385/assets/fonts/bitmap/azo-fire.xml
         this.load.atlas("fontatlas", "/treasures/bitmap-fonts-debug.png", "/treasures/bitmap-fonts.json");
         this.load.xml("azoXML", "/treasures/azo-fire.xml");
 
+        //https://icon-rainbow.com/
         this.load.image("play", "/treasures/play.svg");
         this.load.image("retry", "/treasures/retry.svg");
     }

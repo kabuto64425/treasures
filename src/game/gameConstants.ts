@@ -22,9 +22,9 @@ export const parameterPlayer = { row: 0, column: 0 };
 
 export const numberOfEnemyies = 4;
 
-export const numberOfTreasures = 5;
+export const numberOfTreasuresPerRound = 5;
 
-export const numberOfRounds = 7;
+export const numberOfTreasuresRounds = 6;
 
 export const parametersOfEnemies = [
     { row: 15, column: 29, priorityScanDirections: [DIRECTION.RIGHT, DIRECTION.DOWN, DIRECTION.LEFT, DIRECTION.UP] },

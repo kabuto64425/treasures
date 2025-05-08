@@ -29,6 +29,10 @@ export class TreasuresRoundSupervision implements ISingleRoundSupervision {
         return this.areAllTreasuresCollected();
     }
 
+    isFinalRound(): boolean {
+        return false;
+    }
+
     extractAppearanceTreasureList() {
         return this.treasureList.filter(t => t.isAppearance());
     }

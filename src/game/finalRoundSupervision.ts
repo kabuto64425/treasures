@@ -19,12 +19,15 @@ export class FinalRoundSupervision implements ISingleRoundSupervision {
         if (player.position().row === this.goal.position().row && player.position().column === this.goal.position().column) {
             this.goal.setStateCollected();
             this.goal.clearDisplay();
-            player.addNumberOfCollectedTreasures();
         }
     }
     
     isRoundCompleted(): boolean {
         return this.goal.isCollected();
+    }
+
+    isFinalRound(): boolean {
+        return true;
     }
 
     setStateAppearance() {

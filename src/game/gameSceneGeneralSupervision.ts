@@ -110,10 +110,11 @@ export class GameSceneGeneralSupervision {
         }
 
         // ラウンド進行監督
-        this.roundsSupervision = new RoundsSupervision(GameConstants.numberOfRounds);
-        for (let i = 0; i < GameConstants.numberOfRounds - 1; i++) {
+        // +1でファイナルラウンドに対応しているのは暫定
+        this.roundsSupervision = new RoundsSupervision(GameConstants.numberOfTreasuresRounds + 1);
+        for (let i = 0; i < GameConstants.numberOfTreasuresRounds; i++) {
             const treasureList = [];
-            for (let j = 0; j < GameConstants.numberOfTreasures; j++) {
+            for (let j = 0; j < GameConstants.numberOfTreasuresPerRound; j++) {
                 let treasurePos = { row: Math.floor(Math.random() * GameConstants.H), column: Math.floor(Math.random() * GameConstants.W) };
                 // 壁が存在するところに宝を配置しないようにする
                 while (GameConstants.FIELD[treasurePos.row][treasurePos.column] === 1) {
@@ -126,8 +127,9 @@ export class GameSceneGeneralSupervision {
             this.roundsSupervision.setRoundSupervision(i, new TreasuresRoundSupervision(treasureList));
         }
 
+        // ファイナルラウンド
         let goalPos = { row: 0, column: 0 };
-        this.roundsSupervision.setRoundSupervision(GameConstants.numberOfRounds - 1, new FinalRoundSupervision(scene, goalPos.row, goalPos.column));
+        this.roundsSupervision.setRoundSupervision(GameConstants.numberOfTreasuresRounds, new FinalRoundSupervision(scene, goalPos.row, goalPos.column));
     }
 
     startGame() {
