@@ -1,5 +1,4 @@
 import { ISingleRoundSupervision } from "./iSingleRoundSupervision";
-import { TreasuresRoundSupervision } from "./treasuresRoundSupervision";
 
 export class RoundsSupervision {
     private numberOfRounds: number;
@@ -21,7 +20,7 @@ export class RoundsSupervision {
     }
 
     isCompletedCurrentRound() {
-        return this.getCurrentRoundSupervision().isObjectiveMet();
+        return this.getCurrentRoundSupervision().isRoundCompleted();
     }
 
     advanceRound() {

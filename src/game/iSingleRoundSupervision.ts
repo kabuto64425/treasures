@@ -1,3 +1,7 @@
+import { Player } from "./player";
+
 export interface ISingleRoundSupervision {
-    isObjectiveMet(): boolean;
+    startRound(): void;
+    interactWithPlayer(player : Player): void;
+    isRoundCompleted(): boolean;
 }
