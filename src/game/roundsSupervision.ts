@@ -1,9 +1,9 @@
-import { SingleRoundSupervision } from "./singleRoundSupervision";
+import { ISingleRoundSupervision } from "./iSingleRoundSupervision";
 
 export class RoundsSupervision {
     private numberOfRounds: number;
     private currentRound: number;
-    private singleRoundSupervisionList: SingleRoundSupervision[];
+    private singleRoundSupervisionList: ISingleRoundSupervision[];
 
     constructor(numberOfRound: number) {
         this.numberOfRounds = numberOfRound;
@@ -20,7 +20,7 @@ export class RoundsSupervision {
     }
 
     isCompletedCurrentRound() {
-        return this.getCurrentRoundSupervision().getTreasuresSupervision().areAllTreasuresCollected();
+        return this.getCurrentRoundSupervision().isRoundCompleted();
     }
 
     advanceRound() {
@@ -33,18 +33,7 @@ export class RoundsSupervision {
         return this.singleRoundSupervisionList[this.currentRound];
     }
 
-    setRoundSupervision(round: number, singleRoundSupervision: SingleRoundSupervision) {
+    setRoundSupervision(round: number, singleRoundSupervision: ISingleRoundSupervision) {
         this.singleRoundSupervisionList[round] = singleRoundSupervision;
-    }
-
-    queryNumberOfTreasuresInSingleRound(round: number) {
-        return this.singleRoundSupervisionList[round].getTreasuresSupervision().getNumberOfTreasures();
-    }
-
-    queryNumberOfTreasuresInALLRounds() {
-        return Array.from({ length: this.numberOfRounds }, (_, i) =>{
-            console.log(this.queryNumberOfTreasuresInSingleRound(i));
-            return this.queryNumberOfTreasuresInSingleRound(i);
-        }).reduce((sum, treasures) => sum + treasures, 0);
     }
 }
