@@ -29,7 +29,7 @@ export class Ui {
         this.retry = scene.make.image({ x: 800, y: 550, key: "retry" }, false);
         this.uiLayer.add(this.retry);
 
-        this.deleteRecord = scene.make.image({ x: 1000, y: 550, key: "retry" }, false);
+        this.deleteRecord = scene.make.image({ x: 1000, y: 550, key: "delete" }, false);
         this.uiLayer.add(this.deleteRecord);
 
         this.timeText = scene.make.bitmapText({ x: 645, y: 50, font: "font", text: "0:00.000" }, false);

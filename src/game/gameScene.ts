@@ -26,6 +26,7 @@ export class GameScene extends Phaser.Scene {
         //https://icon-rainbow.com/
         this.load.image("play", "/treasures/play.svg");
         this.load.image("retry", "/treasures/retry.svg");
+        this.load.image("delete", "/treasures/delete.svg");
     }
 
     create() {
