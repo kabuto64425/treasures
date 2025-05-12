@@ -1,9 +1,12 @@
 import { GameScene } from "./gameScene";
 import * as Utils from "./utils"
+import * as GameConstants from "./gameConstants";
 
 export class Ui {
     private scene: GameScene;
     private uiLayer: Phaser.GameObjects.Layer;
+
+    private readyGoText: Phaser.GameObjects.BitmapText;
 
     private timeText: Phaser.GameObjects.BitmapText;
     private collectedTreasuresText: Phaser.GameObjects.BitmapText;
@@ -11,12 +14,18 @@ export class Ui {
     private gameOverText: Phaser.GameObjects.BitmapText;
     private congratulationsText: Phaser.GameObjects.BitmapText;
 
+    private progressBox: Phaser.GameObjects.Graphics;
+    private progressBar: Phaser.GameObjects.Graphics;
+
     private play: Phaser.GameObjects.Image;
 
     private retry: Phaser.GameObjects.Image;
     private deleteRecord: Phaser.GameObjects.Image;
 
     private bestRecordText: Phaser.GameObjects.BitmapText;
+
+    private barWidth = 250;
+    private barHeight = 20;
 
     constructor(scene: GameScene) {
         this.scene = scene;
@@ -26,6 +35,23 @@ export class Ui {
         this.play = scene.make.image({ x: 214, y: 214, key: "play" }, false);
         this.uiLayer.add(this.play);
 
+        this.readyGoText = scene.make.bitmapText({ x: 214, y: 214, font: "font", text: "READY" }, false);
+        this.readyGoText.setVisible(false);
+        this.uiLayer.add(this.readyGoText);
+
+        this.progressBox = scene.make.graphics({x:214, y:320}, false);
+        this.progressBox.setVisible(false);
+        this.progressBox.fillStyle(0x222222, 0.8);
+        this.progressBox.fillRect(0, 0, this.barWidth, this.barHeight);
+        this.uiLayer.add(this.progressBox);
+        
+
+        this.progressBar = scene.make.graphics({x:214, y:320}, false);
+        this.progressBar.setVisible(false);
+        this.progressBar.fillStyle(0xffff00, 0.8);
+        this.progressBar.fillRect(0, 0, this.barWidth, this.barHeight);
+        this.uiLayer.add(this.progressBar);
+        
         this.retry = scene.make.image({ x: 800, y: 550, key: "retry" }, false);
         this.uiLayer.add(this.retry);
 
@@ -60,7 +86,38 @@ export class Ui {
 
         this.play.on("pointerdown", () => {
             this.play.destroy();
-            this.scene.getGeneralSupervision().startGame();
+            this.readyGoText.setVisible(true);
+            this.progressBox.setVisible(true);
+            this.progressBar.setVisible(true);
+
+            const startTime = this.scene.time.now;
+
+            const timerEvent = this.scene.time.addEvent({
+                delay: 0,
+                loop: true,
+                callback: () => {
+                    const elapsed = this.scene.time.now - startTime;
+                    const remaining = Phaser.Math.Clamp(GameConstants.READY_DISPLAY_DURATION - elapsed, 0, GameConstants.READY_DISPLAY_DURATION);
+
+                    const progress = remaining / GameConstants.READY_DISPLAY_DURATION;
+
+                    this.progressBar.clear();
+                    this.progressBar.fillStyle(0xffff00, 0.8);
+                    this.progressBar.fillRect(0, 0, this.barWidth * progress, this.barHeight);
+
+                    if (elapsed >= GameConstants.READY_DISPLAY_DURATION) {
+                        this.readyGoText.setText("GO");
+                        this.progressBar.destroy();
+                        this.progressBox.destroy();
+                        timerEvent.remove();
+
+                        this.scene.time.delayedCall(GameConstants.READY_DISPLAY_DURATION, () => {
+                            this.readyGoText.destroy();
+                            this.scene.getGeneralSupervision().startGame();
+                        });
+                    }
+                }
+            });
         });
     }
 

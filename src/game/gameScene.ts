@@ -16,12 +16,15 @@ export class GameScene extends Phaser.Scene {
     }
 
     preload() {
-        console.log("preload!!");
         //https://cdn.phaserfiles.com/v385/assets/atlas/bitmap-fonts-debug.png
         //https://cdn.phaserfiles.com/v385/assets/atlas/bitmap-fonts.json
         //https://cdn.phaserfiles.com/v385/assets/fonts/bitmap/azo-fire.xml
         this.load.atlas("fontatlas", "/treasures/bitmap-fonts-debug.png", "/treasures/bitmap-fonts.json");
         this.load.xml("azoXML", "/treasures/azo-fire.xml");
+
+        //https://cdn.phaserfiles.com/v385/assets/ui/nine-slice.png
+        //https://cdn.phaserfiles.com/v385/assets/ui/nine-slice.json
+        this.load.atlas('ui', 'nine-slice.png', 'nine-slice.json');
 
         //https://icon-rainbow.com/
         this.load.image("play", "/treasures/play.svg");
@@ -30,8 +33,6 @@ export class GameScene extends Phaser.Scene {
     }
 
     create() {
-        console.log("create!!");
-
         Phaser.GameObjects.BitmapText.ParseFromAtlas(this, "font", "fontatlas", "azo-fire", "azoXML");
 
         this.cursors = this.input.keyboard.createCursorKeys();
@@ -46,7 +47,6 @@ export class GameScene extends Phaser.Scene {
     }
 
     update(_time: number, _delta: number) {
-        console.log("update");
         // create内で確実に作成しているので、アサーションでもいけるはず
         const gameSceneGeneralSupervision = this.gameSceneGeneralSupervision!;
         if(gameSceneGeneralSupervision.isPlaying()) {

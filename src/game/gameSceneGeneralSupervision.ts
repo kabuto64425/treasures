@@ -149,16 +149,12 @@ export class GameSceneGeneralSupervision {
         // キーボードの情報を取得
         let input_dist = null;
         if (cursors.left.isDown) {
-            console.log("Left!!");
             input_dist = DIRECTION.LEFT;
         } else if (cursors.up.isDown) {
-            console.log("UP!!");
             input_dist = DIRECTION.UP;
         } else if (cursors.right.isDown) {
-            console.log("Right!!");
             input_dist = DIRECTION.RIGHT;
         } else if (cursors.down.isDown) {
-            console.log("Down!!");
             input_dist = DIRECTION.DOWN;
         }
 
