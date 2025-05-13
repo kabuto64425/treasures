@@ -19,6 +19,8 @@ export class Ui {
 
     private play: Phaser.GameObjects.Image;
 
+    private timerEvent: Phaser.Time.TimerEvent;
+
     private retry: Phaser.GameObjects.Image;
     private deleteRecord: Phaser.GameObjects.Image;
 
@@ -35,6 +37,31 @@ export class Ui {
         this.play = scene.make.image({ x: 214, y: 214, key: "play" }, false);
         this.uiLayer.add(this.play);
 
+        this.timerEvent = new Phaser.Time.TimerEvent({
+            delay: 0,
+            repeat: 60 - 1,
+            callbackScope: this,
+            callback: function(this : Ui) {
+                const current = this.timerEvent.getRepeatCount(); // 0〜59
+                const progress = current / 60;
+
+                this.progressBar.clear();
+                this.progressBar.fillStyle(0xffff00, 0.8);
+                this.progressBar.fillRect(0, 0, this.barWidth * progress, this.barHeight);
+
+                if(current === 0) {
+                    this.readyGoText.setText("GO");
+                        this.progressBar.destroy();
+                        this.progressBox.destroy();
+
+                        this.scene.time.delayedCall(GameConstants.READY_DISPLAY_DURATION, () => {
+                            this.readyGoText.destroy();
+                            this.scene.getGeneralSupervision().startGame();
+                        });
+                }
+            },
+        });
+
         this.readyGoText = scene.make.bitmapText({ x: 214, y: 214, font: "font", text: "READY" }, false);
         this.readyGoText.setVisible(false);
         this.uiLayer.add(this.readyGoText);
@@ -44,7 +71,6 @@ export class Ui {
         this.progressBox.fillStyle(0x222222, 0.8);
         this.progressBox.fillRect(0, 0, this.barWidth, this.barHeight);
         this.uiLayer.add(this.progressBox);
-        
 
         this.progressBar = scene.make.graphics({x:214, y:320}, false);
         this.progressBar.setVisible(false);
@@ -90,12 +116,13 @@ export class Ui {
             this.progressBox.setVisible(true);
             this.progressBar.setVisible(true);
 
-            const startTime = this.scene.time.now;
+            this.scene.time.addEvent(this.timerEvent);
 
-            const timerEvent = this.scene.time.addEvent({
+            /*this.scene.time.addEvent({
                 delay: 0,
-                loop: true,
-                callback: () => {
+                repeat: 60 - 1,
+                callback: function(timerEvent: Phaser.Time.TimerEvent) {
+                    console.log(timerEvent.getRepeatCount());
                     const elapsed = this.scene.time.now - startTime;
                     const remaining = Phaser.Math.Clamp(GameConstants.READY_DISPLAY_DURATION - elapsed, 0, GameConstants.READY_DISPLAY_DURATION);
 
@@ -117,7 +144,7 @@ export class Ui {
                         });
                     }
                 }
-            });
+            });*/
         });
     }
 
