@@ -22,6 +22,11 @@ export class Ui {
     private timerEvent: Phaser.Time.TimerEvent;
 
     private retry: Phaser.GameObjects.Image;
+
+    private retryLong: Phaser.GameObjects.Image;
+
+    private retryLongTimerEvent: Phaser.Time.TimerEvent;
+
     private deleteRecord: Phaser.GameObjects.Image;
 
     private bestRecordText: Phaser.GameObjects.BitmapText;
@@ -39,17 +44,17 @@ export class Ui {
 
         this.timerEvent = new Phaser.Time.TimerEvent({
             delay: 0,
-            repeat: 60 - 1,
+            repeat: GameConstants.FPS - 1,
             callbackScope: this,
             callback: function (this: Ui) {
-                const current = this.timerEvent.getRepeatCount(); // 0〜59
-                const progress = current / 60;
+                const remainingCount = this.timerEvent.getRepeatCount();
+                const progress = remainingCount / GameConstants.FPS;
 
                 this.progressBar.clear();
                 this.progressBar.fillStyle(0xffff00, 0.8);
                 this.progressBar.fillRect(0, 0, this.barWidth * progress, this.barHeight);
 
-                if (current === 0) {
+                if (remainingCount <= 0) {
                     this.readyGoText.setText("GO");
                     this.progressBar.destroy();
                     this.progressBox.destroy();
@@ -81,6 +86,18 @@ export class Ui {
         this.retry = scene.make.image({ x: 800, y: 550, key: "retry" }, false);
         this.uiLayer.add(this.retry);
 
+        this.retryLong = scene.make.image({ x: 400, y: 400, key: "retry" }, false);
+        this.uiLayer.add(this.retryLong);
+
+        this.retryLongTimerEvent = new Phaser.Time.TimerEvent({
+            delay: 0,
+            repeat: GameConstants.FPS - 1,
+            callbackScope: this,
+            callback: function (this: Ui) {
+                console.log(this.retryLongTimerEvent.getRepeatCount());
+            }
+        });
+
         this.deleteRecord = scene.make.image({ x: 1000, y: 550, key: "delete" }, false);
         this.uiLayer.add(this.deleteRecord);
 
@@ -110,7 +127,7 @@ export class Ui {
         this.play.on("pointerover", () => this.play.setTint(0x44ff44));
         this.play.on("pointerout", () => this.play.clearTint());
 
-        this.play.on("pointerdown", () => {
+        this.play.on("pointerup", () => {
             this.play.destroy();
             this.readyGoText.setVisible(true);
             this.progressBox.setVisible(true);
@@ -132,6 +149,38 @@ export class Ui {
             if (gameSceneGeneralSupervision.isGamePlayed()) {
                 this.scene.scene.restart();
             }
+        });
+    }
+
+    setupRetryLongButton() {
+        this.retryLong.setInteractive();
+
+        this.retryLong.on("pointerdown", () => {
+            this.scene.time.addEvent(this.retryLongTimerEvent);
+        });
+
+        this.retryLong.on("pointerup", () => {
+            this.retryLongTimerEvent.remove();
+            this.retryLongTimerEvent = new Phaser.Time.TimerEvent({
+                delay: 0,
+                repeat: GameConstants.FPS - 1,
+                callbackScope: this,
+                callback: function (this: Ui) {
+                    console.log(this.retryLongTimerEvent.getRepeatCount());
+                }
+            });
+        });
+
+        this.retryLong.on("pointerout", () => {
+            this.retryLongTimerEvent.remove();
+            this.retryLongTimerEvent = new Phaser.Time.TimerEvent({
+                delay: 0,
+                repeat: GameConstants.FPS - 1,
+                callbackScope: this,
+                callback: function (this: Ui) {
+                    console.log(this.retryLongTimerEvent.getRepeatCount());
+                }
+            });
         });
     }
 

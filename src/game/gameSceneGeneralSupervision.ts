@@ -66,6 +66,7 @@ export class GameSceneGeneralSupervision {
         this.gameState = GameSceneGeneralSupervision.GAME_STATE.STANDBY;
         this.ui.setupPlayButton();
         this.ui.setupRetryButton();
+        this.ui.setupRetryLongButton();
         this.ui.setupDeleteRecordButton();
 
         // フィールド描画
