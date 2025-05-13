@@ -41,7 +41,7 @@ export class Ui {
             delay: 0,
             repeat: 60 - 1,
             callbackScope: this,
-            callback: function(this : Ui) {
+            callback: function (this: Ui) {
                 const current = this.timerEvent.getRepeatCount(); // 0〜59
                 const progress = current / 60;
 
@@ -49,15 +49,15 @@ export class Ui {
                 this.progressBar.fillStyle(0xffff00, 0.8);
                 this.progressBar.fillRect(0, 0, this.barWidth * progress, this.barHeight);
 
-                if(current === 0) {
+                if (current === 0) {
                     this.readyGoText.setText("GO");
-                        this.progressBar.destroy();
-                        this.progressBox.destroy();
+                    this.progressBar.destroy();
+                    this.progressBox.destroy();
 
-                        this.scene.time.delayedCall(GameConstants.READY_DISPLAY_DURATION, () => {
-                            this.readyGoText.destroy();
-                            this.scene.getGeneralSupervision().startGame();
-                        });
+                    this.scene.time.delayedCall(GameConstants.READY_DISPLAY_DURATION, () => {
+                        this.readyGoText.destroy();
+                        this.scene.getGeneralSupervision().startGame();
+                    });
                 }
             },
         });
@@ -66,18 +66,18 @@ export class Ui {
         this.readyGoText.setVisible(false);
         this.uiLayer.add(this.readyGoText);
 
-        this.progressBox = scene.make.graphics({x:214, y:320}, false);
+        this.progressBox = scene.make.graphics({ x: 214, y: 320 }, false);
         this.progressBox.setVisible(false);
         this.progressBox.fillStyle(0x222222, 0.8);
         this.progressBox.fillRect(0, 0, this.barWidth, this.barHeight);
         this.uiLayer.add(this.progressBox);
 
-        this.progressBar = scene.make.graphics({x:214, y:320}, false);
+        this.progressBar = scene.make.graphics({ x: 214, y: 320 }, false);
         this.progressBar.setVisible(false);
         this.progressBar.fillStyle(0xffff00, 0.8);
         this.progressBar.fillRect(0, 0, this.barWidth, this.barHeight);
         this.uiLayer.add(this.progressBar);
-        
+
         this.retry = scene.make.image({ x: 800, y: 550, key: "retry" }, false);
         this.uiLayer.add(this.retry);
 
@@ -117,34 +117,6 @@ export class Ui {
             this.progressBar.setVisible(true);
 
             this.scene.time.addEvent(this.timerEvent);
-
-            /*this.scene.time.addEvent({
-                delay: 0,
-                repeat: 60 - 1,
-                callback: function(timerEvent: Phaser.Time.TimerEvent) {
-                    console.log(timerEvent.getRepeatCount());
-                    const elapsed = this.scene.time.now - startTime;
-                    const remaining = Phaser.Math.Clamp(GameConstants.READY_DISPLAY_DURATION - elapsed, 0, GameConstants.READY_DISPLAY_DURATION);
-
-                    const progress = remaining / GameConstants.READY_DISPLAY_DURATION;
-
-                    this.progressBar.clear();
-                    this.progressBar.fillStyle(0xffff00, 0.8);
-                    this.progressBar.fillRect(0, 0, this.barWidth * progress, this.barHeight);
-
-                    if (elapsed >= GameConstants.READY_DISPLAY_DURATION) {
-                        this.readyGoText.setText("GO");
-                        this.progressBar.destroy();
-                        this.progressBox.destroy();
-                        timerEvent.remove();
-
-                        this.scene.time.delayedCall(GameConstants.READY_DISPLAY_DURATION, () => {
-                            this.readyGoText.destroy();
-                            this.scene.getGeneralSupervision().startGame();
-                        });
-                    }
-                }
-            });*/
         });
     }
 
