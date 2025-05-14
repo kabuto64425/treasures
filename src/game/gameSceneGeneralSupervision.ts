@@ -73,7 +73,7 @@ export class GameSceneGeneralSupervision {
     setupSupervision() {
         this.gameState = GameSceneGeneralSupervision.GAME_STATE.STANDBY;
         this.ui.setupPlayButton();
-        this.ui.setupRetryButton();
+        //this.ui.setupRetryButton();
         this.ui.setupRetryLongButton();
         this.ui.setupDeleteRecordButton();
 

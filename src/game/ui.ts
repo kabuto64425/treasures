@@ -25,11 +25,7 @@ export class Ui {
 
     private timerEvent: Phaser.Time.TimerEvent;
 
-    private readonly retry: Phaser.GameObjects.Image;
-
-    private readonly retryLong: Phaser.GameObjects.Image;
-
-    private retryLongTimerEvent: Phaser.Time.TimerEvent;
+    private readonly retryLongButton: RetryLongButton;
 
     private readonly deleteRecord: Phaser.GameObjects.Image;
 
@@ -38,18 +34,16 @@ export class Ui {
     private readonly barWidth = 250;
     private readonly barHeight = 20;
 
-    private readonly isGamePlayed: () => boolean;
     private readonly getElapsedFrame: () => number;
     private readonly queryNumberOfCollectedTreasures: () => number;
 
     private readonly createBestRecordStr: () => string;
     private readonly deleteBestRecord: () => void;
 
-    constructor(generalSupervision: GameSceneGeneralSupervision, gameObjectFactory: Phaser.GameObjects.GameObjectFactory, gameObjectCreator: Phaser.GameObjects.GameObjectCreator, clock : Phaser.Time.Clock, scenePlugin :  Phaser.Scenes.ScenePlugin, bestRecord: BestRecord) {
+    constructor(generalSupervision: GameSceneGeneralSupervision, gameObjectFactory: Phaser.GameObjects.GameObjectFactory, gameObjectCreator: Phaser.GameObjects.GameObjectCreator, clock: Phaser.Time.Clock, scenePlugin: Phaser.Scenes.ScenePlugin, bestRecord: BestRecord) {
         this.clock = clock;
         this.scenePlugin = scenePlugin;
 
-        this.isGamePlayed = generalSupervision.isGamePlayed;
         this.getElapsedFrame = generalSupervision.getElapsedFrame;
         this.queryNumberOfCollectedTreasures = generalSupervision.queryNumberOfCollectedTreasures;
 
@@ -103,43 +97,28 @@ export class Ui {
         this.progressBar.fillRect(0, 0, this.barWidth, this.barHeight);
         this.uiLayer.add(this.progressBar);
 
-        this.retry = gameObjectCreator.image({ x: 800, y: 550, key: "retry" }, false);
-        this.uiLayer.add(this.retry);
-
-        this.retryLong = gameObjectCreator.image({ x: 400, y: 400, key: "retry" }, false);
-        this.uiLayer.add(this.retryLong);
-
-        this.retryLongTimerEvent = new Phaser.Time.TimerEvent({
-            delay: 0,
-            repeat: GameConstants.FPS - 1,
-            callbackScope: this,
-            callback: function (this: Ui) {
-                console.log(this.retryLongTimerEvent.getRepeatCount());
-            }
-        });
-
-        new RetryLongButton(this.uiLayer, gameObjectCreator);
+        this.retryLongButton = new RetryLongButton(generalSupervision, this.uiLayer, this.clock, this.scenePlugin, gameObjectCreator);
 
         this.deleteRecord = gameObjectCreator.image({ x: 1000, y: 550, key: "delete" }, false);
         this.uiLayer.add(this.deleteRecord);
 
-        this.timeText = gameObjectCreator.bitmapText({ x: 645, y: 50, font: "font", text: "0:00.000" }, false);
+        this.timeText = gameObjectCreator.bitmapText({ x: 645, y: 10, font: "font", text: "0:00.000" }, false);
         this.uiLayer.add(this.timeText);
 
-        this.collectedTreasuresText = gameObjectCreator.bitmapText({ x: 645, y: 132, font: "font", text: `0/${Utils.calculateNumberOfTreasuresInALLRounds()}` }, false);
+        this.collectedTreasuresText = gameObjectCreator.bitmapText({ x: 645, y: 92, font: "font", text: `0/${Utils.calculateNumberOfTreasuresInALLRounds()}` }, false);
         this.uiLayer.add(this.collectedTreasuresText);
 
-        this.gameOverText = gameObjectCreator.bitmapText({ x: 645, y: 214, font: "font", text: "GAME OVER!" }, false);
+        this.gameOverText = gameObjectCreator.bitmapText({ x: 645, y: 174, font: "font", text: "GAME OVER!" }, false);
         this.gameOverText.setVisible(false);
         this.uiLayer.add(this.gameOverText);
 
-        this.congratulationsText = gameObjectCreator.bitmapText({ x: 645, y: 214, font: "font", text: "CONGRATULATIONS!" }, false);
+        this.congratulationsText = gameObjectCreator.bitmapText({ x: 645, y: 174, font: "font", text: "CONGRATULATIONS!" }, false);
         this.congratulationsText.setVisible(false);
         this.uiLayer.add(this.congratulationsText);
 
-        const bestText = gameObjectCreator.bitmapText({ x: 645, y: 296, font: "font", text: "BEST" }, false);
+        const bestText = gameObjectCreator.bitmapText({ x: 645, y: 256, font: "font", text: "BEST" }, false);
         this.uiLayer.add(bestText);
-        this.bestRecordText = gameObjectCreator.bitmapText({ x: 645, y: 378, font: "font", text: this.createBestRecordStr() }, false);
+        this.bestRecordText = gameObjectCreator.bitmapText({ x: 645, y: 338, font: "font", text: this.createBestRecordStr() }, false);
         this.uiLayer.add(this.bestRecordText);
     }
 
@@ -159,7 +138,7 @@ export class Ui {
         });
     }
 
-    setupRetryButton() {
+    /*setupRetryButton() {
         this.retry.setInteractive();
 
         this.retry.on("pointerover", () => this.retry.setTint(0x44ff44));
@@ -170,38 +149,10 @@ export class Ui {
                 this.scenePlugin.restart();
             }
         });
-    }
+    }*/
 
     setupRetryLongButton() {
-        this.retryLong.setInteractive();
-
-        this.retryLong.on("pointerdown", () => {
-            this.clock.addEvent(this.retryLongTimerEvent);
-        });
-
-        this.retryLong.on("pointerup", () => {
-            this.retryLongTimerEvent.remove();
-            this.retryLongTimerEvent = new Phaser.Time.TimerEvent({
-                delay: 0,
-                repeat: GameConstants.FPS - 1,
-                callbackScope: this,
-                callback: function (this: Ui) {
-                    console.log(this.retryLongTimerEvent.getRepeatCount());
-                }
-            });
-        });
-
-        this.retryLong.on("pointerout", () => {
-            this.retryLongTimerEvent.remove();
-            this.retryLongTimerEvent = new Phaser.Time.TimerEvent({
-                delay: 0,
-                repeat: GameConstants.FPS - 1,
-                callbackScope: this,
-                callback: function (this: Ui) {
-                    console.log(this.retryLongTimerEvent.getRepeatCount());
-                }
-            });
-        });
+        this.retryLongButton.setupButton();
     }
 
     setupDeleteRecordButton() {
