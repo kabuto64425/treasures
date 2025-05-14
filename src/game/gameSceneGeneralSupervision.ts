@@ -30,7 +30,7 @@ export class GameSceneGeneralSupervision {
 
     private updateBestRecord: (isGameClear: boolean, currentNumberOfCollectedTreasures: number, currentElapedFrame: number) => boolean;
 
-    static readonly GAME_STATE = {
+    private static readonly GAME_STATE = {
         INITIALIZED: -1,
         STANDBY: 0,
         PLAYING: 1,
@@ -66,7 +66,7 @@ export class GameSceneGeneralSupervision {
         }
     }
 
-    updateElapsedFrame() {
+    private updateElapsedFrame() {
         this.elapsedFrame++;
     }
 

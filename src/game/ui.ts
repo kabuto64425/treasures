@@ -5,45 +5,45 @@ import { GameSceneGeneralSupervision } from "./gameSceneGeneralSupervision";
 import { RetryLongButton } from "./retryLongButton";
 
 export class Ui {
-    private clock: Phaser.Time.Clock;
-    private scenePlugin: Phaser.Scenes.ScenePlugin;
+    private readonly clock: Phaser.Time.Clock;
+    private readonly scenePlugin: Phaser.Scenes.ScenePlugin;
 
-    private uiLayer: Phaser.GameObjects.Layer;
+    private readonly uiLayer: Phaser.GameObjects.Layer;
 
-    private readyGoText: Phaser.GameObjects.BitmapText;
+    private readonly readyGoText: Phaser.GameObjects.BitmapText;
 
-    private timeText: Phaser.GameObjects.BitmapText;
-    private collectedTreasuresText: Phaser.GameObjects.BitmapText;
+    private readonly timeText: Phaser.GameObjects.BitmapText;
+    private readonly collectedTreasuresText: Phaser.GameObjects.BitmapText;
 
-    private gameOverText: Phaser.GameObjects.BitmapText;
-    private congratulationsText: Phaser.GameObjects.BitmapText;
+    private readonly gameOverText: Phaser.GameObjects.BitmapText;
+    private readonly congratulationsText: Phaser.GameObjects.BitmapText;
 
-    private progressBox: Phaser.GameObjects.Graphics;
-    private progressBar: Phaser.GameObjects.Graphics;
+    private readonly progressBox: Phaser.GameObjects.Graphics;
+    private readonly progressBar: Phaser.GameObjects.Graphics;
 
-    private play: Phaser.GameObjects.Image;
+    private readonly play: Phaser.GameObjects.Image;
 
     private timerEvent: Phaser.Time.TimerEvent;
 
-    private retry: Phaser.GameObjects.Image;
+    private readonly retry: Phaser.GameObjects.Image;
 
-    private retryLong: Phaser.GameObjects.Image;
+    private readonly retryLong: Phaser.GameObjects.Image;
 
     private retryLongTimerEvent: Phaser.Time.TimerEvent;
 
-    private deleteRecord: Phaser.GameObjects.Image;
+    private readonly deleteRecord: Phaser.GameObjects.Image;
 
-    private bestRecordText: Phaser.GameObjects.BitmapText;
+    private readonly bestRecordText: Phaser.GameObjects.BitmapText;
 
-    private barWidth = 250;
-    private barHeight = 20;
+    private readonly barWidth = 250;
+    private readonly barHeight = 20;
 
-    private isGamePlayed: () => boolean;
-    private getElapsedFrame: () => number;
-    private queryNumberOfCollectedTreasures: () => number;
+    private readonly isGamePlayed: () => boolean;
+    private readonly getElapsedFrame: () => number;
+    private readonly queryNumberOfCollectedTreasures: () => number;
 
-    private createBestRecordStr: () => string;
-    private deleteBestRecord: () => void;
+    private readonly createBestRecordStr: () => string;
+    private readonly deleteBestRecord: () => void;
 
     constructor(generalSupervision: GameSceneGeneralSupervision, gameObjectFactory: Phaser.GameObjects.GameObjectFactory, gameObjectCreator: Phaser.GameObjects.GameObjectCreator, clock : Phaser.Time.Clock, scenePlugin :  Phaser.Scenes.ScenePlugin, bestRecord: BestRecord) {
         this.clock = clock;

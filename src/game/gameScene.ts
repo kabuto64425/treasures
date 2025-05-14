@@ -3,8 +3,8 @@ import { GameSceneGeneralSupervision } from "./gameSceneGeneralSupervision";
 import { BestRecord } from "./bestRecord";
 
 export class GameScene extends Phaser.Scene {
-    private params: any;
-    private bestRecoed: BestRecord;
+    private readonly params: any;
+    private readonly bestRecoed: BestRecord;
     private gameSceneGeneralSupervision: GameSceneGeneralSupervision | undefined;
 
     private cursors: Phaser.Types.Input.Keyboard.CursorKeys | undefined;
@@ -40,8 +40,8 @@ export class GameScene extends Phaser.Scene {
         this.gameSceneGeneralSupervision.setupSupervision();
     }
 
-    // デバッグ用
-    busyWait(ms: number) {
+    // @ts-ignore: デバッグ用
+    private busyWait(ms: number) {
         const start = performance.now();
         while (performance.now() - start < ms) { }
     }

@@ -2,7 +2,7 @@ import { DIRECTION } from "./drection";
 import * as GameConstants from "./gameConstants";
 
 export class Player {
-    private graphics: Phaser.GameObjects.Graphics;
+    private readonly graphics: Phaser.GameObjects.Graphics;
     private row: number;
     private column: number;
     private chargeAmount: number;

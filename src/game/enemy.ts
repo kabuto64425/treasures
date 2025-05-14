@@ -3,11 +3,11 @@ import * as GameConstants from "./gameConstants";
 import { FieldEvalution } from "./fieldEvalution";
 
 export class Enemy {
-    private graphics: Phaser.GameObjects.Graphics;
+    private readonly graphics: Phaser.GameObjects.Graphics;
     private row: number;
     private column: number;
     private chargeAmount: number;
-    private priorityScanDirections: DIRECTION[];
+    private readonly priorityScanDirections: DIRECTION[];
 
     constructor(gameObjectFactory: Phaser.GameObjects.GameObjectFactory, iniRow: number, iniColumn: number, priorityScanDirections: DIRECTION[]) {
         this.graphics = gameObjectFactory.graphics();

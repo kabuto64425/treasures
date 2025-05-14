@@ -1,7 +1,7 @@
 import * as GameConstants from "./gameConstants";
 
 export class RetryLongButton {
-    private image: Phaser.GameObjects.Image;
+    private readonly image: Phaser.GameObjects.Image;
     private timerEvent: Phaser.Time.TimerEvent;
 
     constructor(uiLayer: Phaser.GameObjects.Layer, gameObjectCreator: Phaser.GameObjects.GameObjectCreator) {
