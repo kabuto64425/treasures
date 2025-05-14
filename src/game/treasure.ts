@@ -1,4 +1,3 @@
-import { GameScene } from "./gameScene";
 import * as GameConstants from "./gameConstants";
 
 export class Treasure {
@@ -14,8 +13,8 @@ export class Treasure {
         COLLECTED: 2,
     };
 
-    constructor(scene: GameScene, color: number, iniRow: number, iniColumn: number) {
-        this.graphics = scene.add.graphics();
+    constructor(gameObjectFactory: Phaser.GameObjects.GameObjectFactory, color: number, iniRow: number, iniColumn: number) {
+        this.graphics = gameObjectFactory.graphics();
         this.color = color;
         this.row = iniRow;
         this.column = iniColumn;

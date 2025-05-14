@@ -1,6 +1,5 @@
 import { DIRECTION } from "./drection";
 import * as GameConstants from "./gameConstants";
-import { GameScene } from "./gameScene";
 import { FieldEvalution } from "./fieldEvalution";
 
 export class Enemy {
@@ -10,8 +9,8 @@ export class Enemy {
     private chargeAmount: number;
     private priorityScanDirections: DIRECTION[];
 
-    constructor(scene: GameScene, iniRow: number, iniColumn: number, priorityScanDirections: DIRECTION[]) {
-        this.graphics = scene.add.graphics();
+    constructor(gameObjectFactory: Phaser.GameObjects.GameObjectFactory, iniRow: number, iniColumn: number, priorityScanDirections: DIRECTION[]) {
+        this.graphics = gameObjectFactory.graphics();
         this.graphics.depth = 10;
         this.row = iniRow;
         this.column = iniColumn;

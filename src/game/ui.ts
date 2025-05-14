@@ -1,9 +1,13 @@
-import { GameScene } from "./gameScene";
 import * as Utils from "./utils"
 import * as GameConstants from "./gameConstants";
+import { BestRecord } from "./bestRecord";
+import { GameSceneGeneralSupervision } from "./gameSceneGeneralSupervision";
+import { RetryLongButton } from "./retryLongButton";
 
 export class Ui {
-    private scene: GameScene;
+    private clock: Phaser.Time.Clock;
+    private scenePlugin: Phaser.Scenes.ScenePlugin;
+
     private uiLayer: Phaser.GameObjects.Layer;
 
     private readyGoText: Phaser.GameObjects.BitmapText;
@@ -29,17 +33,28 @@ export class Ui {
 
     private deleteRecord: Phaser.GameObjects.Image;
 
+    private bestRecord : BestRecord;
     private bestRecordText: Phaser.GameObjects.BitmapText;
 
     private barWidth = 250;
     private barHeight = 20;
 
-    constructor(scene: GameScene) {
-        this.scene = scene;
-        this.uiLayer = scene.add.layer();
+    private isGamePlayed: () => boolean;
+    private getElapsedFrame: () => number;
+    private queryNumberOfCollectedTreasures: () => number;
+
+    constructor(generalSupervision: GameSceneGeneralSupervision, gameObjectFactory: Phaser.GameObjects.GameObjectFactory, gameObjectCreator: Phaser.GameObjects.GameObjectCreator, clock : Phaser.Time.Clock, scenePlugin :  Phaser.Scenes.ScenePlugin, bestRecord: BestRecord) {
+        this.clock = clock;
+        this.scenePlugin = scenePlugin;
+
+        this.isGamePlayed = generalSupervision.isGamePlayed;
+        this.getElapsedFrame = generalSupervision.getElapsedFrame;
+        this.queryNumberOfCollectedTreasures = generalSupervision.queryNumberOfCollectedTreasures;
+        
+        this.uiLayer = gameObjectFactory.layer();
         this.uiLayer.setDepth(100);
 
-        this.play = scene.make.image({ x: 214, y: 214, key: "play" }, false);
+        this.play = gameObjectCreator.image({ x: 214, y: 214, key: "play" }, false);
         this.uiLayer.add(this.play);
 
         this.timerEvent = new Phaser.Time.TimerEvent({
@@ -59,34 +74,34 @@ export class Ui {
                     this.progressBar.destroy();
                     this.progressBox.destroy();
 
-                    this.scene.time.delayedCall(GameConstants.READY_DISPLAY_DURATION, () => {
+                    this.clock.delayedCall(GameConstants.READY_DISPLAY_DURATION, () => {
                         this.readyGoText.destroy();
-                        this.scene.getGeneralSupervision().startGame();
+                        generalSupervision.startGame();
                     });
                 }
             },
         });
 
-        this.readyGoText = scene.make.bitmapText({ x: 214, y: 214, font: "font", text: "READY" }, false);
+        this.readyGoText = gameObjectCreator.bitmapText({ x: 214, y: 214, font: "font", text: "READY" }, false);
         this.readyGoText.setVisible(false);
         this.uiLayer.add(this.readyGoText);
 
-        this.progressBox = scene.make.graphics({ x: 214, y: 320 }, false);
+        this.progressBox = gameObjectCreator.graphics({ x: 214, y: 320 }, false);
         this.progressBox.setVisible(false);
         this.progressBox.fillStyle(0x222222, 0.8);
         this.progressBox.fillRect(0, 0, this.barWidth, this.barHeight);
         this.uiLayer.add(this.progressBox);
 
-        this.progressBar = scene.make.graphics({ x: 214, y: 320 }, false);
+        this.progressBar = gameObjectCreator.graphics({ x: 214, y: 320 }, false);
         this.progressBar.setVisible(false);
         this.progressBar.fillStyle(0xffff00, 0.8);
         this.progressBar.fillRect(0, 0, this.barWidth, this.barHeight);
         this.uiLayer.add(this.progressBar);
 
-        this.retry = scene.make.image({ x: 800, y: 550, key: "retry" }, false);
+        this.retry = gameObjectCreator.image({ x: 800, y: 550, key: "retry" }, false);
         this.uiLayer.add(this.retry);
 
-        this.retryLong = scene.make.image({ x: 400, y: 400, key: "retry" }, false);
+        this.retryLong = gameObjectCreator.image({ x: 400, y: 400, key: "retry" }, false);
         this.uiLayer.add(this.retryLong);
 
         this.retryLongTimerEvent = new Phaser.Time.TimerEvent({
@@ -98,26 +113,29 @@ export class Ui {
             }
         });
 
-        this.deleteRecord = scene.make.image({ x: 1000, y: 550, key: "delete" }, false);
+        new RetryLongButton(this.uiLayer, gameObjectCreator);
+
+        this.deleteRecord = gameObjectCreator.image({ x: 1000, y: 550, key: "delete" }, false);
         this.uiLayer.add(this.deleteRecord);
 
-        this.timeText = scene.make.bitmapText({ x: 645, y: 50, font: "font", text: "0:00.000" }, false);
+        this.timeText = gameObjectCreator.bitmapText({ x: 645, y: 50, font: "font", text: "0:00.000" }, false);
         this.uiLayer.add(this.timeText);
 
-        this.collectedTreasuresText = scene.make.bitmapText({ x: 645, y: 132, font: "font", text: `0/${Utils.calculateNumberOfTreasuresInALLRounds()}` }, false);
+        this.collectedTreasuresText = gameObjectCreator.bitmapText({ x: 645, y: 132, font: "font", text: `0/${Utils.calculateNumberOfTreasuresInALLRounds()}` }, false);
         this.uiLayer.add(this.collectedTreasuresText);
 
-        this.gameOverText = scene.make.bitmapText({ x: 645, y: 214, font: "font", text: "GAME OVER!" }, false);
+        this.gameOverText = gameObjectCreator.bitmapText({ x: 645, y: 214, font: "font", text: "GAME OVER!" }, false);
         this.gameOverText.setVisible(false);
         this.uiLayer.add(this.gameOverText);
 
-        this.congratulationsText = scene.make.bitmapText({ x: 645, y: 214, font: "font", text: "CONGRATULATIONS!" }, false);
+        this.congratulationsText = gameObjectCreator.bitmapText({ x: 645, y: 214, font: "font", text: "CONGRATULATIONS!" }, false);
         this.congratulationsText.setVisible(false);
         this.uiLayer.add(this.congratulationsText);
 
-        const bestText = scene.make.bitmapText({ x: 645, y: 296, font: "font", text: "BEST" }, false);
+        const bestText = gameObjectCreator.bitmapText({ x: 645, y: 296, font: "font", text: "BEST" }, false);
         this.uiLayer.add(bestText);
-        this.bestRecordText = scene.make.bitmapText({ x: 645, y: 378, font: "font", text: this.scene.getBestRecord().createBestRecordStr() }, false);
+        this.bestRecord = bestRecord;
+        this.bestRecordText = gameObjectCreator.bitmapText({ x: 645, y: 378, font: "font", text: this.bestRecord.createBestRecordStr() }, false);
         this.uiLayer.add(this.bestRecordText);
     }
 
@@ -133,7 +151,7 @@ export class Ui {
             this.progressBox.setVisible(true);
             this.progressBar.setVisible(true);
 
-            this.scene.time.addEvent(this.timerEvent);
+            this.clock.addEvent(this.timerEvent);
         });
     }
 
@@ -143,11 +161,9 @@ export class Ui {
         this.retry.on("pointerover", () => this.retry.setTint(0x44ff44));
         this.retry.on("pointerout", () => this.retry.clearTint());
 
-        const gameSceneGeneralSupervision = this.scene.getGeneralSupervision();
-
         this.retry.on("pointerdown", () => {
-            if (gameSceneGeneralSupervision.isGamePlayed()) {
-                this.scene.scene.restart();
+            if (this.isGamePlayed()) {
+                this.scenePlugin.restart();
             }
         });
     }
@@ -156,7 +172,7 @@ export class Ui {
         this.retryLong.setInteractive();
 
         this.retryLong.on("pointerdown", () => {
-            this.scene.time.addEvent(this.retryLongTimerEvent);
+            this.clock.addEvent(this.retryLongTimerEvent);
         });
 
         this.retryLong.on("pointerup", () => {
@@ -191,22 +207,22 @@ export class Ui {
         this.deleteRecord.on("pointerout", () => this.deleteRecord.clearTint());
 
         this.deleteRecord.on("pointerdown", () => {
-            this.scene.getBestRecord().deleteBestRecord();
+            this.bestRecord.deleteBestRecord();
             this.updateBestRecordText();
         });
     }
 
     updateTimeText() {
-        this.timeText!.setText(`${Utils.createFormattedTimeFromFrame(this.scene.getGeneralSupervision().getElapsedFrame())}`);
+        this.timeText!.setText(`${Utils.createFormattedTimeFromFrame(this.getElapsedFrame())}`);
     }
 
     updateCollectedTreasuresText() {
-        const numberOfCollectedTreasures = this.scene.getGeneralSupervision().queryNumberOfCollectedTreasures();
+        const numberOfCollectedTreasures = this.queryNumberOfCollectedTreasures();
         this.collectedTreasuresText!.setText(`${numberOfCollectedTreasures}/${Utils.calculateNumberOfTreasuresInALLRounds()}`);
     }
 
     updateBestRecordText() {
-        this.bestRecordText.setText(this.scene.getBestRecord().createBestRecordStr());
+        this.bestRecordText.setText(this.bestRecord.createBestRecordStr());
     }
 
     showGameOverText() {

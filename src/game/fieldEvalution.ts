@@ -1,14 +1,13 @@
 import { DIRECTION } from "./drection";
-import { GameScene } from "./gameScene";
 import * as GameConstants from "./gameConstants";
 
 export class FieldEvalution {
     private shortestDirectionMaps: Map<string, boolean>[][];
     private graphics: Phaser.GameObjects.Graphics;
 
-    constructor(scene: GameScene, isVisible: boolean) {
+    constructor(gameObjectFactory: Phaser.GameObjects.GameObjectFactory, isVisible: boolean) {
         this.shortestDirectionMaps = [...Array(GameConstants.H)].map(() => [...Array(GameConstants.W)].map(() => this.generateDirectionFlagMap() as Map<string, boolean>));
-        this.graphics = scene.add.graphics();
+        this.graphics = gameObjectFactory.graphics();
         this.graphics.depth = 99;
         this.graphics.setVisible(isVisible);
     }

@@ -12,14 +12,17 @@ import { Ui } from "./ui";
 import { FinalRoundSupervision } from "./finalRoundSupervision";
 
 export class GameSceneGeneralSupervision {
-    private params: any;
-    private bestRecord: BestRecord;
+    // これを使用してゲームの物体を生成すると、シーンに自動的に加わる
+    private readonly gameObjectFactory: Phaser.GameObjects.GameObjectFactory;
 
-    private ui: Ui;
+    private readonly params: any;
+    private readonly bestRecord: BestRecord;
 
-    private player: Player;
-    private fieldEvaluation: FieldEvalution;
-    private enemyList: Enemy[];
+    private readonly ui: Ui;
+
+    private readonly player: Player;
+    private readonly fieldEvaluation: FieldEvalution;
+    private readonly enemyList: Enemy[];
     private roundsSupervision: RoundsSupervision | undefined;
     private gameState: number;
 
@@ -36,24 +39,27 @@ export class GameSceneGeneralSupervision {
     };
 
     constructor(scene: GameScene, params: any, bestRecord: BestRecord) {
+        this.gameObjectFactory = scene.add;
+        // これを使用してゲームの物体を生成してもシーンには自動的に加わらない。どこかのレイヤーなどに加えるときに使用
+        const gameObjectCreator = scene.make;
         this.params = params;
         this.bestRecord = bestRecord;
         this.elapsedFrame = 0;
 
         this.gameState = GameSceneGeneralSupervision.GAME_STATE.INITIALIZED;
 
-        this.ui = new Ui(scene);
+        this.ui = new Ui(this, this.gameObjectFactory, gameObjectCreator, scene.time, scene.scene, this.bestRecord);
 
         // プレイヤー
-        this.player = new Player(scene, GameConstants.parameterPlayer.row, GameConstants.parameterPlayer.column);
+        this.player = new Player(scene.add, GameConstants.parameterPlayer.row, GameConstants.parameterPlayer.column);
 
         //フィールド評価
-        this.fieldEvaluation = new FieldEvalution(scene, this.params.visibleFieldEvaluation);
+        this.fieldEvaluation = new FieldEvalution(scene.add, this.params.visibleFieldEvaluation);
 
         // 敵
         this.enemyList = [];
         for (let i = 0; i < GameConstants.numberOfEnemyies; i++) {
-            const enemy = new Enemy(scene, GameConstants.parametersOfEnemies[i].row, GameConstants.parametersOfEnemies[i].column, GameConstants.parametersOfEnemies[i].priorityScanDirections);
+            const enemy = new Enemy(scene.add, GameConstants.parametersOfEnemies[i].row, GameConstants.parametersOfEnemies[i].column, GameConstants.parametersOfEnemies[i].priorityScanDirections);
             this.enemyList.push(enemy);
         }
     }
@@ -62,7 +68,7 @@ export class GameSceneGeneralSupervision {
         this.elapsedFrame++;
     }
 
-    setupSupervision(scene: GameScene) {
+    setupSupervision() {
         this.gameState = GameSceneGeneralSupervision.GAME_STATE.STANDBY;
         this.ui.setupPlayButton();
         this.ui.setupRetryButton();
@@ -70,7 +76,7 @@ export class GameSceneGeneralSupervision {
         this.ui.setupDeleteRecordButton();
 
         // フィールド描画
-        const fieldGraphics = scene.add.graphics({
+        const fieldGraphics = this.gameObjectFactory.graphics({
             lineStyle: { width: 1, color: 0x000000, alpha: 1 },
             fillStyle: { color: 0xffffff, alpha: 1 }
         });
@@ -84,7 +90,7 @@ export class GameSceneGeneralSupervision {
         for (let i = 0; i < GameConstants.H; i++) {
             for (let j = 0; j < GameConstants.W; j++) {
                 if (GameConstants.FIELD[i][j] === 1) {
-                    scene.add.graphics({
+                    this.gameObjectFactory.graphics({
                         lineStyle: { width: 1, color: 0x000000, alpha: 1 },
                         fillStyle: { color: 0x000000, alpha: 1 }
                     }).fillRect(j * GameConstants.GRID_SIZE, i * GameConstants.GRID_SIZE, GameConstants.GRID_SIZE, GameConstants.GRID_SIZE);
@@ -93,7 +99,7 @@ export class GameSceneGeneralSupervision {
         }
 
         // ゲームオーバー時に表示するオーバレイ
-        this.overlay = scene.add.graphics();
+        this.overlay = this.gameObjectFactory.graphics();
         this.overlay.fillStyle(0xd20a13, 0.5).fillRect(0, 0, GameConstants.D_WIDTH, GameConstants.D_HEIGHT);
         this.overlay.setDepth(99);
         this.overlay.setVisible(false);
@@ -121,7 +127,7 @@ export class GameSceneGeneralSupervision {
                 while (GameConstants.FIELD[treasurePos.row][treasurePos.column] === 1) {
                     treasurePos = { row: Math.floor(Math.random() * GameConstants.H), column: Math.floor(Math.random() * GameConstants.W) };
                 }
-                const treasure = new Treasure(scene, 0xffff00, treasurePos.row, treasurePos.column);
+                const treasure = new Treasure(this.gameObjectFactory, 0xffff00, treasurePos.row, treasurePos.column);
                 treasureList.push(treasure);
             }
 
@@ -130,7 +136,7 @@ export class GameSceneGeneralSupervision {
 
         // ファイナルラウンド
         let goalPos = { row: 0, column: 0 };
-        this.roundsSupervision.setRoundSupervision(GameConstants.numberOfTreasuresRounds, new FinalRoundSupervision(scene, goalPos.row, goalPos.column));
+        this.roundsSupervision.setRoundSupervision(GameConstants.numberOfTreasuresRounds, new FinalRoundSupervision(this.gameObjectFactory, goalPos.row, goalPos.column));
     }
 
     startGame() {
@@ -188,7 +194,7 @@ export class GameSceneGeneralSupervision {
             enemy.draw();
         }
 
-         // setup内で確実に作成しているので、アサーションでもいけるはず
+        // setup内で確実に作成しているので、アサーションでもいけるはず
         const roundsSupervision = this.roundsSupervision!;
         roundsSupervision.getCurrentRoundSupervision().interactWithPlayer(this.player);
 
@@ -223,27 +229,27 @@ export class GameSceneGeneralSupervision {
         }
     }
 
-    getElapsedFrame() {
+    getElapsedFrame = () => {
         return this.elapsedFrame;
     }
 
-    queryNumberOfCollectedTreasures() {
+    queryNumberOfCollectedTreasures = () => {
         return this.player.getNumberOfCollectedTreasures();
     }
 
-    isPlaying() {
+    isPlaying = () => {
         return this.gameState === GameSceneGeneralSupervision.GAME_STATE.PLAYING;
     }
 
-    isGameOver() {
+    private isGameOver = () => {
         return this.gameState === GameSceneGeneralSupervision.GAME_STATE.GAME_OVER;
     }
 
-    isGameClear() {
+    private isGameClear = () => {
         return this.gameState === GameSceneGeneralSupervision.GAME_STATE.GAME_CLEAR;
     }
 
-    isGamePlayed() {
+    isGamePlayed = () => {
         return this.isPlaying() || this.isGameOver() || this.isGameClear();
     }
 }
