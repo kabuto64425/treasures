@@ -1,16 +1,15 @@
 import { DIRECTION } from "./drection";
 import * as GameConstants from "./gameConstants";
-import { GameScene } from "./gameScene";
 
 export class Player {
-    private graphics: Phaser.GameObjects.Graphics;
+    private readonly graphics: Phaser.GameObjects.Graphics;
     private row: number;
     private column: number;
     private chargeAmount: number;
     private numberOfCollectedTreasures: number;
 
-    constructor(scene: GameScene, iniRow: number, iniColumn: number) {
-        this.graphics = scene.add.graphics();
+    constructor(gameObjectFactory: Phaser.GameObjects.GameObjectFactory, iniRow: number, iniColumn: number) {
+        this.graphics = gameObjectFactory.graphics();
         this.row = iniRow;
         this.column = iniColumn;
         this.chargeAmount = 0;

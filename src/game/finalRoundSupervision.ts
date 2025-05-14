@@ -1,13 +1,12 @@
-import { GameScene } from "./gameScene";
 import { ISingleRoundSupervision } from "./iSingleRoundSupervision";
 import { Player } from "./player";
 import { Treasure } from "./treasure";
 
 export class FinalRoundSupervision implements ISingleRoundSupervision {
-    private goal: Treasure;
+    private readonly goal: Treasure;
 
-    constructor(scene: GameScene, initRow: number, initColumn: number) {
-        this.goal = new Treasure(scene, 0xffa500, initRow, initColumn);
+    constructor(gameObjectFactory: Phaser.GameObjects.GameObjectFactory, initRow: number, initColumn: number) {
+        this.goal = new Treasure(gameObjectFactory, 0xffa500, initRow, initColumn);
     }
     
     startRound(): void {
@@ -30,11 +29,11 @@ export class FinalRoundSupervision implements ISingleRoundSupervision {
         return true;
     }
 
-    setStateAppearance() {
+    private setStateAppearance() {
         this.goal.setStateAppearance();
     }
 
-    draw() {
+    private draw() {
         this.goal.draw();
     }
 }

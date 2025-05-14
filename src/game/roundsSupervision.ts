@@ -2,7 +2,7 @@ import { ISingleRoundSupervision } from "./iSingleRoundSupervision";
 
 export class RoundsSupervision {
     private currentRound: number;
-    private singleRoundSupervisionList: ISingleRoundSupervision[];
+    private readonly singleRoundSupervisionList: ISingleRoundSupervision[];
 
     constructor(numberOfRound: number) {
         this.currentRound = 0;

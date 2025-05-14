@@ -35,7 +35,7 @@ export class BestRecord {
         return this.elapsedFrame;
     }
 
-    createBestRecordStr() {
+    readonly createBestRecordStr = () => {
         let clearTimeStr = "--:--.---";
         if (this.elapsedFrame) {
             clearTimeStr = Utils.createFormattedTimeFromFrame(this.elapsedFrame);
@@ -43,7 +43,7 @@ export class BestRecord {
         return `${this.numberOfCollectedTreasures}/${Utils.calculateNumberOfTreasuresInALLRounds()}  ${clearTimeStr}`;
     }
 
-    isNewRecord(isGameClear: boolean, currentNumberOfCollectedTreasures: number, currentElapedFrame: number) {
+    private isNewRecord(isGameClear: boolean, currentNumberOfCollectedTreasures: number, currentElapedFrame: number) {
         if (isGameClear) {
             // ゲームクリアなので、獲得宝数はベストレコードと並ぶはずだが、念の為確認
             if (currentNumberOfCollectedTreasures >= this.numberOfCollectedTreasures) {
@@ -57,7 +57,7 @@ export class BestRecord {
         return currentNumberOfCollectedTreasures >= this.numberOfCollectedTreasures;
     }
 
-    updateBestRecord(isGameClear: boolean, currentNumberOfCollectedTreasures: number, currentElapedFrame: number) {
+    readonly updateBestRecord = (isGameClear: boolean, currentNumberOfCollectedTreasures: number, currentElapedFrame: number) => {
         if (!this.isNewRecord(isGameClear, currentNumberOfCollectedTreasures, currentElapedFrame)) {
             return false;
         }
@@ -79,7 +79,7 @@ export class BestRecord {
         return true;
     }
 
-    deleteBestRecord() {
+    readonly deleteBestRecord = () => {
         this.numberOfCollectedTreasures = 0;
         this.elapsedFrame = undefined;
 

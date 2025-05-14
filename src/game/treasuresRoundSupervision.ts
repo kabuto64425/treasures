@@ -4,7 +4,7 @@ import { Treasure } from "./treasure";
 
 export class TreasuresRoundSupervision implements ISingleRoundSupervision {
 
-    private treasureList: Treasure[];
+    private readonly treasureList: Treasure[];
 
     constructor(treasureList: readonly Treasure[]) {
         this.treasureList = [...treasureList];
@@ -33,19 +33,19 @@ export class TreasuresRoundSupervision implements ISingleRoundSupervision {
         return false;
     }
 
-    extractAppearanceTreasureList() {
+    private extractAppearanceTreasureList() {
         return this.treasureList.filter(t => t.isAppearance());
     }
 
-    setAllTreasuresStateAppearance() {
+    private setAllTreasuresStateAppearance() {
         this.treasureList.forEach(t => t.setStateAppearance());
     }
 
-    drawAllTreasures() {
+    private drawAllTreasures() {
         this.treasureList.forEach(t => t.draw());
     }
 
-    areAllTreasuresCollected() {
+    private areAllTreasuresCollected() {
         return this.treasureList.every(t => t.isCollected());
     }
 }
