@@ -33,7 +33,6 @@ export class Ui {
 
     private deleteRecord: Phaser.GameObjects.Image;
 
-    private bestRecord : BestRecord;
     private bestRecordText: Phaser.GameObjects.BitmapText;
 
     private barWidth = 250;
@@ -43,6 +42,9 @@ export class Ui {
     private getElapsedFrame: () => number;
     private queryNumberOfCollectedTreasures: () => number;
 
+    private createBestRecordStr: () => string;
+    private deleteBestRecord: () => void;
+
     constructor(generalSupervision: GameSceneGeneralSupervision, gameObjectFactory: Phaser.GameObjects.GameObjectFactory, gameObjectCreator: Phaser.GameObjects.GameObjectCreator, clock : Phaser.Time.Clock, scenePlugin :  Phaser.Scenes.ScenePlugin, bestRecord: BestRecord) {
         this.clock = clock;
         this.scenePlugin = scenePlugin;
@@ -50,7 +52,10 @@ export class Ui {
         this.isGamePlayed = generalSupervision.isGamePlayed;
         this.getElapsedFrame = generalSupervision.getElapsedFrame;
         this.queryNumberOfCollectedTreasures = generalSupervision.queryNumberOfCollectedTreasures;
-        
+
+        this.createBestRecordStr = bestRecord.createBestRecordStr;
+        this.deleteBestRecord = bestRecord.deleteBestRecord;
+
         this.uiLayer = gameObjectFactory.layer();
         this.uiLayer.setDepth(100);
 
@@ -134,8 +139,7 @@ export class Ui {
 
         const bestText = gameObjectCreator.bitmapText({ x: 645, y: 296, font: "font", text: "BEST" }, false);
         this.uiLayer.add(bestText);
-        this.bestRecord = bestRecord;
-        this.bestRecordText = gameObjectCreator.bitmapText({ x: 645, y: 378, font: "font", text: this.bestRecord.createBestRecordStr() }, false);
+        this.bestRecordText = gameObjectCreator.bitmapText({ x: 645, y: 378, font: "font", text: this.createBestRecordStr() }, false);
         this.uiLayer.add(this.bestRecordText);
     }
 
@@ -207,7 +211,7 @@ export class Ui {
         this.deleteRecord.on("pointerout", () => this.deleteRecord.clearTint());
 
         this.deleteRecord.on("pointerdown", () => {
-            this.bestRecord.deleteBestRecord();
+            this.deleteBestRecord();
             this.updateBestRecordText();
         });
     }
@@ -222,7 +226,7 @@ export class Ui {
     }
 
     updateBestRecordText() {
-        this.bestRecordText.setText(this.bestRecord.createBestRecordStr());
+        this.bestRecordText.setText(this.createBestRecordStr());
     }
 
     showGameOverText() {

@@ -35,7 +35,7 @@ export class BestRecord {
         return this.elapsedFrame;
     }
 
-    createBestRecordStr() {
+    createBestRecordStr = () => {
         let clearTimeStr = "--:--.---";
         if (this.elapsedFrame) {
             clearTimeStr = Utils.createFormattedTimeFromFrame(this.elapsedFrame);
@@ -57,7 +57,7 @@ export class BestRecord {
         return currentNumberOfCollectedTreasures >= this.numberOfCollectedTreasures;
     }
 
-    updateBestRecord(isGameClear: boolean, currentNumberOfCollectedTreasures: number, currentElapedFrame: number) {
+    updateBestRecord = (isGameClear: boolean, currentNumberOfCollectedTreasures: number, currentElapedFrame: number) => {
         if (!this.isNewRecord(isGameClear, currentNumberOfCollectedTreasures, currentElapedFrame)) {
             return false;
         }
@@ -79,7 +79,7 @@ export class BestRecord {
         return true;
     }
 
-    deleteBestRecord() {
+    deleteBestRecord = () => {
         this.numberOfCollectedTreasures = 0;
         this.elapsedFrame = undefined;
 

@@ -36,7 +36,7 @@ export class GameScene extends Phaser.Scene {
         Phaser.GameObjects.BitmapText.ParseFromAtlas(this, "font", "fontatlas", "azo-fire", "azoXML");
 
         this.cursors = this.input.keyboard.createCursorKeys();
-        this.gameSceneGeneralSupervision = new GameSceneGeneralSupervision(this, this.params, this.bestRecoed);
+        this.gameSceneGeneralSupervision = new GameSceneGeneralSupervision(this, this.params);
         this.gameSceneGeneralSupervision.setupSupervision();
     }
 
@@ -52,5 +52,9 @@ export class GameScene extends Phaser.Scene {
         if(gameSceneGeneralSupervision.isPlaying()) {
             gameSceneGeneralSupervision.updatePerFrame(this.cursors!);
         }
+    }
+
+    getBestRecord() {
+        return this.bestRecoed;
     }
 }

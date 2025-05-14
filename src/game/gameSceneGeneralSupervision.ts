@@ -7,7 +7,6 @@ import { Enemy } from "./enemy";
 import { RoundsSupervision } from "./roundsSupervision";
 import { TreasuresRoundSupervision } from "./treasuresRoundSupervision";
 import { Treasure } from "./treasure";
-import { BestRecord } from "./bestRecord";
 import { Ui } from "./ui";
 import { FinalRoundSupervision } from "./finalRoundSupervision";
 
@@ -16,7 +15,6 @@ export class GameSceneGeneralSupervision {
     private readonly gameObjectFactory: Phaser.GameObjects.GameObjectFactory;
 
     private readonly params: any;
-    private readonly bestRecord: BestRecord;
 
     private readonly ui: Ui;
 
@@ -30,6 +28,8 @@ export class GameSceneGeneralSupervision {
 
     private overlay: Phaser.GameObjects.Graphics | undefined;
 
+    private updateBestRecord: (isGameClear: boolean, currentNumberOfCollectedTreasures: number, currentElapedFrame: number) => boolean;
+
     static readonly GAME_STATE = {
         INITIALIZED: -1,
         STANDBY: 0,
@@ -38,17 +38,19 @@ export class GameSceneGeneralSupervision {
         GAME_OVER: 3,
     };
 
-    constructor(scene: GameScene, params: any, bestRecord: BestRecord) {
+    constructor(scene: GameScene, params: any) {
         this.gameObjectFactory = scene.add;
         // これを使用してゲームの物体を生成してもシーンには自動的に加わらない。どこかのレイヤーなどに加えるときに使用
         const gameObjectCreator = scene.make;
         this.params = params;
-        this.bestRecord = bestRecord;
+
+        this.updateBestRecord = scene.getBestRecord().updateBestRecord;
+
         this.elapsedFrame = 0;
 
         this.gameState = GameSceneGeneralSupervision.GAME_STATE.INITIALIZED;
 
-        this.ui = new Ui(this, this.gameObjectFactory, gameObjectCreator, scene.time, scene.scene, this.bestRecord);
+        this.ui = new Ui(this, this.gameObjectFactory, gameObjectCreator, scene.time, scene.scene, scene.getBestRecord());
 
         // プレイヤー
         this.player = new Player(scene.add, GameConstants.parameterPlayer.row, GameConstants.parameterPlayer.column);
@@ -206,7 +208,7 @@ export class GameSceneGeneralSupervision {
                 this.ui.showCongratulationsText();
 
                 this.gameState = GameSceneGeneralSupervision.GAME_STATE.GAME_CLEAR;
-                this.bestRecord.updateBestRecord(this.isGameClear(), this.player.getNumberOfCollectedTreasures(), this.elapsedFrame);
+                this.updateBestRecord(this.isGameClear(), this.player.getNumberOfCollectedTreasures(), this.elapsedFrame);
                 this.ui.updateBestRecordText();
             } else {
                 roundsSupervision.advanceRound();
@@ -222,7 +224,7 @@ export class GameSceneGeneralSupervision {
                     this.overlay!.setVisible(true);
                     this.ui.showGameOverText();
                     this.gameState = GameSceneGeneralSupervision.GAME_STATE.GAME_OVER;
-                    this.bestRecord.updateBestRecord(this.isGameClear(), this.player.getNumberOfCollectedTreasures(), this.elapsedFrame);
+                    this.updateBestRecord(this.isGameClear(), this.player.getNumberOfCollectedTreasures(), this.elapsedFrame);
                     this.ui.updateBestRecordText();
                 }
             }
