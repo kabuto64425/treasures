@@ -3,4 +3,6 @@ export interface IFieldActor {
         row: number;
         column: number;
     };
+
+    onCollideWithPlayer(): void;
 }

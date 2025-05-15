@@ -1,8 +1,9 @@
 import { DIRECTION } from "./drection";
 import * as GameConstants from "./gameConstants";
 import { FieldEvalution } from "./fieldEvalution";
+import { IFieldActor } from "./iFieldActor";
 
-export class Enemy {
+export class Enemy implements IFieldActor {
     private readonly graphics: Phaser.GameObjects.Graphics;
     private row: number;
     private column: number;
@@ -58,5 +59,8 @@ export class Enemy {
         this.graphics.lineStyle(0, 0xff0000);
         this.graphics.fillStyle(0xff0000);
         this.graphics.fillRect(this.column * GameConstants.GRID_SIZE, this.row * GameConstants.GRID_SIZE, GameConstants.GRID_SIZE, GameConstants.GRID_SIZE);
+    }
+
+    onCollideWithPlayer(): void {
     }
 }

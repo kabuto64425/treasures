@@ -1,5 +1,6 @@
 import { DIRECTION } from "./drection";
 import * as GameConstants from "./gameConstants";
+import { IFieldActor } from "./iFieldActor";
 
 export class Player {
     private readonly graphics: Phaser.GameObjects.Graphics;
@@ -73,5 +74,11 @@ export class Player {
         this.graphics.lineStyle(0, 0x0000ff);
         this.graphics.fillStyle(0x0000ff);
         this.graphics.fillRect(this.column * GameConstants.GRID_SIZE, this.row * GameConstants.GRID_SIZE, GameConstants.GRID_SIZE, GameConstants.GRID_SIZE);
+    }
+
+    handleCollisionWith(actor: IFieldActor) {
+        if (this.row === actor.position().row && this.column === actor.position().column) {
+            actor.onCollideWithPlayer();
+        }
     }
 }

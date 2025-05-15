@@ -1,6 +1,7 @@
 import * as GameConstants from "./gameConstants";
+import { IFieldActor } from "./iFieldActor";
 
-export class Treasure {
+export class Treasure implements IFieldActor {
     private graphics: Phaser.GameObjects.Graphics;
     private color: number;
     private row: number;
@@ -55,5 +56,9 @@ export class Treasure {
 
     clearDisplay() {
         this.graphics.clear();
+    }
+
+    onCollideWithPlayer(): void {
+        throw new Error("Method not implemented.");
     }
 }

@@ -6,6 +6,7 @@ export * from "./gameConstants";
 export * from "./gameScene";
 export * from "./gameSceneGeneralSupervision";
 export * from "./iSingleRoundSupervision";
+export * from "./iFieldActor";
 export * from "./player";
 export * from "./roundsSupervision"
 export * from "./treasuresRoundSupervision";
