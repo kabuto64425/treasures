@@ -8,12 +8,12 @@ export class Recorder {
     }
 
     // 宝から通知を受け取った時の処理(要命名)
-    aaa() {
+    addNumberOfCollectedTreasures() {
         this.numberOfCollectedTreasures++;
     }
 
     // elapsedFrameを増やす処理(要命名)
-    bbb() {
+    addElapsedFrame() {
         this.elapsedFrame++;
     }
 }
