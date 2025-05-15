@@ -62,6 +62,6 @@ export class Treasure implements IFieldActor {
         // 実装予定
         // 自身のステータス変更
         // 自身の表示を消す
-        // 総監督に通知
+        // 記録係(作成予定)に通知
     }
 }
