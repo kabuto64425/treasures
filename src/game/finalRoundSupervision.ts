@@ -22,7 +22,7 @@ export class FinalRoundSupervision implements ISingleRoundSupervision {
     }
 
     extractAppearanceTreasures(): Treasure[] {
-        throw [this.goal];
+        return [this.goal];
     }
 
     private setStateAppearance() {
