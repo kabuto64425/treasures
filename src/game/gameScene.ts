@@ -47,11 +47,14 @@ export class GameScene extends Phaser.Scene {
     }
 
     update(_time: number, _delta: number) {
+        //console.log(_delta);
+        let now = performance.now();
         // create内で確実に作成しているので、アサーションでもいけるはず
         const gameSceneGeneralSupervision = this.gameSceneGeneralSupervision!;
-        if(gameSceneGeneralSupervision.isPlaying()) {
+        if (gameSceneGeneralSupervision.isPlaying()) {
             gameSceneGeneralSupervision.updatePerFrame(this.cursors!);
         }
+        console.log([performance.now() - now, _time, this.time.now]);
     }
 
     getBestRecord() {

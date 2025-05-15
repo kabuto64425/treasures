@@ -1,24 +1,16 @@
 import { ISingleRoundSupervision } from "./iSingleRoundSupervision";
-import { Player } from "./player";
 import { Treasure } from "./treasure";
 
 export class FinalRoundSupervision implements ISingleRoundSupervision {
     private readonly goal: Treasure;
 
     constructor(gameObjectFactory: Phaser.GameObjects.GameObjectFactory, initRow: number, initColumn: number) {
-        this.goal = new Treasure(gameObjectFactory, 0xffa500, initRow, initColumn);
+        this.goal = new Treasure(gameObjectFactory, 0xffa500, initRow, initColumn, true);
     }
     
     startRound(): void {
         this.setStateAppearance();
         this.draw();
-    }
-    
-    interactWithPlayer(player: Player): void {
-        if (player.position().row === this.goal.position().row && player.position().column === this.goal.position().column) {
-            this.goal.setStateCollected();
-            this.goal.clearDisplay();
-        }
     }
     
     isRoundCompleted(): boolean {
@@ -27,6 +19,10 @@ export class FinalRoundSupervision implements ISingleRoundSupervision {
 
     isFinalRound(): boolean {
         return true;
+    }
+
+    extractAppearanceTreasures(): Treasure[] {
+        return [this.goal];
     }
 
     private setStateAppearance() {

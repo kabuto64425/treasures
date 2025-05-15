@@ -1,11 +1,16 @@
 import * as GameConstants from "./gameConstants";
+import { IFieldActor } from "./iFieldActor";
+import { RecorderMediator } from "./recoder";
 
-export class Treasure {
-    private graphics: Phaser.GameObjects.Graphics;
-    private color: number;
+export class Treasure implements IFieldActor {
+    private readonly graphics: Phaser.GameObjects.Graphics;
+    private readonly color: number;
     private row: number;
     private column: number;
     private state: number;
+
+    // ファイナルランドのゴールかどうか。そもそもゴールと宝は扱いが別の気がするので、フラグで管理すべきか検討中
+    private readonly isGoal;
 
     static readonly TREASURE_STATE = {
         NON_APPEARANCE: 0,
@@ -13,12 +18,13 @@ export class Treasure {
         COLLECTED: 2,
     };
 
-    constructor(gameObjectFactory: Phaser.GameObjects.GameObjectFactory, color: number, iniRow: number, iniColumn: number) {
+    constructor(gameObjectFactory: Phaser.GameObjects.GameObjectFactory, color: number, iniRow: number, iniColumn: number, isGoal: boolean) {
         this.graphics = gameObjectFactory.graphics();
         this.color = color;
         this.row = iniRow;
         this.column = iniColumn;
         this.state = Treasure.TREASURE_STATE.NON_APPEARANCE;
+        this.isGoal = isGoal;
     }
 
     position() {
@@ -55,5 +61,17 @@ export class Treasure {
 
     clearDisplay() {
         this.graphics.clear();
+    }
+
+    onCollideWithPlayer(): void {
+        // 実装予定
+        // 自身のステータス変更
+        // 自身の表示を消す
+        // 記録係(作成予定)に通知
+        this.state = Treasure.TREASURE_STATE.COLLECTED;
+        this.clearDisplay();
+        if(!this.isGoal) {
+            RecorderMediator.notifyTreasureCollected();
+        }
     }
 }

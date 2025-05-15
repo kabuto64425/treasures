@@ -1,0 +1,7 @@
+const recorder = new Recorder("記録係A");
+const treasure = new Treasure("宝X");
+
+const mediator = new MessengerMediator(recorder);
+treasure.setMediator(mediator);
+
+treasure.sendMessage("発見された宝の情報を記録してください。");
