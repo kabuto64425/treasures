@@ -3,11 +3,14 @@ import { IFieldActor } from "./iFieldActor";
 import { RecorderMediator } from "./recoder";
 
 export class Treasure implements IFieldActor {
-    private graphics: Phaser.GameObjects.Graphics;
-    private color: number;
+    private readonly graphics: Phaser.GameObjects.Graphics;
+    private readonly color: number;
     private row: number;
     private column: number;
     private state: number;
+
+    // ファイナルランドのゴールかどうか。そもそもゴールと宝は扱いが別の気がするので、フラグで管理すべきか検討中
+    private readonly isGoal;
 
     static readonly TREASURE_STATE = {
         NON_APPEARANCE: 0,
@@ -15,12 +18,13 @@ export class Treasure implements IFieldActor {
         COLLECTED: 2,
     };
 
-    constructor(gameObjectFactory: Phaser.GameObjects.GameObjectFactory, color: number, iniRow: number, iniColumn: number) {
+    constructor(gameObjectFactory: Phaser.GameObjects.GameObjectFactory, color: number, iniRow: number, iniColumn: number, isGoal: boolean) {
         this.graphics = gameObjectFactory.graphics();
         this.color = color;
         this.row = iniRow;
         this.column = iniColumn;
         this.state = Treasure.TREASURE_STATE.NON_APPEARANCE;
+        this.isGoal = isGoal;
     }
 
     position() {
@@ -66,6 +70,8 @@ export class Treasure implements IFieldActor {
         // 記録係(作成予定)に通知
         this.state = Treasure.TREASURE_STATE.COLLECTED;
         this.clearDisplay();
-        RecorderMediator.notifyTreasureCollected();
+        if(!this.isGoal) {
+            RecorderMediator.notifyTreasureCollected();
+        }
     }
 }

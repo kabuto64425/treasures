@@ -127,7 +127,7 @@ export class GameSceneGeneralSupervision {
                 while (GameConstants.FIELD[treasurePos.row][treasurePos.column] === 1) {
                     treasurePos = { row: Math.floor(Math.random() * GameConstants.H), column: Math.floor(Math.random() * GameConstants.W) };
                 }
-                const treasure = new Treasure(this.gameObjectFactory, 0xffff00, treasurePos.row, treasurePos.column);
+                const treasure = new Treasure(this.gameObjectFactory, 0xffff00, treasurePos.row, treasurePos.column, false);
                 treasureList.push(treasure);
             }
 
