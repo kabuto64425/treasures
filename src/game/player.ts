@@ -7,14 +7,12 @@ export class Player {
     private row: number;
     private column: number;
     private chargeAmount: number;
-    private numberOfCollectedTreasures: number;
 
     constructor(gameObjectFactory: Phaser.GameObjects.GameObjectFactory, iniRow: number, iniColumn: number) {
         this.graphics = gameObjectFactory.graphics();
         this.row = iniRow;
         this.column = iniColumn;
         this.chargeAmount = 0;
-        this.numberOfCollectedTreasures = 0;
     }
 
     position() {
@@ -59,14 +57,6 @@ export class Player {
             this.column += direction.dc;
             this.chargeAmount = 0;
         }
-    }
-
-    addNumberOfCollectedTreasures() {
-        this.numberOfCollectedTreasures++;
-    }
-
-    getNumberOfCollectedTreasures() {
-        return this.numberOfCollectedTreasures;
     }
 
     draw() {

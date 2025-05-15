@@ -1,5 +1,4 @@
 import { ISingleRoundSupervision } from "./iSingleRoundSupervision";
-import { Player } from "./player";
 import { Treasure } from "./treasure";
 
 export class FinalRoundSupervision implements ISingleRoundSupervision {
@@ -12,13 +11,6 @@ export class FinalRoundSupervision implements ISingleRoundSupervision {
     startRound(): void {
         this.setStateAppearance();
         this.draw();
-    }
-    
-    interactWithPlayer(player: Player): void {
-        if (player.position().row === this.goal.position().row && player.position().column === this.goal.position().column) {
-            this.goal.setStateCollected();
-            this.goal.clearDisplay();
-        }
     }
     
     isRoundCompleted(): boolean {

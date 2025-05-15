@@ -7,13 +7,31 @@ export class Recorder {
         this.elapsedFrame = 0;
     }
 
-    // 宝から通知を受け取った時の処理(要命名)
     addNumberOfCollectedTreasures() {
         this.numberOfCollectedTreasures++;
     }
 
-    // elapsedFrameを増やす処理(要命名)
     addElapsedFrame() {
         this.elapsedFrame++;
+    }
+
+    readonly getNumberOfCollectedTreasures = () => {
+        return this.numberOfCollectedTreasures;
+    }
+
+    readonly getElapsedFrame = () => {
+        return this.elapsedFrame;
+    }
+}
+
+export class RecorderMediator {
+    private static recorder: Recorder;
+
+    static setRecoder(recorder: Recorder) {
+        this.recorder = recorder;
+    }
+
+    static notifyTreasureCollected() {
+        this.recorder.addNumberOfCollectedTreasures();
     }
 }

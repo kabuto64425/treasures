@@ -1,5 +1,4 @@
 import { ISingleRoundSupervision } from "./iSingleRoundSupervision";
-import { Player } from "./player";
 import { Treasure } from "./treasure";
 
 export class TreasuresRoundSupervision implements ISingleRoundSupervision {
@@ -13,16 +12,6 @@ export class TreasuresRoundSupervision implements ISingleRoundSupervision {
     startRound(): void {
         this.setAllTreasuresStateAppearance();
         this.drawAllTreasures();
-    }
-
-    interactWithPlayer(player: Player): void {
-        for (const treasure of this.extractAppearanceTreasures()) {
-            if (player.position().row === treasure.position().row && player.position().column === treasure.position().column) {
-                treasure.setStateCollected();
-                treasure.clearDisplay();
-                player.addNumberOfCollectedTreasures();
-            }
-        }
     }
 
     isRoundCompleted(): boolean {

@@ -34,8 +34,10 @@ export class Ui {
     private readonly barWidth = 250;
     private readonly barHeight = 20;
 
-    private readonly getElapsedFrame: () => number;
-    private readonly queryNumberOfCollectedTreasures: () => number;
+    private readonly queryCurrentRecord: () => {
+        elapsedFrame: number,
+        numberOfCollectedTreasures: number
+    };
 
     private readonly createBestRecordStr: () => string;
     private readonly deleteBestRecord: () => void;
@@ -44,8 +46,7 @@ export class Ui {
         this.clock = clock;
         this.scenePlugin = scenePlugin;
 
-        this.getElapsedFrame = generalSupervision.getElapsedFrame;
-        this.queryNumberOfCollectedTreasures = generalSupervision.queryNumberOfCollectedTreasures;
+        this.queryCurrentRecord = generalSupervision.queryCurrentRecord;
 
         this.createBestRecordStr = bestRecord.createBestRecordStr;
         this.deleteBestRecord = bestRecord.deleteBestRecord;
@@ -155,11 +156,11 @@ export class Ui {
     }
 
     updateTimeText() {
-        this.timeText!.setText(`${Utils.createFormattedTimeFromFrame(this.getElapsedFrame())}`);
+        this.timeText!.setText(`${Utils.createFormattedTimeFromFrame(this.queryCurrentRecord().elapsedFrame)}`);
     }
 
     updateCollectedTreasuresText() {
-        const numberOfCollectedTreasures = this.queryNumberOfCollectedTreasures();
+        const numberOfCollectedTreasures = this.queryCurrentRecord().numberOfCollectedTreasures;
         this.collectedTreasuresText!.setText(`${numberOfCollectedTreasures}/${Utils.calculateNumberOfTreasuresInALLRounds()}`);
     }
 

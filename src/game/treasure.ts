@@ -1,5 +1,6 @@
 import * as GameConstants from "./gameConstants";
 import { IFieldActor } from "./iFieldActor";
+import { RecorderMediator } from "./recoder";
 
 export class Treasure implements IFieldActor {
     private graphics: Phaser.GameObjects.Graphics;
@@ -63,5 +64,8 @@ export class Treasure implements IFieldActor {
         // 自身のステータス変更
         // 自身の表示を消す
         // 記録係(作成予定)に通知
+        this.state = Treasure.TREASURE_STATE.COLLECTED;
+        this.clearDisplay();
+        RecorderMediator.notifyTreasureCollected();
     }
 }

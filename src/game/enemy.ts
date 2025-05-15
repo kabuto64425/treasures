@@ -9,14 +9,16 @@ export class Enemy implements IFieldActor {
     private column: number;
     private chargeAmount: number;
     private readonly priorityScanDirections: DIRECTION[];
+    private readonly onPlayerCaptured: () => void;
 
-    constructor(gameObjectFactory: Phaser.GameObjects.GameObjectFactory, iniRow: number, iniColumn: number, priorityScanDirections: DIRECTION[]) {
+    constructor(gameObjectFactory: Phaser.GameObjects.GameObjectFactory, iniRow: number, iniColumn: number, priorityScanDirections: DIRECTION[], onPlayerCaptured: () => void) {
         this.graphics = gameObjectFactory.graphics();
         this.graphics.depth = 10;
         this.row = iniRow;
         this.column = iniColumn;
         this.chargeAmount = 0;
         this.priorityScanDirections = priorityScanDirections;
+        this.onPlayerCaptured = onPlayerCaptured;
     }
 
     position() {
@@ -63,5 +65,6 @@ export class Enemy implements IFieldActor {
 
     onCollideWithPlayer(): void {
         // 総監督が持つゲームオーバー処理(実装予定)を実行
+        this.onPlayerCaptured();
     }
 }
