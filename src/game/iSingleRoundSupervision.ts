@@ -1,3 +1,4 @@
+import { IFieldActor } from "./iFieldActor";
 import { Player } from "./player";
 
 export interface ISingleRoundSupervision {
@@ -5,4 +6,5 @@ export interface ISingleRoundSupervision {
     interactWithPlayer(player : Player): void;
     isRoundCompleted(): boolean;
     isFinalRound(): boolean;
+    extractAppearanceTreasures(): IFieldActor[];
 }

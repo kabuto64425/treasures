@@ -16,7 +16,7 @@ export class TreasuresRoundSupervision implements ISingleRoundSupervision {
     }
 
     interactWithPlayer(player: Player): void {
-        for (const treasure of this.extractAppearanceTreasureList()) {
+        for (const treasure of this.extractAppearanceTreasures()) {
             if (player.position().row === treasure.position().row && player.position().column === treasure.position().column) {
                 treasure.setStateCollected();
                 treasure.clearDisplay();
@@ -33,7 +33,7 @@ export class TreasuresRoundSupervision implements ISingleRoundSupervision {
         return false;
     }
 
-    private extractAppearanceTreasureList() {
+    extractAppearanceTreasures(): Treasure[] {
         return this.treasureList.filter(t => t.isAppearance());
     }
 

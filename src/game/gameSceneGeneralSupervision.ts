@@ -198,6 +198,11 @@ export class GameSceneGeneralSupervision {
 
         // setup内で確実に作成しているので、アサーションでもいけるはず
         const roundsSupervision = this.roundsSupervision!;
+
+        for(const treasure of roundsSupervision.getCurrentRoundSupervision().extractAppearanceTreasures()) {
+            this.player.handleCollisionWith(treasure);
+        }
+        // handleCollisionWithで獲得の処理ができればinteractWithPlayerは削除予定
         roundsSupervision.getCurrentRoundSupervision().interactWithPlayer(this.player);
 
         this.ui.updateCollectedTreasuresText();
@@ -218,6 +223,7 @@ export class GameSceneGeneralSupervision {
 
         // 敵との接触判定・ゲームオーバー更新
         for (const enemy of this.enemyList) {
+            this.player.handleCollisionWith(enemy);
             if (this.player.position().row === enemy.position().row && this.player.position().column === enemy.position().column) {
                 if (!this.params.noGameOverMode) {
                     // setup内で確実に作成しているので、アサーションでもいけるはず

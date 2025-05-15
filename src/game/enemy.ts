@@ -62,5 +62,6 @@ export class Enemy implements IFieldActor {
     }
 
     onCollideWithPlayer(): void {
+        // 総監督が持つゲームオーバー処理(実装予定)を実行
     }
 }

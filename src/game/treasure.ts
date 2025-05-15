@@ -59,6 +59,6 @@ export class Treasure implements IFieldActor {
     }
 
     onCollideWithPlayer(): void {
-        throw new Error("Method not implemented.");
+        // 実装予定
     }
 }
