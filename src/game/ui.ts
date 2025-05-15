@@ -138,19 +138,6 @@ export class Ui {
         });
     }
 
-    /*setupRetryButton() {
-        this.retry.setInteractive();
-
-        this.retry.on("pointerover", () => this.retry.setTint(0x44ff44));
-        this.retry.on("pointerout", () => this.retry.clearTint());
-
-        this.retry.on("pointerdown", () => {
-            if (this.isGamePlayed()) {
-                this.scenePlugin.restart();
-            }
-        });
-    }*/
-
     setupRetryLongButton() {
         this.retryLongButton.setupButton();
     }
