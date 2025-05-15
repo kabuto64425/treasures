@@ -60,5 +60,8 @@ export class Treasure implements IFieldActor {
 
     onCollideWithPlayer(): void {
         // 実装予定
+        // 自身のステータス変更
+        // 自身の表示を消す
+        // 総監督に通知
     }
 }
