@@ -15,6 +15,8 @@ export class GameSceneGeneralSupervision {
     // これを使用してゲームの物体を生成すると、シーンに自動的に加わる
     private readonly gameObjectFactory: Phaser.GameObjects.GameObjectFactory;
 
+    private readonly inputPlugin: Phaser.Input.InputPlugin;
+
     private readonly params: any;
 
     private readonly ui: Ui;
@@ -39,11 +41,12 @@ export class GameSceneGeneralSupervision {
         GAME_OVER: 3,
     };
 
-    constructor(scene: GameScene, params: any) {
+    constructor(scene: GameScene) {
         this.gameObjectFactory = scene.add;
+        this.inputPlugin = scene.input;
         // これを使用してゲームの物体を生成してもシーンには自動的に加わらない。どこかのレイヤーなどに加えるときに使用
         const gameObjectCreator = scene.make;
-        this.params = params;
+        this.params = scene.getParams();
 
         this.updateBestRecord = scene.getBestRecord().updateBestRecord;
 
@@ -146,12 +149,14 @@ export class GameSceneGeneralSupervision {
         this.roundsSupervision!.getCurrentRoundSupervision().startRound();
     }
 
-    updatePerFrame(cursors: Phaser.Types.Input.Keyboard.CursorKeys) {
+    updatePerFrame() {
         if (!this.isPlaying()) {
             return;
         }
         this.recorder.addElapsedFrame();
         this.ui.updateTimeText();
+
+        const cursors = this.inputPlugin.keyboard.createCursorKeys();
 
         // キーボードの情報を取得
         let input_dist = null;
@@ -236,8 +241,8 @@ export class GameSceneGeneralSupervision {
 
     readonly queryCurrentRecord = () => {
         return {
-            elapsedFrame : this.recorder.getElapsedFrame(),
-            numberOfCollectedTreasures : this.recorder.getNumberOfCollectedTreasures()
+            elapsedFrame: this.recorder.getElapsedFrame(),
+            numberOfCollectedTreasures: this.recorder.getNumberOfCollectedTreasures()
         }
     }
 
