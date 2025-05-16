@@ -42,6 +42,14 @@ export class Ui {
     private readonly createBestRecordStr: () => string;
     private readonly deleteBestRecord: () => void;
 
+    private readonly requestStartGame: () => void;
+
+    // @ts-ignore 採用結果をもとに処理する方針なので、後で必ず使う
+    private readonly queryAcceptedUiActionInfo: () => {
+        isStartGameRequested: boolean,
+        isRetryGameRequested: boolean
+    };
+
     constructor(generalSupervision: GameSceneGeneralSupervision, gameObjectFactory: Phaser.GameObjects.GameObjectFactory, gameObjectCreator: Phaser.GameObjects.GameObjectCreator, clock: Phaser.Time.Clock, scenePlugin: Phaser.Scenes.ScenePlugin, bestRecord: BestRecord) {
         this.clock = clock;
         this.scenePlugin = scenePlugin;
@@ -50,6 +58,9 @@ export class Ui {
 
         this.createBestRecordStr = bestRecord.createBestRecordStr;
         this.deleteBestRecord = bestRecord.deleteBestRecord;
+
+        this.requestStartGame = generalSupervision.getInputManager().requestStartGame;
+        this.queryAcceptedUiActionInfo = generalSupervision.getInputManager().queryAcceptedUiActionInfo;
 
         this.uiLayer = gameObjectFactory.layer();
         this.uiLayer.setDepth(100);
@@ -128,6 +139,10 @@ export class Ui {
 
         this.play.on("pointerover", () => this.play.setTint(0x44ff44));
         this.play.on("pointerout", () => this.play.clearTint());
+
+        this.play.on("pointerup", () => {
+            this.requestStartGame();
+        });
 
         this.play.on("pointerup", () => {
             this.play.destroy();

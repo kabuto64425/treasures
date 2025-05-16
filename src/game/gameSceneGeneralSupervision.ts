@@ -10,6 +10,7 @@ import { Treasure } from "./treasure";
 import { Ui } from "./ui";
 import { FinalRoundSupervision } from "./finalRoundSupervision";
 import { Recorder, RecorderMediator } from "./recoder";
+import { InputManager } from "./inputManager";
 
 export class GameSceneGeneralSupervision {
     // これを使用してゲームの物体を生成すると、シーンに自動的に加わる
@@ -18,6 +19,9 @@ export class GameSceneGeneralSupervision {
     private readonly inputPlugin: Phaser.Input.InputPlugin;
 
     private readonly params: any;
+
+    // @ts-ignore 後で使う
+    private readonly inputManager : InputManager;
 
     private readonly ui: Ui;
 
@@ -53,6 +57,8 @@ export class GameSceneGeneralSupervision {
         this.recorder = new Recorder();
 
         this.gameState = GameSceneGeneralSupervision.GAME_STATE.INITIALIZED;
+
+        this.inputManager = new InputManager(this.inputPlugin);
 
         this.ui = new Ui(this, this.gameObjectFactory, gameObjectCreator, scene.time, scene.scene, scene.getBestRecord());
 
@@ -226,6 +232,10 @@ export class GameSceneGeneralSupervision {
         for (const enemy of this.enemyList) {
             this.player.handleCollisionWith(enemy);
         }
+    }
+
+    getInputManager() {
+        return this.inputManager;
     }
 
     readonly onPlayerCaptured = () => {

@@ -13,6 +13,9 @@ export class RetryLongButton {
 
     private readonly isGamePlayed: () => boolean;
 
+    // @ts-ignore リクエストを送る処理を必ずいれるので使う
+    private readonly requestRetryGame: () => void;
+
     private readonly barWidth = 100;
     private readonly barHeight = 20;
 
@@ -37,10 +40,12 @@ export class RetryLongButton {
     constructor(generalSupervision: GameSceneGeneralSupervision, uiLayer: Phaser.GameObjects.Layer, clock: Phaser.Time.Clock, scenePlugin: Phaser.Scenes.ScenePlugin, gameObjectCreator: Phaser.GameObjects.GameObjectCreator) {
         this.clock = clock;
         this.scenePlugin = scenePlugin;
-        this.image = gameObjectCreator.image({ x: 800, y: 550, key: "retry" }, false);
-        uiLayer.add(this.image);
-
         this.isGamePlayed = generalSupervision.isGamePlayed;
+        this.requestRetryGame = generalSupervision.getInputManager().requestRetryGame;
+
+        this.image = gameObjectCreator.image({ x: 800, y: 550, key: "retry" }, false);
+
+        uiLayer.add(this.image);
 
         this.progressBox = gameObjectCreator.graphics({ x: 750, y: 450, key: "retry" }, false);
         this.progressBox.setVisible(false);
