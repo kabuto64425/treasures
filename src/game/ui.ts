@@ -45,9 +45,9 @@ export class Ui {
     private readonly requestStartGame: () => void;
 
     // @ts-ignore 採用結果をもとに処理する方針なので、後で必ず使う
-    private readonly queryAcceptedUiActionInfo: () => {
-        isStartGameRequested: boolean,
-        isRetryGameRequested: boolean
+    private readonly getApprovedActionInfo: () => {
+        startGame: boolean,
+        retryGame: boolean
     };
 
     constructor(generalSupervision: GameSceneGeneralSupervision, gameObjectFactory: Phaser.GameObjects.GameObjectFactory, gameObjectCreator: Phaser.GameObjects.GameObjectCreator, clock: Phaser.Time.Clock, scenePlugin: Phaser.Scenes.ScenePlugin, bestRecord: BestRecord) {
@@ -59,8 +59,8 @@ export class Ui {
         this.createBestRecordStr = bestRecord.createBestRecordStr;
         this.deleteBestRecord = bestRecord.deleteBestRecord;
 
-        this.requestStartGame = generalSupervision.getInputManager().requestStartGame;
-        this.queryAcceptedUiActionInfo = generalSupervision.getInputManager().queryAcceptedUiActionInfo;
+        this.requestStartGame = generalSupervision.getInputCoordinator().requestStartGame;
+        this.getApprovedActionInfo = generalSupervision.getInputCoordinator().getApprovedActionInfo;
 
         this.uiLayer = gameObjectFactory.layer();
         this.uiLayer.setDepth(100);

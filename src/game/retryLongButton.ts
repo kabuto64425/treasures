@@ -41,7 +41,7 @@ export class RetryLongButton {
         this.clock = clock;
         this.scenePlugin = scenePlugin;
         this.isGamePlayed = generalSupervision.isGamePlayed;
-        this.requestRetryGame = generalSupervision.getInputManager().requestRetryGame;
+        this.requestRetryGame = generalSupervision.getInputCoordinator().requestRetryGame;
 
         this.image = gameObjectCreator.image({ x: 800, y: 550, key: "retry" }, false);
 

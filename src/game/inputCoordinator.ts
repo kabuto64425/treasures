@@ -1,6 +1,6 @@
 import Phaser from "phaser";
 
-export class InputManager {
+export class InputCoordinator {
     private readonly inputPlugin: Phaser.Input.InputPlugin;
     private readonly keyMap: { [key: string]: Phaser.Input.Keyboard.Key };
 
@@ -68,7 +68,7 @@ export class InputManager {
     }
 
     //結果を返す
-    getApprovedActionInfo() {
+    getApprovedActionInfo = () => {
         // 書き換えができてしまうので、余裕があれば書き換えできないように何かしら対応したい
         return this.approvedActionInfo;
     }
