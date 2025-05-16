@@ -7,10 +7,13 @@ export class InputManager {
     private readonly enterKey: Phaser.Input.Keyboard.Key;
     private readonly spaceKey: Phaser.Input.Keyboard.Key;
 
-    //@ts-ignore審査かならず使う
     private isStartGameRequested = false;
-    //@ts-ignore審査かならず使う
     private isRetryGameRequested = false;
+
+    private approvedActionInfo : {
+        startGame: boolean,
+        retryGame: boolean
+    }
 
     constructor(inputPlugin: Phaser.Input.InputPlugin) {
         this.inputPlugin = inputPlugin;
@@ -19,6 +22,11 @@ export class InputManager {
         // キー登録
         this.enterKey = this.inputPlugin.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ENTER);
         this.spaceKey = this.inputPlugin.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
+
+        this.approvedActionInfo = {
+            startGame: false,
+            retryGame: false,
+        }
     }
 
     handleKeyboardInputs() {
@@ -40,8 +48,30 @@ export class InputManager {
     }
 
     // 審査
+    approveRequestedAction() {
+        let startGame = false;
+        let retryGame = false;
+
+        if(this.isRetryGameRequested) {
+            retryGame = true;
+        } else if(this.isStartGameRequested) {
+            startGame = true;
+        }
+
+        this.approvedActionInfo = {
+            startGame : startGame,
+            retryGame : retryGame,
+        }
+
+        this.isStartGameRequested = false;
+        this.isRetryGameRequested = false;
+    }
 
     //結果を返す
+    getApprovedActionInfo() {
+        // 書き換えができてしまうので、余裕があれば書き換えできないように何かしら対応したい
+        return this.approvedActionInfo;
+    }
 
     // @ts-ignore 使うときが来るかも。来なかったら消す
     private registerKeys(keyNames: string[]) {
