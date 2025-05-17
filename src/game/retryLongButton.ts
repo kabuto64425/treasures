@@ -13,34 +13,32 @@ export class RetryLongButton {
 
     private readonly isGamePlayed: () => boolean;
 
+    // @ts-ignore リクエストを送る処理を必ずいれるので使う
+    private readonly requestRetryGame: () => void;
+
     private readonly barWidth = 100;
     private readonly barHeight = 20;
 
+    private repeatCount = 0;
+
     private readonly timerEventConfig = {
         delay: 0,
-        repeat: GameConstants.FPS - 1,
+        loop: true,
         callbackScope: this,
         callback: function (this: RetryLongButton) {
-            const remainingCount = this.timerEvent.getRepeatCount();
-            const progress = 1 - (remainingCount / GameConstants.FPS);
-
-            this.progressBar.clear();
-            this.progressBar.fillStyle(0xffff00, 0.8);
-            this.progressBar.fillRect(0, 0, this.barWidth * progress, this.barHeight);
-
-            if (remainingCount <= 0) {
-                this.scenePlugin.restart();
-            }
+            this.requestRetryGame();
         },
     }
 
     constructor(generalSupervision: GameSceneGeneralSupervision, uiLayer: Phaser.GameObjects.Layer, clock: Phaser.Time.Clock, scenePlugin: Phaser.Scenes.ScenePlugin, gameObjectCreator: Phaser.GameObjects.GameObjectCreator) {
         this.clock = clock;
         this.scenePlugin = scenePlugin;
-        this.image = gameObjectCreator.image({ x: 800, y: 550, key: "retry" }, false);
-        uiLayer.add(this.image);
-
         this.isGamePlayed = generalSupervision.isGamePlayed;
+        this.requestRetryGame = generalSupervision.getInputCoordinator().requestRetryGame;
+
+        this.image = gameObjectCreator.image({ x: 800, y: 550, key: "retry" }, false);
+
+        uiLayer.add(this.image);
 
         this.progressBox = gameObjectCreator.graphics({ x: 750, y: 450, key: "retry" }, false);
         this.progressBox.setVisible(false);
@@ -53,7 +51,6 @@ export class RetryLongButton {
         this.progressBar.fillRect(0, 0, this.barWidth, this.barHeight);
         uiLayer.add(this.progressBar);
 
-
         this.timerEvent = new Phaser.Time.TimerEvent(this.timerEventConfig);
     }
 
@@ -61,25 +58,44 @@ export class RetryLongButton {
         this.image.setInteractive();
 
         this.image.on("pointerdown", () => {
-            if (this.isGamePlayed()) {
-                this.progressBox.setVisible(true);
-                this.progressBar.setVisible(true);
-                this.clock.addEvent(this.timerEvent);
-            }
+            this.clock.addEvent(this.timerEvent);
         });
 
         this.image.on("pointerup", () => {
             this.timerEvent.remove();
-            this.progressBox.setVisible(false);
-            this.progressBar.setVisible(false);
             this.timerEvent = new Phaser.Time.TimerEvent(this.timerEventConfig);
         });
 
         this.image.on("pointerout", () => {
             this.timerEvent.remove();
-            this.progressBox.setVisible(false);
-            this.progressBar.setVisible(false);
             this.timerEvent = new Phaser.Time.TimerEvent(this.timerEventConfig);
         });
+    }
+
+    handleApprovedAction(approved: boolean) {
+        if (!this.isGamePlayed()) {
+            return;
+        }
+        if(approved) {
+            this.repeatCount++;
+            this.progressBox.setVisible(true);
+            this.progressBar.setVisible(true);
+
+            const progress = (this.repeatCount / GameConstants.FPS);
+
+            this.progressBar.clear();
+            this.progressBar.fillStyle(0xffff00, 0.8);
+
+            this.progressBar.fillRect(0, 0, this.barWidth * progress, this.barHeight);
+
+            if(this.repeatCount >= GameConstants.FPS) {
+                // 押し続けてたのでシーンリセット実行
+                this.scenePlugin.restart();
+            }
+        } else {
+            this.repeatCount = 0;
+            this.progressBox.setVisible(false);
+            this.progressBar.setVisible(false);
+        }
     }
 }

@@ -1,13 +1,12 @@
 import Phaser from "phaser";
 import { GameSceneGeneralSupervision } from "./gameSceneGeneralSupervision";
 import { BestRecord } from "./bestRecord";
+import { Logger } from "./logger";
 
 export class GameScene extends Phaser.Scene {
     private readonly params: any;
     private readonly bestRecoed: BestRecord;
     private gameSceneGeneralSupervision: GameSceneGeneralSupervision | undefined;
-
-    private cursors: Phaser.Types.Input.Keyboard.CursorKeys | undefined;
 
     constructor(params: any, bestRecord: BestRecord) {
         super("gameScene");
@@ -35,8 +34,7 @@ export class GameScene extends Phaser.Scene {
     create() {
         Phaser.GameObjects.BitmapText.ParseFromAtlas(this, "font", "fontatlas", "azo-fire", "azoXML");
 
-        this.cursors = this.input.keyboard.createCursorKeys();
-        this.gameSceneGeneralSupervision = new GameSceneGeneralSupervision(this, this.params);
+        this.gameSceneGeneralSupervision = new GameSceneGeneralSupervision(this);
         this.gameSceneGeneralSupervision.setupSupervision();
     }
 
@@ -47,14 +45,14 @@ export class GameScene extends Phaser.Scene {
     }
 
     update(_time: number, _delta: number) {
-        //console.log(_delta);
         let now = performance.now();
-        // create内で確実に作成しているので、アサーションでもいけるはず
         const gameSceneGeneralSupervision = this.gameSceneGeneralSupervision!;
-        if (gameSceneGeneralSupervision.isPlaying()) {
-            gameSceneGeneralSupervision.updatePerFrame(this.cursors!);
-        }
-        console.log([performance.now() - now, _time, this.time.now]);
+        gameSceneGeneralSupervision.updatePerFrame();
+        Logger.all(performance.now() - now, _delta, _time, this.time.now);
+    }
+
+    getParams() {
+        return this.params;
     }
 
     getBestRecord() {

@@ -10,12 +10,17 @@ import { Treasure } from "./treasure";
 import { Ui } from "./ui";
 import { FinalRoundSupervision } from "./finalRoundSupervision";
 import { Recorder, RecorderMediator } from "./recoder";
+import { InputCoordinator } from "./inputCoordinator";
 
 export class GameSceneGeneralSupervision {
     // これを使用してゲームの物体を生成すると、シーンに自動的に加わる
     private readonly gameObjectFactory: Phaser.GameObjects.GameObjectFactory;
 
+    private readonly inputPlugin: Phaser.Input.InputPlugin;
+
     private readonly params: any;
+
+    private readonly inputCoordinator : InputCoordinator;
 
     private readonly ui: Ui;
 
@@ -25,7 +30,7 @@ export class GameSceneGeneralSupervision {
     private roundsSupervision: RoundsSupervision | undefined;
     private gameState: number;
 
-    private readonly recorder: Recorder
+    private readonly recorder: Recorder;
 
     private overlay: Phaser.GameObjects.Graphics | undefined;
 
@@ -39,17 +44,20 @@ export class GameSceneGeneralSupervision {
         GAME_OVER: 3,
     };
 
-    constructor(scene: GameScene, params: any) {
+    constructor(scene: GameScene) {
         this.gameObjectFactory = scene.add;
+        this.inputPlugin = scene.input;
         // これを使用してゲームの物体を生成してもシーンには自動的に加わらない。どこかのレイヤーなどに加えるときに使用
         const gameObjectCreator = scene.make;
-        this.params = params;
+        this.params = scene.getParams();
 
         this.updateBestRecord = scene.getBestRecord().updateBestRecord;
 
         this.recorder = new Recorder();
 
         this.gameState = GameSceneGeneralSupervision.GAME_STATE.INITIALIZED;
+
+        this.inputCoordinator = new InputCoordinator(this.inputPlugin);
 
         this.ui = new Ui(this, this.gameObjectFactory, gameObjectCreator, scene.time, scene.scene, scene.getBestRecord());
 
@@ -146,12 +154,17 @@ export class GameSceneGeneralSupervision {
         this.roundsSupervision!.getCurrentRoundSupervision().startRound();
     }
 
-    updatePerFrame(cursors: Phaser.Types.Input.Keyboard.CursorKeys) {
+    updatePerFrame() {
+        this.inputCoordinator.handleKeyboardInputs();
+        this.inputCoordinator.approveRequestedAction();
+        this.ui.handleApprovedAction();
         if (!this.isPlaying()) {
             return;
         }
         this.recorder.addElapsedFrame();
         this.ui.updateTimeText();
+
+        const cursors = this.inputPlugin.keyboard.createCursorKeys();
 
         // キーボードの情報を取得
         let input_dist = null;
@@ -223,6 +236,10 @@ export class GameSceneGeneralSupervision {
         }
     }
 
+    getInputCoordinator() {
+        return this.inputCoordinator;
+    }
+
     readonly onPlayerCaptured = () => {
         if (!this.params.noGameOverMode) {
             // setup内で確実に作成しているので、アサーションでもいけるはず
@@ -236,8 +253,8 @@ export class GameSceneGeneralSupervision {
 
     readonly queryCurrentRecord = () => {
         return {
-            elapsedFrame : this.recorder.getElapsedFrame(),
-            numberOfCollectedTreasures : this.recorder.getNumberOfCollectedTreasures()
+            elapsedFrame: this.recorder.getElapsedFrame(),
+            numberOfCollectedTreasures: this.recorder.getNumberOfCollectedTreasures()
         }
     }
 

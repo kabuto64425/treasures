@@ -3,6 +3,7 @@ import * as GameConstants from "./gameConstants";
 import { BestRecord } from "./bestRecord";
 import { GameSceneGeneralSupervision } from "./gameSceneGeneralSupervision";
 import { RetryLongButton } from "./retryLongButton";
+import { Logger } from "./logger";
 
 export class Ui {
     private readonly clock: Phaser.Time.Clock;
@@ -42,6 +43,14 @@ export class Ui {
     private readonly createBestRecordStr: () => string;
     private readonly deleteBestRecord: () => void;
 
+    private readonly requestStartGame: () => void;
+
+    // @ts-ignore 採用結果をもとに処理する方針なので、後で必ず使う
+    private readonly getApprovedActionInfo: () => {
+        startGame: boolean,
+        retryGame: boolean
+    };
+
     constructor(generalSupervision: GameSceneGeneralSupervision, gameObjectFactory: Phaser.GameObjects.GameObjectFactory, gameObjectCreator: Phaser.GameObjects.GameObjectCreator, clock: Phaser.Time.Clock, scenePlugin: Phaser.Scenes.ScenePlugin, bestRecord: BestRecord) {
         this.clock = clock;
         this.scenePlugin = scenePlugin;
@@ -50,6 +59,9 @@ export class Ui {
 
         this.createBestRecordStr = bestRecord.createBestRecordStr;
         this.deleteBestRecord = bestRecord.deleteBestRecord;
+
+        this.requestStartGame = generalSupervision.getInputCoordinator().requestStartGame;
+        this.getApprovedActionInfo = generalSupervision.getInputCoordinator().getApprovedActionInfo;
 
         this.uiLayer = gameObjectFactory.layer();
         this.uiLayer.setDepth(100);
@@ -130,12 +142,8 @@ export class Ui {
         this.play.on("pointerout", () => this.play.clearTint());
 
         this.play.on("pointerup", () => {
-            this.play.destroy();
-            this.readyGoText.setVisible(true);
-            this.progressBox.setVisible(true);
-            this.progressBar.setVisible(true);
-
-            this.clock.addEvent(this.timerEvent);
+            Logger.debug("pointerup");
+            this.requestStartGame();
         });
     }
 
@@ -153,6 +161,23 @@ export class Ui {
             this.deleteBestRecord();
             this.updateBestRecordText();
         });
+    }
+
+    handleApprovedAction() {
+        if(this.getApprovedActionInfo().startGame) {
+            Logger.debug("startgame");
+            this.executeStartGameAction();
+        }
+        this.retryLongButton.handleApprovedAction(this.getApprovedActionInfo().retryGame);
+    }
+
+    private executeStartGameAction() {
+        this.play.destroy();
+        this.readyGoText.setVisible(true);
+        this.progressBox.setVisible(true);
+        this.progressBar.setVisible(true);
+
+        this.clock.addEvent(this.timerEvent);
     }
 
     updateTimeText() {

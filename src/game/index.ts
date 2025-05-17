@@ -1,4 +1,5 @@
 export * from "./bestRecord";
+export * from "./logger"
 export * from "./drection";
 export * from "./enemy";
 export * from "./fieldEvalution";
