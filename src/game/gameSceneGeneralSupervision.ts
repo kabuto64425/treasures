@@ -20,7 +20,6 @@ export class GameSceneGeneralSupervision {
 
     private readonly params: any;
 
-    // @ts-ignore 後で使う
     private readonly inputCoordinator : InputCoordinator;
 
     private readonly ui: Ui;
