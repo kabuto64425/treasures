@@ -1,4 +1,5 @@
 import Phaser from "phaser";
+import { Logger } from "./logger";
 
 export class InputCoordinator {
     private readonly inputPlugin: Phaser.Input.InputPlugin;
@@ -10,9 +11,9 @@ export class InputCoordinator {
     private isStartGameRequested = false;
     private isRetryGameRequested = false;
 
-    private approvedActionInfo : {
-        startGame: boolean,
-        retryGame: boolean
+    private approvedActionInfo: {
+        readonly startGame: boolean,
+        readonly retryGame: boolean
     }
 
     constructor(inputPlugin: Phaser.Input.InputPlugin) {
@@ -25,7 +26,7 @@ export class InputCoordinator {
 
         this.approvedActionInfo = {
             startGame: false,
-            retryGame: false,
+            retryGame: false
         }
     }
 
@@ -40,6 +41,7 @@ export class InputCoordinator {
 
     // リクエスト→審査→採用結果を返す関数
     readonly requestStartGame = () => {
+        Logger.debug("requestStartGame");
         this.isStartGameRequested = true;
     }
 
@@ -52,15 +54,15 @@ export class InputCoordinator {
         let startGame = false;
         let retryGame = false;
 
-        if(this.isRetryGameRequested) {
+        if (this.isRetryGameRequested) {
             retryGame = true;
-        } else if(this.isStartGameRequested) {
+        } else if (this.isStartGameRequested) {
             startGame = true;
         }
 
         this.approvedActionInfo = {
-            startGame : startGame,
-            retryGame : retryGame,
+            startGame: startGame,
+            retryGame: retryGame,
         }
 
         this.isStartGameRequested = false;
@@ -69,7 +71,6 @@ export class InputCoordinator {
 
     //結果を返す
     getApprovedActionInfo = () => {
-        // 書き換えができてしまうので、余裕があれば書き換えできないように何かしら対応したい
         return this.approvedActionInfo;
     }
 

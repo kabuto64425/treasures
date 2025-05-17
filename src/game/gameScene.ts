@@ -1,6 +1,7 @@
 import Phaser from "phaser";
 import { GameSceneGeneralSupervision } from "./gameSceneGeneralSupervision";
 import { BestRecord } from "./bestRecord";
+import { Logger } from "./logger";
 
 export class GameScene extends Phaser.Scene {
     private readonly params: any;
@@ -44,13 +45,10 @@ export class GameScene extends Phaser.Scene {
     }
 
     update(_time: number, _delta: number) {
-        //console.log(_delta);
         let now = performance.now();
         const gameSceneGeneralSupervision = this.gameSceneGeneralSupervision!;
-        if (gameSceneGeneralSupervision.isPlaying()) {
-            gameSceneGeneralSupervision.updatePerFrame();
-        }
-        console.log([performance.now() - now, _time, this.time.now]);
+        gameSceneGeneralSupervision.updatePerFrame();
+        Logger.all(performance.now() - now, _delta, _time, this.time.now);
     }
 
     getParams() {

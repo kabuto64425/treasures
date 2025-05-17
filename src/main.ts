@@ -1,5 +1,6 @@
 import Phaser from "phaser";
 import * as Game from "./game";
+import { Logger } from "./game/logger";
 
 fetch("/treasures//params.json")
     .then(res => res.json())
@@ -9,6 +10,7 @@ fetch("/treasures//params.json")
 
 // Phaser3オブジェクトを作る
 function initGame(params: any) {
+    Logger.setLogLevel(params.logLevel);
     const bestRecord = new Game.BestRecord(params.enableUsingLocalstorage);
     // Phaser3の設定データ
     const config: Phaser.Types.Core.GameConfig = {

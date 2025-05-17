@@ -58,7 +58,6 @@ export class RetryLongButton {
         this.progressBar.fillRect(0, 0, this.barWidth, this.barHeight);
         uiLayer.add(this.progressBar);
 
-
         this.timerEvent = new Phaser.Time.TimerEvent(this.timerEventConfig);
     }
 

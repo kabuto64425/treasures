@@ -3,6 +3,7 @@ import * as GameConstants from "./gameConstants";
 import { BestRecord } from "./bestRecord";
 import { GameSceneGeneralSupervision } from "./gameSceneGeneralSupervision";
 import { RetryLongButton } from "./retryLongButton";
+import { Logger } from "./logger";
 
 export class Ui {
     private readonly clock: Phaser.Time.Clock;
@@ -141,16 +142,8 @@ export class Ui {
         this.play.on("pointerout", () => this.play.clearTint());
 
         this.play.on("pointerup", () => {
+            Logger.debug("pointerup");
             this.requestStartGame();
-        });
-
-        this.play.on("pointerup", () => {
-            this.play.destroy();
-            this.readyGoText.setVisible(true);
-            this.progressBox.setVisible(true);
-            this.progressBar.setVisible(true);
-
-            this.clock.addEvent(this.timerEvent);
         });
     }
 
@@ -168,6 +161,25 @@ export class Ui {
             this.deleteBestRecord();
             this.updateBestRecordText();
         });
+    }
+
+    handleApprovedAction() {
+        if(this.getApprovedActionInfo().startGame) {
+            Logger.debug("startgame");
+            this.executeStartGameAction();
+        }
+        if(this.getApprovedActionInfo().retryGame) {
+
+        }
+    }
+
+    private executeStartGameAction() {
+        this.play.destroy();
+        this.readyGoText.setVisible(true);
+        this.progressBox.setVisible(true);
+        this.progressBar.setVisible(true);
+
+        this.clock.addEvent(this.timerEvent);
     }
 
     updateTimeText() {

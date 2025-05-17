@@ -31,7 +31,7 @@ export class GameSceneGeneralSupervision {
     private roundsSupervision: RoundsSupervision | undefined;
     private gameState: number;
 
-    private readonly recorder: Recorder
+    private readonly recorder: Recorder;
 
     private overlay: Phaser.GameObjects.Graphics | undefined;
 
@@ -156,6 +156,9 @@ export class GameSceneGeneralSupervision {
     }
 
     updatePerFrame() {
+        this.inputCoordinator.handleKeyboardInputs();
+        this.inputCoordinator.approveRequestedAction();
+        this.ui.handleApprovedAction();
         if (!this.isPlaying()) {
             return;
         }
