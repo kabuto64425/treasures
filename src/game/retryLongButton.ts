@@ -19,21 +19,14 @@ export class RetryLongButton {
     private readonly barWidth = 100;
     private readonly barHeight = 20;
 
+    private repeatCount = 0;
+
     private readonly timerEventConfig = {
         delay: 0,
-        repeat: GameConstants.FPS - 1,
+        loop: true,
         callbackScope: this,
         callback: function (this: RetryLongButton) {
-            const remainingCount = this.timerEvent.getRepeatCount();
-            const progress = 1 - (remainingCount / GameConstants.FPS);
-
-            this.progressBar.clear();
-            this.progressBar.fillStyle(0xffff00, 0.8);
-            this.progressBar.fillRect(0, 0, this.barWidth * progress, this.barHeight);
-
-            if (remainingCount <= 0) {
-                this.scenePlugin.restart();
-            }
+            this.requestRetryGame();
         },
     }
 
@@ -65,25 +58,44 @@ export class RetryLongButton {
         this.image.setInteractive();
 
         this.image.on("pointerdown", () => {
-            if (this.isGamePlayed()) {
-                this.progressBox.setVisible(true);
-                this.progressBar.setVisible(true);
-                this.clock.addEvent(this.timerEvent);
-            }
+            this.clock.addEvent(this.timerEvent);
         });
 
         this.image.on("pointerup", () => {
             this.timerEvent.remove();
-            this.progressBox.setVisible(false);
-            this.progressBar.setVisible(false);
             this.timerEvent = new Phaser.Time.TimerEvent(this.timerEventConfig);
         });
 
         this.image.on("pointerout", () => {
             this.timerEvent.remove();
-            this.progressBox.setVisible(false);
-            this.progressBar.setVisible(false);
             this.timerEvent = new Phaser.Time.TimerEvent(this.timerEventConfig);
         });
+    }
+
+    handleApprovedAction(approved: boolean) {
+        if (!this.isGamePlayed()) {
+            return;
+        }
+        if(approved) {
+            this.repeatCount++;
+            this.progressBox.setVisible(true);
+            this.progressBar.setVisible(true);
+
+            const progress = (this.repeatCount / GameConstants.FPS);
+
+            this.progressBar.clear();
+            this.progressBar.fillStyle(0xffff00, 0.8);
+
+            this.progressBar.fillRect(0, 0, this.barWidth * progress, this.barHeight);
+
+            if(this.repeatCount >= GameConstants.FPS) {
+                // 押し続けてたのでシーンリセット実行
+                this.scenePlugin.restart();
+            }
+        } else {
+            this.repeatCount = 0;
+            this.progressBox.setVisible(false);
+            this.progressBar.setVisible(false);
+        }
     }
 }

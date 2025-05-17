@@ -39,13 +39,13 @@ export class InputCoordinator {
         }
     }
 
-    // リクエスト→審査→採用結果を返す関数
     readonly requestStartGame = () => {
         Logger.debug("requestStartGame");
         this.isStartGameRequested = true;
     }
 
     readonly requestRetryGame = () => {
+        Logger.debug("requestRetryGame");
         this.isRetryGameRequested = true;
     }
 

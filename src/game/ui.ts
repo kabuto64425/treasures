@@ -168,9 +168,7 @@ export class Ui {
             Logger.debug("startgame");
             this.executeStartGameAction();
         }
-        if(this.getApprovedActionInfo().retryGame) {
-
-        }
+        this.retryLongButton.handleApprovedAction(this.getApprovedActionInfo().retryGame);
     }
 
     private executeStartGameAction() {
