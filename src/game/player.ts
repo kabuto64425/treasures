@@ -9,6 +9,7 @@ export class Player {
     private chargeAmount: number;
     private readonly moveCost: number;
 
+    // @ts-ignore 使わなかったら消す
     private elapsedFrameLastInput: number;
     private nextDirection: DIRECTION | undefined;
 
@@ -42,13 +43,9 @@ export class Player {
     }
 
     resolveActionPerFrame(playerDirection: DIRECTION | undefined) {
-        if(this.elapsedFrameLastInput >= 5) {
-            if (playerDirection !== undefined) {
-                this.setNextDirection(playerDirection);
-                this.elapsedFrameLastInput = 0;
-            }
-        } else {
-            this.elapsedFrameLastInput++;
+        if (playerDirection !== undefined) {
+            this.setNextDirection(playerDirection);
+            this.elapsedFrameLastInput = 0;
         }
 
         if (this.isChargeCompleted()) {
