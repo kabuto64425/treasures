@@ -38,9 +38,10 @@ export class GameSceneGeneralSupervision {
     private static readonly GAME_STATE = {
         INITIALIZED: -1,
         STANDBY: 0,
-        PLAYING: 1,
-        GAME_CLEAR: 2,
-        GAME_OVER: 3,
+        READY: 1,
+        PLAYING: 2,
+        GAME_CLEAR: 3,
+        GAME_OVER: 4,
     };
 
     constructor(scene: GameScene) {
@@ -61,7 +62,7 @@ export class GameSceneGeneralSupervision {
         this.ui = new Ui(this, this.gameObjectFactory, gameObjectCreator, scene.time, scene.scene, scene.getBestRecord());
 
         // プレイヤー
-        this.player = new Player(scene.add, GameConstants.parameterPlayer.row, GameConstants.parameterPlayer.column);
+        this.player = new Player(scene.add, GameConstants.parameterPlayer.row, GameConstants.parameterPlayer.column, this.params.playerMoveCost);
 
         //フィールド評価
         this.fieldEvaluation = new FieldEvalution(scene.add, this.params.visibleFieldEvaluation);
@@ -69,7 +70,7 @@ export class GameSceneGeneralSupervision {
         // 敵
         this.enemyList = [];
         for (let i = 0; i < GameConstants.numberOfEnemyies; i++) {
-            const enemy = new Enemy(scene.add, GameConstants.parametersOfEnemies[i].row, GameConstants.parametersOfEnemies[i].column, GameConstants.parametersOfEnemies[i].priorityScanDirections, this.onPlayerCaptured);
+            const enemy = new Enemy(scene.add, GameConstants.parametersOfEnemies[i].row, GameConstants.parametersOfEnemies[i].column, this.params.enemyMoveCost, GameConstants.parametersOfEnemies[i].priorityScanDirections, this.onPlayerCaptured);
             this.enemyList.push(enemy);
         }
     }
@@ -164,17 +165,10 @@ export class GameSceneGeneralSupervision {
         this.ui.updateTimeText();
 
         // キーボードの情報を取得
-        let input_dist = this.inputCoordinator.getApprovedActionInfo().playerDirection;
+        let playerDirection= this.inputCoordinator.getApprovedActionInfo().playerDirection;
 
         // プレイヤー
-        if (this.player.isChargeCompleted()) {
-            if (input_dist !== undefined && this.player.canMove(input_dist)) {
-                this.player.move(input_dist);
-            }
-        } else {
-            this.player.charge();
-        }
-
+        this.player.resolveActionPerFrame(playerDirection);
         this.player.draw();
 
         // フィールド評価
@@ -244,6 +238,14 @@ export class GameSceneGeneralSupervision {
             elapsedFrame: this.recorder.getElapsedFrame(),
             numberOfCollectedTreasures: this.recorder.getNumberOfCollectedTreasures()
         }
+    }
+
+    readonly isStandby = () => {
+        return this.gameState === GameSceneGeneralSupervision.GAME_STATE.STANDBY;
+    }
+
+    readonly setReady = () => {
+        this.gameState = GameSceneGeneralSupervision.GAME_STATE.READY;
     }
 
     readonly isPlaying = () => {

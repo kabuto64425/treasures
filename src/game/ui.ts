@@ -35,6 +35,9 @@ export class Ui {
     private readonly barWidth = 250;
     private readonly barHeight = 20;
 
+    private readonly isStandby: () => boolean;
+    private readonly setReady: () => void;
+
     private readonly queryCurrentRecord: () => {
         elapsedFrame: number,
         numberOfCollectedTreasures: number
@@ -53,6 +56,9 @@ export class Ui {
     constructor(generalSupervision: GameSceneGeneralSupervision, gameObjectFactory: Phaser.GameObjects.GameObjectFactory, gameObjectCreator: Phaser.GameObjects.GameObjectCreator, clock: Phaser.Time.Clock, scenePlugin: Phaser.Scenes.ScenePlugin, bestRecord: BestRecord) {
         this.clock = clock;
         this.scenePlugin = scenePlugin;
+
+        this.isStandby = generalSupervision.isStandby;
+        this.setReady = generalSupervision.setReady;
 
         this.queryCurrentRecord = generalSupervision.queryCurrentRecord;
 
@@ -164,13 +170,16 @@ export class Ui {
 
     handleApprovedAction() {
         if(this.getApprovedActionInfo().startGame) {
-            Logger.debug("startgame");
-            this.executeStartGameAction();
+            if(this.isStandby()) {
+                Logger.debug("startgame");
+                this.executeStartGameAction();
+            }
         }
         this.retryLongButton.handleApprovedAction(this.getApprovedActionInfo().retryGame);
     }
 
     private executeStartGameAction() {
+        this.setReady();
         this.play.destroy();
         this.readyGoText.setVisible(true);
         this.progressBox.setVisible(true);

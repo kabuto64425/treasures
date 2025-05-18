@@ -7,30 +7,71 @@ export class Player {
     private row: number;
     private column: number;
     private chargeAmount: number;
+    private readonly moveCost: number;
 
-    constructor(gameObjectFactory: Phaser.GameObjects.GameObjectFactory, iniRow: number, iniColumn: number) {
+    private elapsedFrameLastInput: number;
+    private nextDirection: DIRECTION | undefined;
+
+    constructor(gameObjectFactory: Phaser.GameObjects.GameObjectFactory, iniRow: number, iniColumn: number, moveCost: number) {
         this.graphics = gameObjectFactory.graphics();
         this.row = iniRow;
         this.column = iniColumn;
         this.chargeAmount = 0;
+        this.moveCost = moveCost;
+        this.elapsedFrameLastInput = 0;
+        this.nextDirection = undefined;
     }
 
     position() {
         return { row: this.row, column: this.column };
     }
 
-    charge() {
+    private charge() {
         this.chargeAmount++;
     }
 
-    isChargeCompleted() {
-        if (this.chargeAmount >= 3) {
+    private setNextDirection(direction: DIRECTION) {
+        this.nextDirection = direction;
+    }
+
+    private isChargeCompleted() {
+        if (this.chargeAmount >= this.moveCost) {
             return true;
         }
         return false;
     }
 
-    canMove(direction: DIRECTION) {
+    resolveActionPerFrame(playerDirection: DIRECTION | undefined) {
+        if(this.elapsedFrameLastInput >= 5) {
+            if (playerDirection !== undefined) {
+                this.setNextDirection(playerDirection);
+                this.elapsedFrameLastInput = 0;
+            }
+        } else {
+            this.elapsedFrameLastInput++;
+        }
+
+        if (this.isChargeCompleted()) {
+            this.resolveMoveInNextDirection();
+        } else {
+            this.charge();
+        }
+    }
+
+    private resolveMoveInNextDirection() {
+        if (this.nextDirection === undefined) {
+            return;
+        }
+
+        const direction = this.nextDirection;
+        this.nextDirection = undefined;
+
+        if (this.canMove(direction)) {
+            this.move(direction);
+        }
+    }
+
+    private canMove(direction: DIRECTION) {
         const toRow = this.row + direction.dr;
         const toCol = this.column + direction.dc;
         if (toRow < 0) {
@@ -51,8 +92,8 @@ export class Player {
         return true;
     }
 
-    move(direction: DIRECTION) {
-        if (this.chargeAmount >= 3) {
+    private move(direction: DIRECTION) {
+        if (this.chargeAmount >= this.moveCost) {
             this.row += direction.dr;
             this.column += direction.dc;
             this.chargeAmount = 0;

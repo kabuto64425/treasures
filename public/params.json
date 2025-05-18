@@ -2,5 +2,7 @@
     "noGameOverMode": false,
     "visibleFieldEvaluation": false,
     "enableUsingLocalstorage": true,
+    "playerMoveCost": 6,
+    "enemyMoveCost": 14,
     "logLevel": "DEBUG"
 }

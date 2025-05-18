@@ -2,12 +2,11 @@ import Phaser from "phaser";
 import { Logger } from "./logger";
 import { DIRECTION } from "./drection";
 
+const NO_PRESS_RANK = -1;
+
 export class InputCoordinator {
     private readonly inputPlugin: Phaser.Input.InputPlugin;
     private readonly keyMap: { [key: string]: Phaser.Input.Keyboard.Key };
-
-    // カーソルが押されたときの経過フレームを記録する用。
-    private elapsedFrame: number;
 
     private readonly cursorKey: Phaser.Types.Input.Keyboard.CursorKeys;
     private readonly enterKey: Phaser.Input.Keyboard.Key;
@@ -41,13 +40,11 @@ export class InputCoordinator {
         this.enterKey = this.inputPlugin.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ENTER);
         this.spaceKey = this.inputPlugin.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
 
-        this.elapsedFrame = 0;
-
         this.cusorKeysPressOrderRank = {
-            arrowUp: -1,
-            arrowDown: -1,
-            arrowLeft: -1,
-            arrowRight: -1,
+            arrowUp: NO_PRESS_RANK,
+            arrowDown: NO_PRESS_RANK,
+            arrowLeft: NO_PRESS_RANK,
+            arrowRight: NO_PRESS_RANK,
         };
 
         this.approvedActionInfo = {
@@ -63,7 +60,7 @@ export class InputCoordinator {
 
     private pickDirectionMaxOrderRank() {
         const maxRank = this.maxRankCusorKeysPressOrder();
-        if(maxRank <= 0) {
+        if(maxRank === NO_PRESS_RANK) {
             return undefined;
         }
         if(this.cusorKeysPressOrderRank.arrowLeft === maxRank) {
@@ -83,7 +80,6 @@ export class InputCoordinator {
     }
 
     handleKeyboardInputs() {
-        this.elapsedFrame++;
         if (this.enterKey.isDown) {
             this.requestStartGameFromKey();
         }
@@ -94,27 +90,35 @@ export class InputCoordinator {
         const maxRank = Math.max(this.maxRankCusorKeysPressOrder(), 1);
 
         if (this.cursorKey.left.isDown) {
-            this.cusorKeysPressOrderRank.arrowLeft = maxRank + 1;
+            if(this.cusorKeysPressOrderRank.arrowLeft === NO_PRESS_RANK) {
+                this.cusorKeysPressOrderRank.arrowLeft = maxRank + 1;
+            }
         } else {
-            this.cusorKeysPressOrderRank.arrowLeft = -1;
+            this.cusorKeysPressOrderRank.arrowLeft = NO_PRESS_RANK;
         }
 
         if (this.cursorKey.up.isDown) {
-            this.cusorKeysPressOrderRank.arrowUp = maxRank + 1;
+            if(this.cusorKeysPressOrderRank.arrowUp === NO_PRESS_RANK) {
+                this.cusorKeysPressOrderRank.arrowUp = maxRank + 1;
+            }
         } else {
-            this.cusorKeysPressOrderRank.arrowUp = -1;
+            this.cusorKeysPressOrderRank.arrowUp = NO_PRESS_RANK;
         }
 
         if (this.cursorKey.right.isDown) {
-            this.cusorKeysPressOrderRank.arrowRight = maxRank + 1;
+            if(this.cusorKeysPressOrderRank.arrowRight === NO_PRESS_RANK) {
+                this.cusorKeysPressOrderRank.arrowRight = maxRank + 1;
+            }
         } else {
-            this.cusorKeysPressOrderRank.arrowRight = -1;
+            this.cusorKeysPressOrderRank.arrowRight = NO_PRESS_RANK;
         }
 
         if (this.cursorKey.down.isDown) {
-            this.cusorKeysPressOrderRank.arrowDown = maxRank + 1;
+            if(this.cusorKeysPressOrderRank.arrowDown === NO_PRESS_RANK) {
+                this.cusorKeysPressOrderRank.arrowDown = maxRank + 1;
+            }
         } else {
-            this.cusorKeysPressOrderRank.arrowDown = -1;
+            this.cusorKeysPressOrderRank.arrowDown = NO_PRESS_RANK;
         }
     }
 

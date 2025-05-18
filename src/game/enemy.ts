@@ -7,15 +7,19 @@ export class Enemy implements IFieldActor {
     private readonly graphics: Phaser.GameObjects.Graphics;
     private row: number;
     private column: number;
+    private readonly moveCost: number;
+
     private chargeAmount: number;
     private readonly priorityScanDirections: DIRECTION[];
     private readonly onPlayerCaptured: () => void;
 
-    constructor(gameObjectFactory: Phaser.GameObjects.GameObjectFactory, iniRow: number, iniColumn: number, priorityScanDirections: DIRECTION[], onPlayerCaptured: () => void) {
+    constructor(gameObjectFactory: Phaser.GameObjects.GameObjectFactory, iniRow: number, iniColumn: number, moveCost: number, priorityScanDirections: DIRECTION[], onPlayerCaptured: () => void) {
         this.graphics = gameObjectFactory.graphics();
         this.graphics.depth = 10;
         this.row = iniRow;
         this.column = iniColumn;
+        this.moveCost = moveCost
+
         this.chargeAmount = 0;
         this.priorityScanDirections = priorityScanDirections;
         this.onPlayerCaptured = onPlayerCaptured;
@@ -30,7 +34,7 @@ export class Enemy implements IFieldActor {
     }
 
     isChargeCompleted() {
-        if (this.chargeAmount >= 6) {
+        if (this.chargeAmount >= this.moveCost) {
             return true;
         }
         return false;
@@ -49,7 +53,7 @@ export class Enemy implements IFieldActor {
         if (direction === null) {
             return;
         }
-        if (this.chargeAmount >= 6) {
+        if (this.chargeAmount >= this.moveCost) {
             this.row += direction.dr;
             this.column += direction.dc;
             this.chargeAmount = 0;
