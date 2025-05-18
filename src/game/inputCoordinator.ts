@@ -8,8 +8,11 @@ export class InputCoordinator {
     private readonly enterKey: Phaser.Input.Keyboard.Key;
     private readonly spaceKey: Phaser.Input.Keyboard.Key;
 
-    private isStartGameRequested = false;
-    private isRetryGameRequested = false;
+    private isStartGameRequestedFromKey = false;
+    private isRetryGameRequestedFromKey = false;
+
+    private isStartGameRequestedFromUi = false;
+    private isRetryGameRequestedFromUi = false;
 
     private approvedActionInfo: {
         readonly startGame: boolean,
@@ -32,21 +35,31 @@ export class InputCoordinator {
 
     handleKeyboardInputs() {
         if (this.enterKey.isDown) {
-            this.requestStartGame();
+            this.requestStartGameFromKey();
         }
         if (this.spaceKey.isDown) {
-            this.requestRetryGame();
+            this.requestRetryGameFromKey();
         }
     }
 
-    readonly requestStartGame = () => {
+    private readonly requestStartGameFromKey = () => {
         Logger.debug("requestStartGame");
-        this.isStartGameRequested = true;
+        this.isStartGameRequestedFromKey = true;
     }
 
-    readonly requestRetryGame = () => {
+    private readonly requestRetryGameFromKey = () => {
         Logger.debug("requestRetryGame");
-        this.isRetryGameRequested = true;
+        this.isRetryGameRequestedFromKey = true;
+    }
+
+    readonly requestStartGameFromUi = () => {
+        Logger.debug("requestStartGame");
+        this.isStartGameRequestedFromUi = true;
+    }
+
+    readonly requestRetryGameFromUi = () => {
+        Logger.debug("requestRetryGame");
+        this.isRetryGameRequestedFromUi = true;
     }
 
     // 審査
@@ -54,9 +67,14 @@ export class InputCoordinator {
         let startGame = false;
         let retryGame = false;
 
-        if (this.isRetryGameRequested) {
+        if(this.isRetryGameRequestedFromUi) {
             retryGame = true;
-        } else if (this.isStartGameRequested) {
+        } else if(this.isStartGameRequestedFromUi) {
+            Logger.debug("isStartGameRequestedFromUi");
+            startGame = true;
+        } else if (this.isRetryGameRequestedFromKey) {
+            retryGame = true;
+        } else if (this.isStartGameRequestedFromKey) {
             startGame = true;
         }
 
@@ -65,8 +83,10 @@ export class InputCoordinator {
             retryGame: retryGame,
         }
 
-        this.isStartGameRequested = false;
-        this.isRetryGameRequested = false;
+        this.isStartGameRequestedFromKey = false;
+        this.isRetryGameRequestedFromKey = false;
+        this.isStartGameRequestedFromUi = false;
+        this.isRetryGameRequestedFromUi = false;
     }
 
     //結果を返す

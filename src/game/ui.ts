@@ -43,9 +43,8 @@ export class Ui {
     private readonly createBestRecordStr: () => string;
     private readonly deleteBestRecord: () => void;
 
-    private readonly requestStartGame: () => void;
+    private readonly requestStartGameFromUi: () => void;
 
-    // @ts-ignore 採用結果をもとに処理する方針なので、後で必ず使う
     private readonly getApprovedActionInfo: () => {
         startGame: boolean,
         retryGame: boolean
@@ -60,7 +59,7 @@ export class Ui {
         this.createBestRecordStr = bestRecord.createBestRecordStr;
         this.deleteBestRecord = bestRecord.deleteBestRecord;
 
-        this.requestStartGame = generalSupervision.getInputCoordinator().requestStartGame;
+        this.requestStartGameFromUi = generalSupervision.getInputCoordinator().requestStartGameFromUi;
         this.getApprovedActionInfo = generalSupervision.getInputCoordinator().getApprovedActionInfo;
 
         this.uiLayer = gameObjectFactory.layer();
@@ -143,7 +142,7 @@ export class Ui {
 
         this.play.on("pointerup", () => {
             Logger.debug("pointerup");
-            this.requestStartGame();
+            this.requestStartGameFromUi();
         });
     }
 

@@ -14,7 +14,7 @@ export class RetryLongButton {
     private readonly isGamePlayed: () => boolean;
 
     // @ts-ignore リクエストを送る処理を必ずいれるので使う
-    private readonly requestRetryGame: () => void;
+    private readonly requestRetryGameFromUi: () => void;
 
     private readonly barWidth = 100;
     private readonly barHeight = 20;
@@ -26,7 +26,7 @@ export class RetryLongButton {
         loop: true,
         callbackScope: this,
         callback: function (this: RetryLongButton) {
-            this.requestRetryGame();
+            this.requestRetryGameFromUi();
         },
     }
 
@@ -34,7 +34,7 @@ export class RetryLongButton {
         this.clock = clock;
         this.scenePlugin = scenePlugin;
         this.isGamePlayed = generalSupervision.isGamePlayed;
-        this.requestRetryGame = generalSupervision.getInputCoordinator().requestRetryGame;
+        this.requestRetryGameFromUi = generalSupervision.getInputCoordinator().requestRetryGameFromUi;
 
         this.image = gameObjectCreator.image({ x: 800, y: 550, key: "retry" }, false);
 
