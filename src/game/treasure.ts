@@ -64,10 +64,6 @@ export class Treasure implements IFieldActor {
     }
 
     onCollideWithPlayer(): void {
-        // 実装予定
-        // 自身のステータス変更
-        // 自身の表示を消す
-        // 記録係(作成予定)に通知
         this.state = Treasure.TREASURE_STATE.COLLECTED;
         this.clearDisplay();
         if(!this.isGoal) {
