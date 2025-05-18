@@ -1,7 +1,6 @@
 import { GameScene } from "./gameScene"
 import { Player } from "./player"
 import * as GameConstants from "./gameConstants"
-import { DIRECTION } from "./drection";
 import { FieldEvalution } from "./fieldEvalution";
 import { Enemy } from "./enemy";
 import { RoundsSupervision } from "./roundsSupervision";
@@ -164,23 +163,12 @@ export class GameSceneGeneralSupervision {
         this.recorder.addElapsedFrame();
         this.ui.updateTimeText();
 
-        const cursors = this.inputPlugin.keyboard.createCursorKeys();
-
         // キーボードの情報を取得
-        let input_dist = null;
-        if (cursors.left.isDown) {
-            input_dist = DIRECTION.LEFT;
-        } else if (cursors.up.isDown) {
-            input_dist = DIRECTION.UP;
-        } else if (cursors.right.isDown) {
-            input_dist = DIRECTION.RIGHT;
-        } else if (cursors.down.isDown) {
-            input_dist = DIRECTION.DOWN;
-        }
+        let input_dist = this.inputCoordinator.getApprovedActionInfo().playerDirection;
 
         // プレイヤー
         if (this.player.isChargeCompleted()) {
-            if (input_dist !== null && this.player.canMove(input_dist)) {
+            if (input_dist !== undefined && this.player.canMove(input_dist)) {
                 this.player.move(input_dist);
             }
         } else {
