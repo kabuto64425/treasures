@@ -11,6 +11,7 @@ export class Player {
     private readonly moveCost: number;
 
     private playerDirectionBuffer: PlayerDirectionBuffer;
+    private lastMoveDirection: DIRECTION | undefined;
 
     private elapsedFrameLastInput: number;
 
@@ -20,7 +21,8 @@ export class Player {
         this.column = iniColumn;
         this.chargeAmount = 0;
         this.moveCost = params.playerMoveCost;
-        this.playerDirectionBuffer = new PlayerDirectionBuffer(params.playerMoveCost, 4);
+        this.playerDirectionBuffer = new PlayerDirectionBuffer(params.playerMoveCost, params.playerMoveCost, this.getLastMoveDirection);
+        this.lastMoveDirection = undefined;
         this.elapsedFrameLastInput = 0;
     }
 
@@ -45,7 +47,10 @@ export class Player {
         }
 
         if(this.isChargeCompleted()) {
-            const nextDirection = this.playerDirectionBuffer.consumeDirectionBuffer();
+            let nextDirection = this.playerDirectionBuffer.consumeDirectionBuffer();
+            if(nextDirection === undefined && playerDirection !== undefined) {
+                nextDirection = playerDirection;
+            }
             if(nextDirection !== undefined) {
                 if (this.canMove(nextDirection)) {
                     this.move(nextDirection);
@@ -79,11 +84,10 @@ export class Player {
     }
 
     private move(direction: DIRECTION) {
-        if (this.chargeAmount >= this.moveCost) {
-            this.row += direction.dr;
-            this.column += direction.dc;
-            this.chargeAmount = 0;
-        }
+        this.row += direction.dr;
+        this.column += direction.dc;
+        this.lastMoveDirection = direction;
+        this.chargeAmount = 0;
     }
 
     draw() {
@@ -91,6 +95,10 @@ export class Player {
         this.graphics.lineStyle(0, 0x0000ff);
         this.graphics.fillStyle(0x0000ff);
         this.graphics.fillRect(this.column * GameConstants.GRID_SIZE, this.row * GameConstants.GRID_SIZE, GameConstants.GRID_SIZE, GameConstants.GRID_SIZE);
+    }
+
+    readonly getLastMoveDirection = () => {
+        return this.lastMoveDirection;
     }
 
     handleCollisionWith(actor: IFieldActor) {
