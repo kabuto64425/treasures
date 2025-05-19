@@ -4,6 +4,12 @@ import { DIRECTION } from "./drection";
 
 const NO_PRESS_RANK = -1;
 
+// const を付ける必要があるため
+const directions = DIRECTION.values();
+type DirectionsFlagMap = {
+  readonly [K in (typeof directions[number]["keyName"])]: boolean;
+};
+
 export class InputCoordinator {
     private readonly inputPlugin: Phaser.Input.InputPlugin;
     private readonly keyMap: { [key: string]: Phaser.Input.Keyboard.Key };
@@ -28,8 +34,9 @@ export class InputCoordinator {
     private approvedActionInfo: {
         readonly startGame: boolean,
         readonly retryGame: boolean,
-        readonly playerDirection: DIRECTION | undefined
     };
+
+    private approvedPlayerDirectionInfo: DirectionsFlagMap;
 
     constructor(inputPlugin: Phaser.Input.InputPlugin) {
         this.inputPlugin = inputPlugin;
@@ -50,33 +57,15 @@ export class InputCoordinator {
         this.approvedActionInfo = {
             startGame: false,
             retryGame: false,
-            playerDirection: undefined
+        }
+
+        this.approvedPlayerDirectionInfo = {
+            aa : true
         }
     }
 
     private maxRankCusorKeysPressOrder() {
         return Math.max(...Object.values(this.cusorKeysPressOrderRank));
-    }
-
-    private pickDirectionMaxOrderRank() {
-        const maxRank = this.maxRankCusorKeysPressOrder();
-        if(maxRank === NO_PRESS_RANK) {
-            return undefined;
-        }
-        if(this.cusorKeysPressOrderRank.arrowLeft === maxRank) {
-            return DIRECTION.LEFT;
-        }
-        if(this.cusorKeysPressOrderRank.arrowUp === maxRank) {
-            return DIRECTION.UP;
-        }
-        if(this.cusorKeysPressOrderRank.arrowRight === maxRank) {
-            return DIRECTION.RIGHT;
-        }
-        if(this.cusorKeysPressOrderRank.arrowDown === maxRank) {
-            return DIRECTION.DOWN;
-        }
-        // ここまで来ないはずだけど、念の為
-        return undefined;
     }
 
     handleKeyboardInputs() {
@@ -161,7 +150,6 @@ export class InputCoordinator {
         this.approvedActionInfo = {
             startGame: startGame,
             retryGame: retryGame,
-            playerDirection: this.pickDirectionMaxOrderRank()
         }
 
         this.isStartGameRequestedFromKey = false;
