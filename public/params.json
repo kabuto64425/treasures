@@ -4,5 +4,7 @@
     "enableUsingLocalstorage": true,
     "playerMoveCost": 6,
     "enemyMoveCost": 14,
+    "bufferLimitFrames": 10,
+    "sameDirectionInputCooldownFrames": 5,
     "logLevel": "DEBUG"
 }

@@ -1,6 +1,8 @@
 import { DIRECTION } from "./drection";
 import * as GameConstants from "./gameConstants";
 import { IFieldActor } from "./iFieldActor";
+import { Logger } from "./logger";
+import { PlayerDirectionBuffer } from "./playerDirectionBuffer";
 
 export class Player {
     private readonly graphics: Phaser.GameObjects.Graphics;
@@ -9,18 +11,18 @@ export class Player {
     private chargeAmount: number;
     private readonly moveCost: number;
 
-    // @ts-ignore 使わなかったら消す
-    private elapsedFrameLastInput: number;
-    private nextDirection: DIRECTION | undefined;
+    private playerDirectionBuffer: PlayerDirectionBuffer;
 
-    constructor(gameObjectFactory: Phaser.GameObjects.GameObjectFactory, iniRow: number, iniColumn: number, moveCost: number) {
+    private elapsedFrameLastInput: number;
+
+    constructor(gameObjectFactory: Phaser.GameObjects.GameObjectFactory, iniRow: number, iniColumn: number, params: any) {
         this.graphics = gameObjectFactory.graphics();
         this.row = iniRow;
         this.column = iniColumn;
         this.chargeAmount = 0;
-        this.moveCost = moveCost;
+        this.moveCost = params.playerMoveCost;
+        this.playerDirectionBuffer = new PlayerDirectionBuffer(params.bufferLimitFrames, params.sameDirectionInputCooldownFrames);
         this.elapsedFrameLastInput = 0;
-        this.nextDirection = undefined;
     }
 
     position() {
@@ -31,10 +33,6 @@ export class Player {
         this.chargeAmount++;
     }
 
-    private setNextDirection(direction: DIRECTION) {
-        this.nextDirection = direction;
-    }
-
     private isChargeCompleted() {
         if (this.chargeAmount >= this.moveCost) {
             return true;
@@ -42,30 +40,23 @@ export class Player {
         return false;
     }
 
-    resolveActionPerFrame(playerDirection: DIRECTION | undefined) {
+    resolvePlayerFrame(playerDirection: DIRECTION | undefined) {
         if (playerDirection !== undefined) {
-            this.setNextDirection(playerDirection);
-            this.elapsedFrameLastInput = 0;
+            this.playerDirectionBuffer.push(playerDirection, this.elapsedFrameLastInput);
         }
+        Logger.debug(this.playerDirectionBuffer.getQueue());
 
-        if (this.isChargeCompleted()) {
-            this.resolveMoveInNextDirection();
+        if(this.isChargeCompleted()) {
+            const nextDirection = this.playerDirectionBuffer.consume(this.elapsedFrameLastInput);
+            if(nextDirection !== undefined) {
+                if (this.canMove(nextDirection)) {
+                    this.move(nextDirection);
+                }
+            }
         } else {
             this.charge();
         }
-    }
-
-    private resolveMoveInNextDirection() {
-        if (this.nextDirection === undefined) {
-            return;
-        }
-
-        const direction = this.nextDirection;
-        this.nextDirection = undefined;
-
-        if (this.canMove(direction)) {
-            this.move(direction);
-        }
+        this.elapsedFrameLastInput++;
     }
 
     private canMove(direction: DIRECTION) {

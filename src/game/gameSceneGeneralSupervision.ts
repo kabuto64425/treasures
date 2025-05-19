@@ -62,7 +62,7 @@ export class GameSceneGeneralSupervision {
         this.ui = new Ui(this, this.gameObjectFactory, gameObjectCreator, scene.time, scene.scene, scene.getBestRecord());
 
         // プレイヤー
-        this.player = new Player(scene.add, GameConstants.parameterPlayer.row, GameConstants.parameterPlayer.column, this.params.playerMoveCost);
+        this.player = new Player(scene.add, GameConstants.parameterPlayer.row, GameConstants.parameterPlayer.column, this.params);
 
         //フィールド評価
         this.fieldEvaluation = new FieldEvalution(scene.add, this.params.visibleFieldEvaluation);
@@ -168,7 +168,7 @@ export class GameSceneGeneralSupervision {
         let playerDirection= this.inputCoordinator.getApprovedActionInfo().playerDirection;
 
         // プレイヤー
-        this.player.resolveActionPerFrame(playerDirection);
+        this.player.resolvePlayerFrame(playerDirection);
         this.player.draw();
 
         // フィールド評価
