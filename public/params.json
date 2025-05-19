@@ -3,6 +3,6 @@
     "visibleFieldEvaluation": false,
     "enableUsingLocalstorage": true,
     "playerMoveCost": 6,
-    "enemyMoveCost": 50,
+    "enemyMoveCost": 15,
     "logLevel": "DEBUG"
 }
