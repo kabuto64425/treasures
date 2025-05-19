@@ -2,9 +2,9 @@
     "noGameOverMode": false,
     "visibleFieldEvaluation": false,
     "enableUsingLocalstorage": true,
-    "playerMoveCost": 6,
-    "enemyMoveCost": 14,
-    "bufferLimitFrames": 10,
-    "sameDirectionInputCooldownFrames": 5,
+    "playerMoveCost": 9,
+    "bufferLimitFrames": 20,
+    "sameDirectionInputCooldownFrames": 6,
+    "enemyMoveCost": 50,
     "logLevel": "DEBUG"
 }
