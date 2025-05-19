@@ -1,0 +1,32 @@
+class InputBuffer {
+    private readonly queue: { direction: DIRECTION, frame: number }[] = [];
+    private readonly bufferLimit: number;
+
+    constructor(bufferLimit: number = 6) {
+        this.bufferLimit = bufferLimit;
+    }
+
+    push(direction: DIRECTION, currentFrame: number) {
+        const last = this.queue[this.queue.length - 1];
+        if (!last || last.direction !== direction) {
+            this.queue.push({ direction, frame: currentFrame });
+        }
+    }
+
+    consume(currentFrame: number): DIRECTION | undefined {
+        while (this.queue.length > 0) {
+            const { direction, frame } = this.queue[0];
+            if (currentFrame - frame <= this.bufferLimit) {
+                this.queue.shift();
+                return direction;
+            } else {
+                this.queue.shift(); // 古いので破棄
+            }
+        }
+        return undefined;
+    }
+
+    clear() {
+        this.queue.length = 0;
+    }
+}

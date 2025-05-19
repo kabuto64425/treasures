@@ -1,0 +1,19 @@
+class DirectionBuffer {
+    private buffer: { direction: DIRECTION, frame: number } | null = null;
+
+    push(direction: DIRECTION, frame: number) {
+        this.buffer = { direction, frame }; // 常に最新に更新
+    }
+
+    popIfValid(currentFrame: number, maxDelay: number): DIRECTION | null {
+        if (!this.buffer) return null;
+        const age = currentFrame - this.buffer.frame;
+        if (age <= maxDelay) {
+            const dir = this.buffer.direction;
+            this.buffer = null; // 消費
+            return dir;
+        }
+        this.buffer = null; // 古すぎるので破棄
+        return null;
+    }
+}

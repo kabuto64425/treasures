@@ -1,51 +1,28 @@
 import { DIRECTION } from "./drection";
-import { Logger } from "./logger";
 
 export class PlayerDirectionBuffer {
-    private readonly queue: { direction: DIRECTION, frame: number }[] = [];
-    private readonly bufferLimitFrames: number;
-    private readonly sameDirectionInputCooldownFrames : number
+    private directionBuffer: DIRECTION | undefined;
+    private readonly playerMoveCost: number;
+    private readonly inputPreChargeFrames: number;
 
-    private lastPushedDirection: DIRECTION | undefined;
-    private lastPushedFrame: number | undefined;
-
-    constructor(bufferLimitFrames: number, sameDirectionInputCooldownFrames: number) {
-        this.bufferLimitFrames = bufferLimitFrames;
-        this.sameDirectionInputCooldownFrames = sameDirectionInputCooldownFrames;
-        this.lastPushedDirection = undefined;
-        this.lastPushedFrame = undefined;
+    constructor(playerMoveCost: number, inputPreChargeFrames: number) {
+        this.directionBuffer = undefined;
+        this.playerMoveCost = playerMoveCost;
+        this.inputPreChargeFrames = inputPreChargeFrames;
     }
 
-    push(direction: DIRECTION, currentFrame: number) {
-        if(this.lastPushedDirection && direction === this.lastPushedDirection) {
-            if(this.lastPushedFrame && (currentFrame - this.lastPushedFrame <= this.sameDirectionInputCooldownFrames)) {
-                return;
-            }
+    trySetDirectionBuffer(direction: DIRECTION, currentCharge: number) {
+        if (currentCharge >= this.playerMoveCost - this.inputPreChargeFrames) {
+            this.directionBuffer = direction;
         }
-        this.queue.push({ direction, frame: currentFrame });
-        this.lastPushedDirection = direction;
-        this.lastPushedFrame = currentFrame;
     }
 
-    getQueue() {
-        return this.queue;
-    }
-
-    consume(currentFrame: number): DIRECTION | undefined {
-        Logger.debug("consume");
-        while (this.queue.length > 0) {
-            const { direction, frame } = this.queue[0];
-            if (currentFrame - frame <= this.bufferLimitFrames) {
-                this.queue.shift();
-                return direction;
-            } else {
-                this.queue.shift(); // 古いので破棄
-            }
+    consumeDirectionBuffer() {
+        if(this.directionBuffer !== undefined) {
+            const ret = this.directionBuffer;
+            this.directionBuffer = undefined;
+            return ret;
         }
         return undefined;
-    }
-
-    clear() {
-        this.queue.length = 0;
     }
 }

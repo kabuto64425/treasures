@@ -1,7 +1,6 @@
 import { DIRECTION } from "./drection";
 import * as GameConstants from "./gameConstants";
 import { IFieldActor } from "./iFieldActor";
-import { Logger } from "./logger";
 import { PlayerDirectionBuffer } from "./playerDirectionBuffer";
 
 export class Player {
@@ -21,7 +20,7 @@ export class Player {
         this.column = iniColumn;
         this.chargeAmount = 0;
         this.moveCost = params.playerMoveCost;
-        this.playerDirectionBuffer = new PlayerDirectionBuffer(params.bufferLimitFrames, params.sameDirectionInputCooldownFrames);
+        this.playerDirectionBuffer = new PlayerDirectionBuffer(params.playerMoveCost, 4);
         this.elapsedFrameLastInput = 0;
     }
 
@@ -42,12 +41,11 @@ export class Player {
 
     resolvePlayerFrame(playerDirection: DIRECTION | undefined) {
         if (playerDirection !== undefined) {
-            this.playerDirectionBuffer.push(playerDirection, this.elapsedFrameLastInput);
+            this.playerDirectionBuffer.trySetDirectionBuffer(playerDirection, this.chargeAmount);
         }
-        Logger.debug(this.playerDirectionBuffer.getQueue());
 
         if(this.isChargeCompleted()) {
-            const nextDirection = this.playerDirectionBuffer.consume(this.elapsedFrameLastInput);
+            const nextDirection = this.playerDirectionBuffer.consumeDirectionBuffer();
             if(nextDirection !== undefined) {
                 if (this.canMove(nextDirection)) {
                     this.move(nextDirection);
