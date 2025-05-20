@@ -1,6 +1,7 @@
 import { DIRECTION } from "./drection";
 import * as GameConstants from "./gameConstants";
 import { IFieldActor } from "./iFieldActor";
+import { PlayerDirectionBuffer } from "./playerDirectionBuffer";
 
 export class Player {
     private readonly graphics: Phaser.GameObjects.Graphics;
@@ -9,18 +10,23 @@ export class Player {
     private chargeAmount: number;
     private readonly moveCost: number;
 
-    // @ts-ignore 使わなかったら消す
-    private elapsedFrameLastInput: number;
-    private nextDirection: DIRECTION | undefined;
+    private playerDirectionBuffer: PlayerDirectionBuffer;
+    private lastMoveDirection: DIRECTION | undefined;
 
-    constructor(gameObjectFactory: Phaser.GameObjects.GameObjectFactory, iniRow: number, iniColumn: number, moveCost: number) {
+    private elapsedFrameLastInput: number;
+
+    private isApprovedPlayerDirection: (direction: DIRECTION) => boolean;
+
+    constructor(gameObjectFactory: Phaser.GameObjects.GameObjectFactory, iniRow: number, iniColumn: number, params: any, isApprovedPlayerDirection: (direction: DIRECTION) => boolean) {
         this.graphics = gameObjectFactory.graphics();
         this.row = iniRow;
         this.column = iniColumn;
         this.chargeAmount = 0;
-        this.moveCost = moveCost;
+        this.moveCost = params.playerMoveCost;
+        this.playerDirectionBuffer = new PlayerDirectionBuffer(params.playerMoveCost, params.playerMoveCost, this.getLastMoveDirection);
+        this.lastMoveDirection = undefined;
         this.elapsedFrameLastInput = 0;
-        this.nextDirection = undefined;
+        this.isApprovedPlayerDirection = isApprovedPlayerDirection;
     }
 
     position() {
@@ -31,10 +37,6 @@ export class Player {
         this.chargeAmount++;
     }
 
-    private setNextDirection(direction: DIRECTION) {
-        this.nextDirection = direction;
-    }
-
     private isChargeCompleted() {
         if (this.chargeAmount >= this.moveCost) {
             return true;
@@ -42,30 +44,42 @@ export class Player {
         return false;
     }
 
-    resolveActionPerFrame(playerDirection: DIRECTION | undefined) {
-        if (playerDirection !== undefined) {
-            this.setNextDirection(playerDirection);
-            this.elapsedFrameLastInput = 0;
+    resolvePlayerFrame() {
+        // 先行入力設定
+        // 2方向入力されている場合は、どちらか一方を先行入力に設定
+        for (const direction of DIRECTION.values()) {
+            if (this.isApprovedPlayerDirection(direction)) {
+                const res = this.playerDirectionBuffer.trySetDirectionBuffer(direction, this.chargeAmount);
+                if (res) {
+                    break;
+                }
+            }
         }
 
         if (this.isChargeCompleted()) {
-            this.resolveMoveInNextDirection();
+            // 移動方向の決定
+            // まずは先行入力が入っているか確認
+            let nextDirection = this.playerDirectionBuffer.consumeDirectionBuffer();
+            if (nextDirection === undefined) {
+                // 先行入力が入ってない場合、入力されている方向とする
+                // 2方向入力されている場合は、どちらか一方を移動方向にする
+                for (const direction of DIRECTION.values()) {
+                    if(this.isApprovedPlayerDirection(direction)) {
+                        nextDirection = direction;
+                    }
+                }
+            }
+
+            // 移動してみる
+            if (nextDirection !== undefined) {
+                if (this.canMove(nextDirection)) {
+                    this.move(nextDirection);
+                }
+            }
         } else {
             this.charge();
         }
-    }
-
-    private resolveMoveInNextDirection() {
-        if (this.nextDirection === undefined) {
-            return;
-        }
-
-        const direction = this.nextDirection;
-        this.nextDirection = undefined;
-
-        if (this.canMove(direction)) {
-            this.move(direction);
-        }
+        this.elapsedFrameLastInput++;
     }
 
     private canMove(direction: DIRECTION) {
@@ -90,11 +104,10 @@ export class Player {
     }
 
     private move(direction: DIRECTION) {
-        if (this.chargeAmount >= this.moveCost) {
-            this.row += direction.dr;
-            this.column += direction.dc;
-            this.chargeAmount = 0;
-        }
+        this.row += direction.dr;
+        this.column += direction.dc;
+        this.lastMoveDirection = direction;
+        this.chargeAmount = 0;
     }
 
     draw() {
@@ -102,6 +115,10 @@ export class Player {
         this.graphics.lineStyle(0, 0x0000ff);
         this.graphics.fillStyle(0x0000ff);
         this.graphics.fillRect(this.column * GameConstants.GRID_SIZE, this.row * GameConstants.GRID_SIZE, GameConstants.GRID_SIZE, GameConstants.GRID_SIZE);
+    }
+
+    readonly getLastMoveDirection = () => {
+        return this.lastMoveDirection;
     }
 
     handleCollisionWith(actor: IFieldActor) {
