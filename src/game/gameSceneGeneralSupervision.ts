@@ -19,7 +19,7 @@ export class GameSceneGeneralSupervision {
 
     private readonly params: any;
 
-    private readonly inputCoordinator : InputCoordinator;
+    private readonly inputCoordinator: InputCoordinator;
 
     private readonly ui: Ui;
 
@@ -62,7 +62,7 @@ export class GameSceneGeneralSupervision {
         this.ui = new Ui(this, this.gameObjectFactory, gameObjectCreator, scene.time, scene.scene, scene.getBestRecord());
 
         // プレイヤー
-        this.player = new Player(scene.add, GameConstants.parameterPlayer.row, GameConstants.parameterPlayer.column, this.params);
+        this.player = new Player(scene.add, GameConstants.parameterPlayer.row, GameConstants.parameterPlayer.column, this.params, this.inputCoordinator.isApprovedPlayerDirection);
 
         //フィールド評価
         this.fieldEvaluation = new FieldEvalution(scene.add, this.params.visibleFieldEvaluation);
@@ -164,11 +164,8 @@ export class GameSceneGeneralSupervision {
         this.recorder.addElapsedFrame();
         this.ui.updateTimeText();
 
-        // キーボードの情報を取得
-        let playerDirection= this.inputCoordinator.getApprovedActionInfo().playerDirection;
-
         // プレイヤー
-        this.player.resolvePlayerFrame(playerDirection);
+        this.player.resolvePlayerFrame();
         this.player.draw();
 
         // フィールド評価

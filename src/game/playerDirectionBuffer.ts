@@ -13,13 +13,15 @@ export class PlayerDirectionBuffer {
         this.getLastMoveDirection = getLastMoveDirection;
     }
 
-    trySetDirectionBuffer(direction: DIRECTION, currentCharge: number) {
+    trySetDirectionBuffer(direction: DIRECTION, currentCharge: number) : boolean {
         if(this.getLastMoveDirection() !== undefined && direction === this.getLastMoveDirection()) {
-            return;
+            return false;
         }
         if (currentCharge >= this.playerMoveCost - this.inputPreChargeFrames) {
             this.directionBuffer = direction;
+            return true;
         }
+        return false;
     }
 
     consumeDirectionBuffer() {

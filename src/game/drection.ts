@@ -22,6 +22,6 @@ export class DIRECTION {
     }
 
     static values(): DIRECTION[] {
-        return [DIRECTION.LEFT, DIRECTION.UP, DIRECTION.RIGHT, DIRECTION.DOWN];
+        return [DIRECTION.LEFT, DIRECTION.UP, DIRECTION.RIGHT, DIRECTION.DOWN] as const;
     }
 }
