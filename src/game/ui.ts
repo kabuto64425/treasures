@@ -48,7 +48,7 @@ export class Ui {
 
     private readonly requestStartGameFromUi: () => void;
 
-    private readonly getApprovedGameMenuActionInfo: () => {
+    private readonly getApprovedActionInfo: () => {
         startGame: boolean,
         retryGame: boolean
     };
@@ -66,7 +66,7 @@ export class Ui {
         this.deleteBestRecord = bestRecord.deleteBestRecord;
 
         this.requestStartGameFromUi = generalSupervision.getInputCoordinator().requestStartGameFromUi;
-        this.getApprovedGameMenuActionInfo = generalSupervision.getInputCoordinator().getApprovedGameMenuActionInfo;
+        this.getApprovedActionInfo = generalSupervision.getInputCoordinator().getApprovedActionInfo;
 
         this.uiLayer = gameObjectFactory.layer();
         this.uiLayer.setDepth(100);
@@ -169,13 +169,13 @@ export class Ui {
     }
 
     handleApprovedAction() {
-        if(this.getApprovedGameMenuActionInfo().startGame) {
+        if(this.getApprovedActionInfo().startGame) {
             if(this.isStandby()) {
                 Logger.debug("startgame");
                 this.executeStartGameAction();
             }
         }
-        this.retryLongButton.handleApprovedAction(this.getApprovedGameMenuActionInfo().retryGame);
+        this.retryLongButton.handleApprovedAction(this.getApprovedActionInfo().retryGame);
     }
 
     private executeStartGameAction() {

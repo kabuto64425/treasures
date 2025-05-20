@@ -2,6 +2,8 @@ import Phaser from "phaser";
 import { Logger } from "./logger";
 import { DIRECTION } from "./drection";
 
+const NO_PRESS_RANK = -1;
+
 export class InputCoordinator {
     private readonly inputPlugin: Phaser.Input.InputPlugin;
     private readonly keyMap: { [key: string]: Phaser.Input.Keyboard.Key };
@@ -16,14 +18,13 @@ export class InputCoordinator {
     private isStartGameRequestedFromUi = false;
     private isRetryGameRequestedFromUi = false;
 
-    private readonly requestedPlayerDirectionMap: Map<string, boolean>;
+    private readonly cursorKeysPressOrderRankMap: Map<string, number>;
 
-    private approvedGameMenuActionInfo: {
+    private approvedActionInfo: {
         readonly startGame: boolean,
         readonly retryGame: boolean,
+        readonly playerDirection: DIRECTION | undefined
     };
-
-    private readonly approvedPlayerDirectionMap: Map<string, boolean>;
 
     constructor(inputPlugin: Phaser.Input.InputPlugin) {
         this.inputPlugin = inputPlugin;
@@ -34,14 +35,44 @@ export class InputCoordinator {
         this.enterKey = this.inputPlugin.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ENTER);
         this.spaceKey = this.inputPlugin.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
 
-        this.approvedGameMenuActionInfo = {
+        this.approvedActionInfo = {
             startGame: false,
             retryGame: false,
+            playerDirection: undefined
         }
 
-        const mapPairs = DIRECTION.values().map(d => [d.keyName, false] as [string, boolean]);
-        this.requestedPlayerDirectionMap = new Map<string, boolean>(mapPairs);
-        this.approvedPlayerDirectionMap = new Map<string, boolean>(mapPairs);
+        const mapPairs = DIRECTION.values().map(d => [d.keyName, NO_PRESS_RANK] as [string, number]);
+        this.cursorKeysPressOrderRankMap = new Map<string, number>(mapPairs);
+    }
+
+    private maxRankCusorKeysPressOrder() {
+        return Math.max(Math.max(...this.cursorKeysPressOrderRankMap.values()));
+    }
+
+    private pickDirectionMaxOrderRank() {
+        const maxRank = this.maxRankCusorKeysPressOrder();
+        if(maxRank === NO_PRESS_RANK) {
+            return undefined;
+        }
+        for(const direction of DIRECTION.values()) {
+            const value = this.cursorKeysPressOrderRankMap.get(direction.keyName);
+            if(value === maxRank) {
+                return direction;
+            }
+        }
+        // ここまで来ないはずだけど、念の為
+        return undefined;
+    }
+
+    updateCursorKeyRank(cursorKey : Phaser.Input.Keyboard.Key, direction : DIRECTION, maxRank : number, inputInspector:string[]) {
+        if(cursorKey.isDown) {
+            inputInspector.push(direction.keyName);
+            if(this.cursorKeysPressOrderRankMap.get(direction.keyName) === NO_PRESS_RANK) {
+                this.cursorKeysPressOrderRankMap.set(direction.keyName, maxRank + 1);
+            }
+        } else {
+            this.cursorKeysPressOrderRankMap.set(direction.keyName, NO_PRESS_RANK);
+        }
     }
 
     handleKeyboardInputs() {
@@ -52,10 +83,15 @@ export class InputCoordinator {
             this.requestRetryGameFromKey();
         }
 
-        this.requestedPlayerDirectionMap.set(DIRECTION.LEFT.keyName, this.cursorKey.left.isDown);
-        this.requestedPlayerDirectionMap.set(DIRECTION.UP.keyName, this.cursorKey.up.isDown);
-        this.requestedPlayerDirectionMap.set(DIRECTION.RIGHT.keyName, this.cursorKey.right.isDown);
-        this.requestedPlayerDirectionMap.set(DIRECTION.DOWN.keyName, this.cursorKey.down.isDown);
+        const maxRank = Math.max(this.maxRankCusorKeysPressOrder(), 0);
+
+        // デバッグ用
+        const inputInspector:string[] = [];
+
+        this.updateCursorKeyRank(this.cursorKey.left, DIRECTION.LEFT, maxRank, inputInspector);
+        this.updateCursorKeyRank(this.cursorKey.up, DIRECTION.UP, maxRank, inputInspector);
+        this.updateCursorKeyRank(this.cursorKey.right, DIRECTION.RIGHT, maxRank, inputInspector);
+        this.updateCursorKeyRank(this.cursorKey.down, DIRECTION.DOWN, maxRank, inputInspector);
     }
 
     private readonly requestStartGameFromKey = () => {
@@ -95,33 +131,11 @@ export class InputCoordinator {
         }
 
         // 審査結果
-        this.approvedGameMenuActionInfo = {
+        this.approvedActionInfo = {
             startGame: startGame,
             retryGame: retryGame,
+            playerDirection: this.pickDirectionMaxOrderRank()
         }
-
-        // プレーヤーの進行方向に関する審査(審査結果のセットも含む)
-        this.approvedPlayerDirectionMap.forEach((_, key) => {
-            this.approvedPlayerDirectionMap.set(key, false);
-        });
-        if(!this.requestedPlayerDirectionMap.get(DIRECTION.LEFT.keyName) || !this.requestedPlayerDirectionMap.get(DIRECTION.RIGHT.keyName)) {
-            if(this.requestedPlayerDirectionMap.get(DIRECTION.LEFT.keyName)) {
-                this.approvedPlayerDirectionMap.set(DIRECTION.LEFT.keyName, true);
-            }
-            if(this.requestedPlayerDirectionMap.get(DIRECTION.RIGHT.keyName)) {
-                this.approvedPlayerDirectionMap.set(DIRECTION.RIGHT.keyName, true);
-            } 
-        }
-
-        if(!this.requestedPlayerDirectionMap.get(DIRECTION.UP.keyName) || !this.requestedPlayerDirectionMap.get(DIRECTION.DOWN.keyName)) {
-            if(this.requestedPlayerDirectionMap.get(DIRECTION.UP.keyName)) {
-                this.approvedPlayerDirectionMap.set(DIRECTION.UP.keyName, true);
-            }
-            if(this.requestedPlayerDirectionMap.get(DIRECTION.DOWN.keyName)) {
-                this.approvedPlayerDirectionMap.set(DIRECTION.DOWN.keyName, true);
-            } 
-        }
-
 
         // 審査終了処理
         // 申請に関するフラグをリセット
@@ -129,23 +143,11 @@ export class InputCoordinator {
         this.isRetryGameRequestedFromKey = false;
         this.isStartGameRequestedFromUi = false;
         this.isRetryGameRequestedFromUi = false;
-        this.requestedPlayerDirectionMap.forEach((_, key) => {
-            this.requestedPlayerDirectionMap.set(key, false);
-        });
     }
 
     // 審査結果は渡せるようにしておく
-    // ゲームメニューに関する審査
-    getApprovedGameMenuActionInfo = () => {
-        return this.approvedGameMenuActionInfo;
-    }
-
-    // プレーヤー進行方向に関する審査結果
-    isApprovedPlayerDirection = (direction : DIRECTION) => {
-        // DIRECTIONが持つ全方向、確実に値を持っているはず。
-        // なので、引数がDIRECTIONだと、マップが持ってないキーが指定されることはないはず。
-        // アサーションでも問題ない。
-        return this.approvedPlayerDirectionMap.get(direction.keyName)!;
+    getApprovedActionInfo = () => {
+        return this.approvedActionInfo;
     }
 
     // @ts-ignore 使うときが来るかも。来なかったら消す

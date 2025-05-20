@@ -13,11 +13,7 @@ export class Player {
     private playerDirectionBuffer: PlayerDirectionBuffer;
     private lastMoveDirection: DIRECTION | undefined;
 
-    private elapsedFrameLastInput: number;
-
-    private isApprovedPlayerDirection: (direction: DIRECTION) => boolean;
-
-    constructor(gameObjectFactory: Phaser.GameObjects.GameObjectFactory, iniRow: number, iniColumn: number, params: any, isApprovedPlayerDirection: (direction: DIRECTION) => boolean) {
+    constructor(gameObjectFactory: Phaser.GameObjects.GameObjectFactory, iniRow: number, iniColumn: number, params: any) {
         this.graphics = gameObjectFactory.graphics();
         this.row = iniRow;
         this.column = iniColumn;
@@ -25,8 +21,6 @@ export class Player {
         this.moveCost = params.playerMoveCost;
         this.playerDirectionBuffer = new PlayerDirectionBuffer(params.playerMoveCost, params.playerMoveCost, this.getLastMoveDirection);
         this.lastMoveDirection = undefined;
-        this.elapsedFrameLastInput = 0;
-        this.isApprovedPlayerDirection = isApprovedPlayerDirection;
     }
 
     position() {
@@ -44,30 +38,19 @@ export class Player {
         return false;
     }
 
-    resolvePlayerFrame() {
+    resolvePlayerFrame(playerDirection: DIRECTION | undefined) {
         // 先行入力設定
         // 2方向入力されている場合は、どちらか一方を先行入力に設定
-        for (const direction of DIRECTION.values()) {
-            if (this.isApprovedPlayerDirection(direction)) {
-                const res = this.playerDirectionBuffer.trySetDirectionBuffer(direction, this.chargeAmount);
-                if (res) {
-                    break;
-                }
-            }
+        if (playerDirection !== undefined) {
+            this.playerDirectionBuffer.trySetDirectionBuffer(playerDirection, this.chargeAmount);
         }
 
         if (this.isChargeCompleted()) {
             // 移動方向の決定
             // まずは先行入力が入っているか確認
             let nextDirection = this.playerDirectionBuffer.consumeDirectionBuffer();
-            if (nextDirection === undefined) {
-                // 先行入力が入ってない場合、入力されている方向とする
-                // 2方向入力されている場合は、どちらか一方を移動方向にする
-                for (const direction of DIRECTION.values()) {
-                    if(this.isApprovedPlayerDirection(direction)) {
-                        nextDirection = direction;
-                    }
-                }
+            if(nextDirection === undefined && playerDirection !== undefined) {
+                nextDirection = playerDirection;
             }
 
             // 移動してみる
@@ -79,7 +62,6 @@ export class Player {
         } else {
             this.charge();
         }
-        this.elapsedFrameLastInput++;
     }
 
     private canMove(direction: DIRECTION) {

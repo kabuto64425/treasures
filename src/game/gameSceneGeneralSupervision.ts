@@ -62,7 +62,7 @@ export class GameSceneGeneralSupervision {
         this.ui = new Ui(this, this.gameObjectFactory, gameObjectCreator, scene.time, scene.scene, scene.getBestRecord());
 
         // プレイヤー
-        this.player = new Player(scene.add, GameConstants.parameterPlayer.row, GameConstants.parameterPlayer.column, this.params, this.inputCoordinator.isApprovedPlayerDirection);
+        this.player = new Player(scene.add, GameConstants.parameterPlayer.row, GameConstants.parameterPlayer.column, this.params);
 
         //フィールド評価
         this.fieldEvaluation = new FieldEvalution(scene.add, this.params.visibleFieldEvaluation);
@@ -164,8 +164,11 @@ export class GameSceneGeneralSupervision {
         this.recorder.addElapsedFrame();
         this.ui.updateTimeText();
 
+        // input調整役から
+        // 承認されたプレイヤーの方向を取得
+        let playerDirection= this.inputCoordinator.getApprovedActionInfo().playerDirection;
         // プレイヤー
-        this.player.resolvePlayerFrame();
+        this.player.resolvePlayerFrame(playerDirection);
         this.player.draw();
 
         // フィールド評価
