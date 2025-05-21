@@ -71,4 +71,8 @@ export class Enemy implements IFieldActor {
         // 総監督が持つゲームオーバー処理(実装予定)を実行
         this.onPlayerCaptured();
     }
+
+    isOnPlaerLastFootprint() {
+        
+    }
 }

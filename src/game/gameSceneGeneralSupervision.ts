@@ -113,6 +113,7 @@ export class GameSceneGeneralSupervision {
         this.overlay.setVisible(false);
 
         // プレイヤー描画
+        this.player.setup(this.recorder.getElapsedFrame());
         this.player.draw();
 
         // フィールド評価
@@ -166,19 +167,18 @@ export class GameSceneGeneralSupervision {
 
         // input調整役から
         // 承認されたプレイヤーの方向を取得
-        let playerDirection= this.inputCoordinator.getApprovedActionInfo().playerDirection;
+        let playerDirection = this.inputCoordinator.getApprovedActionInfo().playerDirection;
         // プレイヤー
-        this.player.resolvePlayerFrame(playerDirection);
+        this.player.resolvePlayerFrame(playerDirection, this.recorder.getElapsedFrame());
         this.player.draw();
 
         // フィールド評価
         // setup内で確実に作成しているので、アサーションでもいけるはず
         const fieldEvaluation = this.fieldEvaluation!;
-        fieldEvaluation.updateEvaluation(this.player.position().row, this.player.position().column);
+        fieldEvaluation.updateEvaluation(this.player.getFirstFootPrint().row, this.player.getFirstFootPrint().column);
         fieldEvaluation.draw();
 
         // 敵
-        // setup内で確実に作成しているので、アサーションでもいけるはず
         for (const enemy of this.enemyList) {
             if (enemy.isChargeCompleted()) {
                 let enemyDist = enemy.decideMoveDirection(fieldEvaluation);
@@ -215,7 +215,7 @@ export class GameSceneGeneralSupervision {
         // 敵との接触判定・ゲームオーバー更新
         for (const enemy of this.enemyList) {
             this.player.handleCollisionWith(enemy);
-        }
+        } 
     }
 
     getInputCoordinator() {
