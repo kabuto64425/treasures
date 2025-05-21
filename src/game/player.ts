@@ -19,6 +19,7 @@ export class Player {
         this.column = iniColumn;
         this.chargeAmount = 0;
         this.moveCost = params.playerMoveCost;
+        // 先行入力受付は、暫定チャージ中いつでもできるように第２引数を指定している。多分これで確定しそう。
         this.playerDirectionBuffer = new PlayerDirectionBuffer(params.playerMoveCost, params.playerMoveCost, this.getLastMoveDirection);
         this.lastMoveDirection = undefined;
     }

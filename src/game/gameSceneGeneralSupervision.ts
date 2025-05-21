@@ -143,7 +143,7 @@ export class GameSceneGeneralSupervision {
         }
 
         // ファイナルラウンド
-        let goalPos = { row: 0, column: 0 };
+        let goalPos = { row: 1, column: 1 };
         this.roundsSupervision.setRoundSupervision(GameConstants.numberOfTreasuresRounds, new FinalRoundSupervision(this.gameObjectFactory, goalPos.row, goalPos.column));
     }
 

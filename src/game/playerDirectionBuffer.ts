@@ -3,6 +3,7 @@ import { DIRECTION } from "./drection";
 export class PlayerDirectionBuffer {
     private directionBuffer: DIRECTION | undefined;
     private readonly playerMoveCost: number;
+    // チャージ完了の何フレーム前から先行入力の受付を開始するか
     private readonly inputPreChargeFrames: number;
     private readonly getLastMoveDirection: () => DIRECTION | undefined;
 
