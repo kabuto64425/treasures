@@ -222,6 +222,7 @@ export class GameSceneGeneralSupervision {
         return this.inputCoordinator;
     }
 
+    // onPlayerCapturedは、「プレーヤーが捕まる」という認識でいいらしい by chatgpt
     readonly onPlayerCaptured = () => {
         if (!this.params.noGameOverMode) {
             // setup内で確実に作成しているので、アサーションでもいけるはず
