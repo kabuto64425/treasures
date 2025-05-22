@@ -2,7 +2,6 @@ import { DIRECTION } from "./drection";
 import * as GameConstants from "./gameConstants";
 import { FieldEvalution } from "./fieldEvalution";
 import { IFieldActor } from "./iFieldActor";
-import * as Util from "./utils";
 
 export class Enemy implements IFieldActor {
     private readonly graphics: Phaser.GameObjects.Graphics;
