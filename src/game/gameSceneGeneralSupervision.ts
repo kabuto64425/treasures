@@ -180,8 +180,13 @@ export class GameSceneGeneralSupervision {
             this.player.handleCollisionWith(treasure);
         }
 
+        // 宝の数が更新されるから
         this.ui.updateCollectedTreasuresText();
 
+        
+        this.roundsSupervision.updateProgressPerFrame();
+
+        // リファクタリングで、updateProgressPerFrame内で処理する
         // 次ラウンド進行判断・次ラウンド進行
         if (this.roundsSupervision.isCompletedCurrentRound()) {
             if (this.roundsSupervision.isFinalRound()) {

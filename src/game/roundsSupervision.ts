@@ -20,6 +20,11 @@ export class RoundsSupervision {
         }
     }
 
+    // リファクタリングで、実装する
+    updateProgressPerFrame() {
+        
+    }
+
     getCurrentRound() {
         return this.currentRound;
     }
