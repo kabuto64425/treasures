@@ -6,10 +6,13 @@ import { TreasuresRoundSupervision } from "./treasuresRoundSupervision";
 export class RoundsSupervision {
     private currentRound: number;
     private readonly singleRoundSupervisionList: ISingleRoundSupervision[];
+    private readonly onGameCompleted: () => void;
 
-    constructor(gameObjectFactory: Phaser.GameObjects.GameObjectFactory) {
+    constructor(gameObjectFactory: Phaser.GameObjects.GameObjectFactory, onGameCompleted: () => void) {
         this.currentRound = 0;
-        this.singleRoundSupervisionList = Array.from({ length: GameConstants.numberOfTreasuresRounds }, (_, i) =>
+        this.onGameCompleted = onGameCompleted;
+        // +1でファイナルラウンドに対応しているのは暫定
+        this.singleRoundSupervisionList = Array.from({ length: GameConstants.numberOfTreasuresRounds + 1 }, (_, i) =>
             (i === GameConstants.numberOfTreasuresRounds - 1)? new FinalRoundSupervision(gameObjectFactory) : new TreasuresRoundSupervision(gameObjectFactory)
         );
     }
@@ -20,9 +23,16 @@ export class RoundsSupervision {
         }
     }
 
-    // リファクタリングで、実装する
     updateProgressPerFrame() {
-        
+        // 次ラウンド進行判断・次ラウンド進行
+        if (this.isCompletedCurrentRound()) {
+            if (this.isFinalRound()) {
+                this.onGameCompleted();
+            } else {
+                this.advanceRound();
+                this.getCurrentRoundSupervision().startRound();
+            }
+        }
     }
 
     getCurrentRound() {

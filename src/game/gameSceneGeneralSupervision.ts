@@ -78,8 +78,7 @@ export class GameSceneGeneralSupervision {
         }
 
         // ラウンド進行監督
-        // +1でファイナルラウンドに対応しているのは暫定
-        this.roundsSupervision = new RoundsSupervision(this.gameObjectFactory);
+        this.roundsSupervision = new RoundsSupervision(this.gameObjectFactory, this.onGameCompleted);
     }
 
     setupSupervision() {
@@ -183,23 +182,8 @@ export class GameSceneGeneralSupervision {
         // 宝の数が更新されるから
         this.ui.updateCollectedTreasuresText();
 
-        
+        // ラウンド進行
         this.roundsSupervision.updateProgressPerFrame();
-
-        // リファクタリングで、updateProgressPerFrame内で処理する
-        // 次ラウンド進行判断・次ラウンド進行
-        if (this.roundsSupervision.isCompletedCurrentRound()) {
-            if (this.roundsSupervision.isFinalRound()) {
-                this.ui.showCongratulationsText();
-
-                this.gameState = GameSceneGeneralSupervision.GAME_STATE.GAME_CLEAR;
-                this.updateBestRecord(this.isGameClear(), this.recorder.getNumberOfCollectedTreasures(), this.recorder.getElapsedFrame());
-                this.ui.updateBestRecordText();
-            } else {
-                this.roundsSupervision.advanceRound();
-                this.roundsSupervision.getCurrentRoundSupervision().startRound();
-            }
-        }
 
         // 敵との接触判定・ゲームオーバー更新
         for (const enemy of this.enemyList) {
@@ -220,6 +204,14 @@ export class GameSceneGeneralSupervision {
             this.updateBestRecord(this.isGameClear(), this.recorder.getNumberOfCollectedTreasures(), this.recorder.getElapsedFrame());
             this.ui.updateBestRecordText();
         }
+    }
+
+    readonly onGameCompleted = () => {
+        this.ui.showCongratulationsText();
+
+        this.gameState = GameSceneGeneralSupervision.GAME_STATE.GAME_CLEAR;
+        this.updateBestRecord(this.isGameClear(), this.recorder.getNumberOfCollectedTreasures(), this.recorder.getElapsedFrame());
+        this.ui.updateBestRecordText();
     }
 
     readonly queryCurrentRecord = () => {
