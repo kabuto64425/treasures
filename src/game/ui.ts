@@ -117,26 +117,33 @@ export class Ui {
 
         this.retryLongButton = new RetryLongButton(generalSupervision, this.uiLayer, this.clock, this.scenePlugin, gameObjectCreator);
 
-        this.deleteRecord = gameObjectCreator.image({ x: 1000, y: 550, key: "delete" }, false);
+        this.deleteRecord = gameObjectCreator.image({ x: 1195, y: 550, key: "delete" }, false);
+        this.deleteRecord.setScale(0.7);
         this.uiLayer.add(this.deleteRecord);
 
-        this.timeText = gameObjectCreator.bitmapText({ x: 645, y: 10, font: "font", text: "0:00.000" }, false);
+        this.timeText = gameObjectCreator.bitmapText({ x: 970, y: 10, font: "font", text: "0:00.000" }, false);
+        this.timeText.setScale(0.4);
         this.uiLayer.add(this.timeText);
 
-        this.collectedTreasuresText = gameObjectCreator.bitmapText({ x: 645, y: 92, font: "font", text: `0/${Utils.calculateNumberOfTreasuresInALLRounds()}` }, false);
+        this.collectedTreasuresText = gameObjectCreator.bitmapText({ x: 970, y: 92, font: "font", text: `0/${Utils.calculateNumberOfTreasuresInALLRounds()}` }, false);
+        this.collectedTreasuresText.setScale(0.4);
         this.uiLayer.add(this.collectedTreasuresText);
 
-        this.gameOverText = gameObjectCreator.bitmapText({ x: 645, y: 174, font: "font", text: "GAME OVER!" }, false);
+        this.gameOverText = gameObjectCreator.bitmapText({ x: 970, y: 174, font: "font", text: "GAME OVER!" }, false);
         this.gameOverText.setVisible(false);
+        this.gameOverText.setScale(0.4);
         this.uiLayer.add(this.gameOverText);
 
-        this.congratulationsText = gameObjectCreator.bitmapText({ x: 645, y: 174, font: "font", text: "CONGRATULATIONS!" }, false);
+        this.congratulationsText = gameObjectCreator.bitmapText({ x: 970, y: 174, font: "font", text: "CONGRATULATIONS!" }, false);
         this.congratulationsText.setVisible(false);
+        this.congratulationsText.setScale(0.4);
         this.uiLayer.add(this.congratulationsText);
 
-        const bestText = gameObjectCreator.bitmapText({ x: 645, y: 256, font: "font", text: "BEST" }, false);
+        const bestText = gameObjectCreator.bitmapText({ x: 970, y: 256, font: "font", text: "BEST" }, false);
         this.uiLayer.add(bestText);
-        this.bestRecordText = gameObjectCreator.bitmapText({ x: 645, y: 338, font: "font", text: this.createBestRecordStr() }, false);
+        bestText.setScale(0.4);
+        this.bestRecordText = gameObjectCreator.bitmapText({ x: 970, y: 338, font: "font", text: this.createBestRecordStr() }, false);
+        this.bestRecordText.setScale(0.4);
         this.uiLayer.add(this.bestRecordText);
     }
 
