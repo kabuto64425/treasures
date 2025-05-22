@@ -27,14 +27,14 @@ export class FieldEvalution {
         return this.shortestDirectionMaps[row][column].get(direction.keyName);
     }
 
-    updateEvaluation(playerRow: number, playerColumn: number) {
+    updateEvaluation(startRow: number, startColumn: number) {
         this.shortestDirectionMaps.forEach(n => n.forEach(dir => { this.resetMapValues(dir, false) }));
 
         const queue = [];
         const dist = [...Array(GameConstants.H)].map(() => [...Array(GameConstants.W)].fill(-1));
 
-        queue.push([playerRow, playerColumn]);
-        dist[playerRow][playerColumn] = 0;
+        queue.push([startRow, startColumn]);
+        dist[startRow][startColumn] = 0;
 
         while (queue.length > 0) {
             // 直前で空チェックしてるので、アサーションでもいけるはず

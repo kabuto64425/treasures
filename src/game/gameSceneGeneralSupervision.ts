@@ -70,7 +70,10 @@ export class GameSceneGeneralSupervision {
         // 敵
         this.enemyList = [];
         for (let i = 0; i < GameConstants.numberOfEnemyies; i++) {
-            const enemy = new Enemy(scene.add, GameConstants.parametersOfEnemies[i].row, GameConstants.parametersOfEnemies[i].column, this.params.enemyMoveCost, GameConstants.parametersOfEnemies[i].priorityScanDirections, this.onPlayerCaptured);
+            const enemy = new Enemy(scene.add, GameConstants.parametersOfEnemies[i].row, GameConstants.parametersOfEnemies[i].column,
+                this.params.enemyMoveCost, GameConstants.parametersOfEnemies[i].priorityScanDirections, this.onPlayerCaptured,
+                this.player.getFootPrint().getFirstPrint, this.player.getFootPrint().onSteppedOnByEnemy
+            );
             this.enemyList.push(enemy);
         }
     }
@@ -171,11 +174,12 @@ export class GameSceneGeneralSupervision {
         // プレイヤー
         this.player.resolvePlayerFrame(playerDirection, this.recorder.getElapsedFrame());
         this.player.draw();
+        this.player.getFootPrint().draw();
 
         // フィールド評価
         // setup内で確実に作成しているので、アサーションでもいけるはず
         const fieldEvaluation = this.fieldEvaluation!;
-        fieldEvaluation.updateEvaluation(this.player.getFirstFootPrint().row, this.player.getFirstFootPrint().column);
+        fieldEvaluation.updateEvaluation(this.player.getFootPrint().getFirstPrint().row, this.player.getFootPrint().getFirstPrint().column);
         fieldEvaluation.draw();
 
         // 敵
@@ -186,6 +190,7 @@ export class GameSceneGeneralSupervision {
             } else {
                 enemy.charge();
             }
+
             enemy.draw();
         }
 

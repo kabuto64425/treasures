@@ -2,6 +2,7 @@ import { DIRECTION } from "./drection";
 import * as GameConstants from "./gameConstants";
 import { FieldEvalution } from "./fieldEvalution";
 import { IFieldActor } from "./iFieldActor";
+import * as Util from "./utils";
 
 export class Enemy implements IFieldActor {
     private readonly graphics: Phaser.GameObjects.Graphics;
@@ -12,8 +13,13 @@ export class Enemy implements IFieldActor {
     private chargeAmount: number;
     private readonly priorityScanDirections: DIRECTION[];
     private readonly onPlayerCaptured: () => void;
+    private readonly getFirstFootprint: () => Util.Position;
+    private readonly stepOnFirstFootprint: () => void;
 
-    constructor(gameObjectFactory: Phaser.GameObjects.GameObjectFactory, iniRow: number, iniColumn: number, moveCost: number, priorityScanDirections: DIRECTION[], onPlayerCaptured: () => void) {
+    constructor(gameObjectFactory: Phaser.GameObjects.GameObjectFactory, iniRow: number,
+        iniColumn: number, moveCost: number, priorityScanDirections: DIRECTION[], onPlayerCaptured: () => void,
+        getFirstFootprint: () => Util.Position, stepOnFirstFootprint: () => void
+    ) {
         this.graphics = gameObjectFactory.graphics();
         this.graphics.depth = 10;
         this.row = iniRow;
@@ -23,6 +29,8 @@ export class Enemy implements IFieldActor {
         this.chargeAmount = 0;
         this.priorityScanDirections = priorityScanDirections;
         this.onPlayerCaptured = onPlayerCaptured;
+        this.getFirstFootprint = getFirstFootprint;
+        this.stepOnFirstFootprint = stepOnFirstFootprint;
     }
 
     position() {
@@ -72,7 +80,10 @@ export class Enemy implements IFieldActor {
         this.onPlayerCaptured();
     }
 
-    isOnPlaerLastFootprint() {
-        
+    handleFirstFootprintStep() {
+        this.getFirstFootprint()
+        if(Util.isSamePosition(this.position(), this.getFirstFootprint())) {
+            this.stepOnFirstFootprint()
+        }
     }
 }

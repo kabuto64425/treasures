@@ -25,7 +25,7 @@ export class Player {
         this.moveCost = params.playerMoveCost;
         this.playerDirectionBuffer = new PlayerDirectionBuffer(params.playerMoveCost, params.playerMoveCost, this.getLastMoveDirection);
         this.lastMoveDirection = undefined;
-        this.footPrint = new Footprint();
+        this.footPrint = new Footprint(gameObjectFactory, params.visibleFootPrint, params.footPrintLimitFrame);
     }
 
     position() {
@@ -75,8 +75,8 @@ export class Player {
         this.footPrint.resolveFootprintPerFrame(currentFrame);
     }
 
-    getFirstFootPrint() {
-        return this.footPrint.getFirstPrint();
+    getFootPrint() {
+        return this.footPrint;
     }
 
     private canMove(direction: DIRECTION) {
