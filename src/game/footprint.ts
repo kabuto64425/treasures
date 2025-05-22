@@ -1,5 +1,6 @@
 import { Position } from "./utils";
 import * as GameConstants from "./gameConstants";
+import { Logger } from "./logger";
 
 export class Footprint {
     private readonly queue: { position: Position, frame: number }[] = [];
@@ -38,6 +39,8 @@ export class Footprint {
                 this.removeFirstPrint();
             }
         }
+        // 次のフレームに備えてフラグをリセット
+        this.isFirstPrintStepped = false;
     }
 
     draw() {
@@ -56,6 +59,7 @@ export class Footprint {
     }
 
     private removeFirstPrint() {
+        Logger.debug("removefirstprint");
         this.queue.shift();
     }
 }

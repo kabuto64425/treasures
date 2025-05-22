@@ -190,6 +190,7 @@ export class GameSceneGeneralSupervision {
             } else {
                 enemy.charge();
             }
+            enemy.handleFirstFootprintStep();
 
             enemy.draw();
         }
