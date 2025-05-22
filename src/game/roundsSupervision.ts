@@ -1,12 +1,23 @@
 import { ISingleRoundSupervision } from "./iSingleRoundSupervision";
+import * as GameConstants from "./gameConstants";
+import { FinalRoundSupervision } from "./finalRoundSupervision";
+import { TreasuresRoundSupervision } from "./treasuresRoundSupervision";
 
 export class RoundsSupervision {
     private currentRound: number;
     private readonly singleRoundSupervisionList: ISingleRoundSupervision[];
 
-    constructor(numberOfRound: number) {
+    constructor(gameObjectFactory: Phaser.GameObjects.GameObjectFactory) {
         this.currentRound = 0;
-        this.singleRoundSupervisionList = new Array(numberOfRound);
+        this.singleRoundSupervisionList = Array.from({ length: GameConstants.numberOfTreasuresRounds }, (_, i) =>
+            (i === GameConstants.numberOfTreasuresRounds - 1)? new FinalRoundSupervision(gameObjectFactory) : new TreasuresRoundSupervision(gameObjectFactory)
+        );
+    }
+
+    setup() {
+        for(const round of this.singleRoundSupervisionList) {
+            round.setup();
+        }
     }
 
     getCurrentRound() {

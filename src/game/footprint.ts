@@ -3,7 +3,7 @@ import * as GameConstants from "./gameConstants";
 import { Logger } from "./logger";
 
 export class Footprint {
-    private readonly queue: { position: Position, frame: number }[] = [];
+    private readonly queue: { position: Position, frame: number }[];
     private readonly graphics: Phaser.GameObjects.Graphics;
 
     private readonly limit: number;
@@ -11,6 +11,7 @@ export class Footprint {
 
     constructor(gameObjectFactory: Phaser.GameObjects.GameObjectFactory, isVisible: boolean, limit: number) {
         this.graphics = gameObjectFactory.graphics();
+        this.queue = [];
         this.limit = limit;
         this.isFirstPrintStepped = false;
         this.graphics.setVisible(isVisible);

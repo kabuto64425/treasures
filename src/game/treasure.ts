@@ -1,12 +1,14 @@
 import * as GameConstants from "./gameConstants";
 import { IFieldActor } from "./iFieldActor";
 import { RecorderMediator } from "./recoder";
+import { Position } from "./utils";
 
 export class Treasure implements IFieldActor {
     private readonly graphics: Phaser.GameObjects.Graphics;
     private readonly color: number;
-    private row: number;
-    private column: number;
+    // undefinedのまま呼び出すとエラー・バグになるので注意!!
+    private row!: number;
+    private column!: number;
     private state: number;
 
     // ファイナルランドのゴールかどうか。そもそもゴールと宝は扱いが別の気がするので、フラグで管理すべきか検討中
@@ -18,13 +20,17 @@ export class Treasure implements IFieldActor {
         COLLECTED: 2,
     };
 
-    constructor(gameObjectFactory: Phaser.GameObjects.GameObjectFactory, color: number, iniRow: number, iniColumn: number, isGoal: boolean) {
+    constructor(gameObjectFactory: Phaser.GameObjects.GameObjectFactory, color: number, isGoal: boolean) {
         this.graphics = gameObjectFactory.graphics();
         this.color = color;
-        this.row = iniRow;
-        this.column = iniColumn;
         this.state = Treasure.TREASURE_STATE.NON_APPEARANCE;
         this.isGoal = isGoal;
+    }
+
+    // 位置情報が取得される前にかならずこのメソッドを呼び出す
+    setPosition(position: Position) {
+        this.row = position.row;
+        this.column = position.column;
     }
 
     position() {

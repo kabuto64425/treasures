@@ -4,10 +4,7 @@ import * as GameConstants from "./gameConstants"
 import { FieldEvalution } from "./fieldEvalution";
 import { Enemy } from "./enemy";
 import { RoundsSupervision } from "./roundsSupervision";
-import { TreasuresRoundSupervision } from "./treasuresRoundSupervision";
-import { Treasure } from "./treasure";
 import { Ui } from "./ui";
-import { FinalRoundSupervision } from "./finalRoundSupervision";
 import { Recorder, RecorderMediator } from "./recoder";
 import { InputCoordinator } from "./inputCoordinator";
 
@@ -26,7 +23,7 @@ export class GameSceneGeneralSupervision {
     private readonly player: Player;
     private readonly fieldEvaluation: FieldEvalution;
     private readonly enemyList: Enemy[];
-    private roundsSupervision: RoundsSupervision | undefined;
+    private roundsSupervision: RoundsSupervision;
     private gameState: number;
 
     private readonly recorder: Recorder;
@@ -76,6 +73,10 @@ export class GameSceneGeneralSupervision {
             );
             this.enemyList.push(enemy);
         }
+
+        // ラウンド進行監督
+        // +1でファイナルラウンドに対応しているのは暫定
+        this.roundsSupervision = new RoundsSupervision(this.gameObjectFactory);
     }
 
     setupSupervision() {
@@ -128,27 +129,8 @@ export class GameSceneGeneralSupervision {
             enemy.draw();
         }
 
-        // ラウンド進行監督
-        // +1でファイナルラウンドに対応しているのは暫定
-        this.roundsSupervision = new RoundsSupervision(GameConstants.numberOfTreasuresRounds + 1);
-        for (let i = 0; i < GameConstants.numberOfTreasuresRounds; i++) {
-            const treasureList = [];
-            for (let j = 0; j < GameConstants.numberOfTreasuresPerRound; j++) {
-                let treasurePos = { row: Math.floor(Math.random() * GameConstants.H), column: Math.floor(Math.random() * GameConstants.W) };
-                // 壁が存在するところに宝を配置しないようにする
-                while (GameConstants.FIELD[treasurePos.row][treasurePos.column] === 1) {
-                    treasurePos = { row: Math.floor(Math.random() * GameConstants.H), column: Math.floor(Math.random() * GameConstants.W) };
-                }
-                const treasure = new Treasure(this.gameObjectFactory, 0xffff00, treasurePos.row, treasurePos.column, false);
-                treasureList.push(treasure);
-            }
-
-            this.roundsSupervision.setRoundSupervision(i, new TreasuresRoundSupervision(treasureList));
-        }
-
-        // ファイナルラウンド
-        let goalPos = { row: 1, column: 1 };
-        this.roundsSupervision.setRoundSupervision(GameConstants.numberOfTreasuresRounds, new FinalRoundSupervision(this.gameObjectFactory, goalPos.row, goalPos.column));
+        // ゲーム進行管理
+        this.roundsSupervision.setup();
     }
 
     startGame() {
