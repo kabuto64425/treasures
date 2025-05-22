@@ -1,3 +1,4 @@
+import * as Util from "./utils";
 import { DIRECTION } from "./drection";
 import * as GameConstants from "./gameConstants";
 import { IFieldActor } from "./iFieldActor";
@@ -66,29 +67,17 @@ export class Player {
     }
 
     private canMove(direction: DIRECTION) {
-        const toRow = this.row + direction.dr;
-        const toCol = this.column + direction.dc;
-        if (toRow < 0) {
-            return false;
-        }
-        if (toRow >= GameConstants.H) {
-            return false;
-        }
-        if (toCol < 0) {
-            return false;
-        }
-        if (toCol >= GameConstants.W) {
-            return false;
-        }
-        if (GameConstants.FIELD[toRow][toCol] === 1) {
+        const nextPosition = Util.calculateNextPosition(this.position(), direction);
+        if (GameConstants.FIELD[nextPosition.row][nextPosition.column] === 1) {
             return false;
         }
         return true;
     }
 
     private move(direction: DIRECTION) {
-        this.row += direction.dr;
-        this.column += direction.dc;
+        const nextPosition = Util.calculateNextPosition(this.position(), direction);
+        this.row = nextPosition.row;
+        this.column = nextPosition.column;
         this.lastMoveDirection = direction;
         this.chargeAmount = 0;
     }

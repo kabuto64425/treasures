@@ -14,3 +14,4 @@ export * from "./treasuresRoundSupervision";
 export * from "./treasure";
 export * from "./bestRecord"
 export * from "./ui"
+export * from "./utils"
