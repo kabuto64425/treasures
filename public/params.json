@@ -4,5 +4,7 @@
     "enableUsingLocalstorage": true,
     "playerMoveCost": 6,
     "enemyMoveCost": 15,
+    "visibleFootPrint": false,
+    "footPrintLimitFrame": 30,
     "logLevel": "DEBUG"
 }

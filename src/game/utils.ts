@@ -1,5 +1,10 @@
 import * as GameConstants from "./gameConstants"
 
+export type Position = {
+    row: number,
+    column: number
+}
+
 export function caluculateMsFromFrame(frame: number) {
     return Math.floor((frame * GameConstants.MS_PER_SECOND) / GameConstants.FPS);
 }
@@ -19,4 +24,8 @@ export function createFormattedTimeFromFrame(frame: number) {
 export function calculateNumberOfTreasuresInALLRounds() {
     // 総宝数の取得方法は暫定
     return GameConstants.numberOfTreasuresPerRound * GameConstants.numberOfTreasuresRounds;
+}
+
+export function isSamePosition(positionA : Position, positionB : Position) {
+    return positionA.row === positionB.row && positionA.column === positionB.column;
 }

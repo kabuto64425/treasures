@@ -1,7 +1,9 @@
 import { DIRECTION } from "./drection";
+import { Footprint } from "./footprint";
 import * as GameConstants from "./gameConstants";
 import { IFieldActor } from "./iFieldActor";
 import { PlayerDirectionBuffer } from "./playerDirectionBuffer";
+import * as Utils from "./utils"
 
 export class Player {
     private readonly graphics: Phaser.GameObjects.Graphics;
@@ -13,6 +15,8 @@ export class Player {
     private playerDirectionBuffer: PlayerDirectionBuffer;
     private lastMoveDirection: DIRECTION | undefined;
 
+    private footPrint: Footprint;
+
     constructor(gameObjectFactory: Phaser.GameObjects.GameObjectFactory, iniRow: number, iniColumn: number, params: any) {
         this.graphics = gameObjectFactory.graphics();
         this.row = iniRow;
@@ -21,6 +25,7 @@ export class Player {
         this.moveCost = params.playerMoveCost;
         this.playerDirectionBuffer = new PlayerDirectionBuffer(params.playerMoveCost, params.playerMoveCost, this.getLastMoveDirection);
         this.lastMoveDirection = undefined;
+        this.footPrint = new Footprint(gameObjectFactory, params.visibleFootPrint, params.footPrintLimitFrame);
     }
 
     position() {
@@ -38,7 +43,11 @@ export class Player {
         return false;
     }
 
-    resolvePlayerFrame(playerDirection: DIRECTION | undefined) {
+    setup(currentFrame: number) {
+        this.footPrint.push(this.position(), currentFrame);
+    }
+
+    resolvePlayerFrame(playerDirection: DIRECTION | undefined, currentFrame : number) {
         // 先行入力設定
         // 2方向入力されている場合は、どちらか一方を先行入力に設定
         if (playerDirection !== undefined) {
@@ -49,19 +58,25 @@ export class Player {
             // 移動方向の決定
             // まずは先行入力が入っているか確認
             let nextDirection = this.playerDirectionBuffer.consumeDirectionBuffer();
-            if(nextDirection === undefined && playerDirection !== undefined) {
+            if (nextDirection === undefined && playerDirection !== undefined) {
                 nextDirection = playerDirection;
             }
 
             // 移動してみる
             if (nextDirection !== undefined) {
                 if (this.canMove(nextDirection)) {
-                    this.move(nextDirection);
+                    this.move(nextDirection, currentFrame);
                 }
             }
         } else {
             this.charge();
         }
+
+        this.footPrint.resolveFootprintPerFrame(currentFrame);
+    }
+
+    getFootPrint() {
+        return this.footPrint;
     }
 
     private canMove(direction: DIRECTION) {
@@ -85,10 +100,11 @@ export class Player {
         return true;
     }
 
-    private move(direction: DIRECTION) {
+    private move(direction: DIRECTION, currentFrame : number) {
         this.row += direction.dr;
         this.column += direction.dc;
         this.lastMoveDirection = direction;
+        this.footPrint.push(this.position(), currentFrame);
         this.chargeAmount = 0;
     }
 
@@ -104,7 +120,7 @@ export class Player {
     }
 
     handleCollisionWith(actor: IFieldActor) {
-        if (this.row === actor.position().row && this.column === actor.position().column) {
+        if (Utils.isSamePosition(this.position(), actor.position())) {
             actor.onCollideWithPlayer();
         }
     }
