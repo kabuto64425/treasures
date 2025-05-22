@@ -147,7 +147,7 @@ export class GameSceneGeneralSupervision {
         }
 
         // ファイナルラウンド
-        let goalPos = { row: 0, column: 0 };
+        let goalPos = { row: 1, column: 1 };
         this.roundsSupervision.setRoundSupervision(GameConstants.numberOfTreasuresRounds, new FinalRoundSupervision(this.gameObjectFactory, goalPos.row, goalPos.column));
     }
 
@@ -228,6 +228,7 @@ export class GameSceneGeneralSupervision {
         return this.inputCoordinator;
     }
 
+    // onPlayerCapturedは、「プレーヤーが捕まる」という認識でいいらしい by chatgpt
     readonly onPlayerCaptured = () => {
         if (!this.params.noGameOverMode) {
             // setup内で確実に作成しているので、アサーションでもいけるはず

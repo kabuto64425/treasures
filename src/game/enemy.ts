@@ -1,3 +1,4 @@
+import * as Util from "./utils";
 import { DIRECTION } from "./drection";
 import * as GameConstants from "./gameConstants";
 import { FieldEvalution } from "./fieldEvalution";
@@ -61,11 +62,10 @@ export class Enemy implements IFieldActor {
         if (direction === null) {
             return;
         }
-        if (this.chargeAmount >= this.moveCost) {
-            this.row += direction.dr;
-            this.column += direction.dc;
-            this.chargeAmount = 0;
-        }
+        const nextPosition = Util.calculateNextPosition(this.position(), direction);
+        this.row = nextPosition.row;
+        this.column = nextPosition.column;
+        this.chargeAmount = 0;
     }
 
     draw() {
@@ -76,7 +76,6 @@ export class Enemy implements IFieldActor {
     }
 
     onCollideWithPlayer(): void {
-        // 総監督が持つゲームオーバー処理(実装予定)を実行
         this.onPlayerCaptured();
     }
 
