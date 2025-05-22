@@ -28,7 +28,7 @@ export class GameSceneGeneralSupervision {
 
     private readonly recorder: Recorder;
 
-    private overlay: Phaser.GameObjects.Graphics | undefined;
+    private overlay: Phaser.GameObjects.Graphics;
 
     private updateBestRecord: (isGameClear: boolean, currentNumberOfCollectedTreasures: number, currentElapedFrame: number) => boolean;
 
@@ -58,8 +58,11 @@ export class GameSceneGeneralSupervision {
 
         this.ui = new Ui(this, this.gameObjectFactory, gameObjectCreator, scene.time, scene.scene, scene.getBestRecord());
 
+        // ゲームオーバー時に表示するオーバレイ
+        this.overlay = this.gameObjectFactory.graphics();
+
         // プレイヤー
-        this.player = new Player(scene.add, GameConstants.parameterPlayer.row, GameConstants.parameterPlayer.column, this.params);
+        this.player = new Player(this.gameObjectFactory, GameConstants.parameterPlayer.row, GameConstants.parameterPlayer.column, this.params);
 
         //フィールド評価
         this.fieldEvaluation = new FieldEvalution(scene.add, this.params.visibleFieldEvaluation);
@@ -110,8 +113,7 @@ export class GameSceneGeneralSupervision {
             }
         }
 
-        // ゲームオーバー時に表示するオーバレイ
-        this.overlay = this.gameObjectFactory.graphics();
+
         this.overlay.fillStyle(0xd20a13, 0.5).fillRect(0, 0, GameConstants.D_WIDTH, GameConstants.D_HEIGHT);
         this.overlay.setDepth(99);
         this.overlay.setVisible(false);
@@ -136,8 +138,7 @@ export class GameSceneGeneralSupervision {
     startGame() {
         this.gameState = GameSceneGeneralSupervision.GAME_STATE.PLAYING;
         // 最初のラウンドの宝描画
-        // setup内で確実に作成しているので、アサーションでもいけるはず
-        this.roundsSupervision!.getCurrentRoundSupervision().startRound();
+        this.roundsSupervision.getCurrentRoundSupervision().startRound();
     }
 
     updatePerFrame() {
@@ -159,15 +160,13 @@ export class GameSceneGeneralSupervision {
         this.player.getFootPrint().draw();
 
         // フィールド評価
-        // setup内で確実に作成しているので、アサーションでもいけるはず
-        const fieldEvaluation = this.fieldEvaluation!;
-        fieldEvaluation.updateEvaluation(this.player.getFootPrint().getFirstPrint().row, this.player.getFootPrint().getFirstPrint().column);
-        fieldEvaluation.draw();
+        this.fieldEvaluation.updateEvaluation(this.player.getFootPrint().getFirstPrint().row, this.player.getFootPrint().getFirstPrint().column);
+        this.fieldEvaluation.draw();
 
         // 敵
         for (const enemy of this.enemyList) {
             if (enemy.isChargeCompleted()) {
-                let enemyDist = enemy.decideMoveDirection(fieldEvaluation);
+                let enemyDist = enemy.decideMoveDirection(this.fieldEvaluation);
                 enemy.move(enemyDist);
             } else {
                 enemy.charge();
@@ -177,33 +176,30 @@ export class GameSceneGeneralSupervision {
             enemy.draw();
         }
 
-        // setup内で確実に作成しているので、アサーションでもいけるはず
-        const roundsSupervision = this.roundsSupervision!;
-
-        for (const treasure of roundsSupervision.getCurrentRoundSupervision().extractAppearanceTreasures()) {
+        for (const treasure of this.roundsSupervision.getCurrentRoundSupervision().extractAppearanceTreasures()) {
             this.player.handleCollisionWith(treasure);
         }
 
         this.ui.updateCollectedTreasuresText();
 
         // 次ラウンド進行判断・次ラウンド進行
-        if (roundsSupervision.isCompletedCurrentRound()) {
-            if (roundsSupervision.isFinalRound()) {
+        if (this.roundsSupervision.isCompletedCurrentRound()) {
+            if (this.roundsSupervision.isFinalRound()) {
                 this.ui.showCongratulationsText();
 
                 this.gameState = GameSceneGeneralSupervision.GAME_STATE.GAME_CLEAR;
                 this.updateBestRecord(this.isGameClear(), this.recorder.getNumberOfCollectedTreasures(), this.recorder.getElapsedFrame());
                 this.ui.updateBestRecordText();
             } else {
-                roundsSupervision.advanceRound();
-                roundsSupervision.getCurrentRoundSupervision().startRound();
+                this.roundsSupervision.advanceRound();
+                this.roundsSupervision.getCurrentRoundSupervision().startRound();
             }
         }
 
         // 敵との接触判定・ゲームオーバー更新
         for (const enemy of this.enemyList) {
             this.player.handleCollisionWith(enemy);
-        } 
+        }
     }
 
     getInputCoordinator() {
@@ -213,8 +209,7 @@ export class GameSceneGeneralSupervision {
     // onPlayerCapturedは、「プレーヤーが捕まる」という認識でいいらしい by chatgpt
     readonly onPlayerCaptured = () => {
         if (!this.params.noGameOverMode) {
-            // setup内で確実に作成しているので、アサーションでもいけるはず
-            this.overlay!.setVisible(true);
+            this.overlay.setVisible(true);
             this.ui.showGameOverText();
             this.gameState = GameSceneGeneralSupervision.GAME_STATE.GAME_OVER;
             this.updateBestRecord(this.isGameClear(), this.recorder.getNumberOfCollectedTreasures(), this.recorder.getElapsedFrame());

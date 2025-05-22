@@ -196,12 +196,12 @@ export class Ui {
     }
 
     updateTimeText() {
-        this.timeText!.setText(`${Utils.createFormattedTimeFromFrame(this.queryCurrentRecord().elapsedFrame)}`);
+        this.timeText.setText(`${Utils.createFormattedTimeFromFrame(this.queryCurrentRecord().elapsedFrame)}`);
     }
 
     updateCollectedTreasuresText() {
         const numberOfCollectedTreasures = this.queryCurrentRecord().numberOfCollectedTreasures;
-        this.collectedTreasuresText!.setText(`${numberOfCollectedTreasures}/${Utils.calculateNumberOfTreasuresInALLRounds()}`);
+        this.collectedTreasuresText.setText(`${numberOfCollectedTreasures}/${Utils.calculateNumberOfTreasuresInALLRounds()}`);
     }
 
     updateBestRecordText() {

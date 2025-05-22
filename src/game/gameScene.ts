@@ -6,7 +6,9 @@ import { Logger } from "./logger";
 export class GameScene extends Phaser.Scene {
     private readonly params: any;
     private readonly bestRecoed: BestRecord;
-    private gameSceneGeneralSupervision: GameSceneGeneralSupervision | undefined;
+
+    // create内で、必ず初期化しておくこと
+    private gameSceneGeneralSupervision!: GameSceneGeneralSupervision;
 
     constructor(params: any, bestRecord: BestRecord) {
         super("gameScene");
@@ -46,7 +48,7 @@ export class GameScene extends Phaser.Scene {
 
     update(_time: number, _delta: number) {
         let now = performance.now();
-        const gameSceneGeneralSupervision = this.gameSceneGeneralSupervision!;
+        const gameSceneGeneralSupervision = this.gameSceneGeneralSupervision;
         gameSceneGeneralSupervision.updatePerFrame();
         Logger.all(performance.now() - now, _delta, _time, this.time.now);
     }
