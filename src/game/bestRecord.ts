@@ -40,7 +40,7 @@ export class BestRecord {
         if (this.elapsedFrame) {
             clearTimeStr = Utils.createFormattedTimeFromFrame(this.elapsedFrame);
         }
-        return `${this.numberOfCollectedTreasures}/${Utils.calculateNumberOfTreasuresInALLRounds()}  ${clearTimeStr}`;
+        return `${this.numberOfCollectedTreasures}/${Utils.calculateNumberOfTreasuresInALLRounds()} ${clearTimeStr}`;
     }
 
     private isNewRecord(isGameClear: boolean, currentNumberOfCollectedTreasures: number, currentElapedFrame: number) {

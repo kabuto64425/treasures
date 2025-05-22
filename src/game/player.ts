@@ -1,3 +1,4 @@
+import * as Util from "./utils";
 import { DIRECTION } from "./drection";
 import { Footprint } from "./footprint";
 import * as GameConstants from "./gameConstants";
@@ -23,6 +24,7 @@ export class Player {
         this.column = iniColumn;
         this.chargeAmount = 0;
         this.moveCost = params.playerMoveCost;
+        // 先行入力受付は、暫定チャージ中いつでもできるように第２引数を指定している。多分これで確定しそう。
         this.playerDirectionBuffer = new PlayerDirectionBuffer(params.playerMoveCost, params.playerMoveCost, this.getLastMoveDirection);
         this.lastMoveDirection = undefined;
         this.footPrint = new Footprint(gameObjectFactory, params.visibleFootPrint, params.footPrintLimitFrame);
@@ -80,29 +82,17 @@ export class Player {
     }
 
     private canMove(direction: DIRECTION) {
-        const toRow = this.row + direction.dr;
-        const toCol = this.column + direction.dc;
-        if (toRow < 0) {
-            return false;
-        }
-        if (toRow >= GameConstants.H) {
-            return false;
-        }
-        if (toCol < 0) {
-            return false;
-        }
-        if (toCol >= GameConstants.W) {
-            return false;
-        }
-        if (GameConstants.FIELD[toRow][toCol] === 1) {
+        const nextPosition = Util.calculateNextPosition(this.position(), direction);
+        if (GameConstants.FIELD[nextPosition.row][nextPosition.column] === 1) {
             return false;
         }
         return true;
     }
 
     private move(direction: DIRECTION, currentFrame : number) {
-        this.row += direction.dr;
-        this.column += direction.dc;
+        const nextPosition = Util.calculateNextPosition(this.position(), direction);
+        this.row = nextPosition.row;
+        this.column = nextPosition.column;
         this.lastMoveDirection = direction;
         this.footPrint.push(this.position(), currentFrame);
         this.chargeAmount = 0;
