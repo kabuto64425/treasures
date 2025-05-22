@@ -27,9 +27,13 @@ export function calculateNumberOfTreasuresInALLRounds() {
     return GameConstants.numberOfTreasuresPerRound * GameConstants.numberOfTreasuresRounds;
 }
 
-export function calculateNextPosition(position : Position, direction: DIRECTION): Position {
+export function calculateNextPosition(position: Position, direction: DIRECTION): Position {
     return {
         row: (position.row + direction.dr + GameConstants.H) % GameConstants.H,
         column: (position.column + direction.dc + GameConstants.W) % GameConstants.W,
     }
+}
+
+export function isSamePosition(positionA: Position, positionB: Position) {
+    return positionA.row === positionB.row && positionA.column === positionB.column;
 }

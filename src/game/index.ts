@@ -3,6 +3,7 @@ export * from "./logger"
 export * from "./drection";
 export * from "./enemy";
 export * from "./fieldEvalution";
+export * from "./footprint"
 export * from "./gameConstants";
 export * from "./gameScene";
 export * from "./gameSceneGeneralSupervision";
