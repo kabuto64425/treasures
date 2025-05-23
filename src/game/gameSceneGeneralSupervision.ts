@@ -100,6 +100,16 @@ export class GameSceneGeneralSupervision {
                 fieldGraphics.strokeRect(j * GameConstants.GRID_SIZE, i * GameConstants.GRID_SIZE, GameConstants.GRID_SIZE, GameConstants.GRID_SIZE);
             }
         }
+        
+        this.gameObjectFactory.text(3 * GameConstants.GRID_SIZE + 5, 0 * GameConstants.GRID_SIZE, "↑", {fontSize: "22px", color: "#000000"});
+        this.gameObjectFactory.text(4 * GameConstants.GRID_SIZE + 5, 0 * GameConstants.GRID_SIZE, "↑", {fontSize: "22px", color: "#000000"});
+        this.gameObjectFactory.text(37 * GameConstants.GRID_SIZE + 5, 0 * GameConstants.GRID_SIZE, "↑", {fontSize: "22px", color: "#000000"});
+        this.gameObjectFactory.text(38 * GameConstants.GRID_SIZE + 5, 0 * GameConstants.GRID_SIZE, "↑", {fontSize: "22px", color: "#000000"});
+
+        this.gameObjectFactory.text(3 * GameConstants.GRID_SIZE + 5, 31 * GameConstants.GRID_SIZE, "↓", {fontSize: "22px", color: "#000000"});
+        this.gameObjectFactory.text(4 * GameConstants.GRID_SIZE + 5, 31 * GameConstants.GRID_SIZE, "↓", {fontSize: "22px", color: "#000000"});
+        this.gameObjectFactory.text(37 * GameConstants.GRID_SIZE + 5, 31 * GameConstants.GRID_SIZE, "↓", {fontSize: "22px", color: "#000000"});
+        this.gameObjectFactory.text(38 * GameConstants.GRID_SIZE + 5, 31 * GameConstants.GRID_SIZE, "↓", {fontSize: "22px", color: "#000000"});
 
         // 壁描画
         for (let i = 0; i < GameConstants.H; i++) {
