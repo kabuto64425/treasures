@@ -8,6 +8,9 @@ export const GRID_SIZE = 22;
 export const H = 32;
 export const W = 42;
 
+export const FIELD_WIDTH = W * GRID_SIZE;
+export const FIELD_HEIGHT = H * GRID_SIZE;
+
 /*
 requestAnimationFameを使用しているので、60しか設定できないと思っていて良い。
 ディスプレイのフレッシュレートに依存しているみたいで、多くのフレッシュレートが60のため60固定

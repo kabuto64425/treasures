@@ -7,7 +7,7 @@ export class TreasuresRoundSupervision implements ISingleRoundSupervision {
     private readonly treasureList: Treasure[];
 
     constructor(gameObjectFactory: Phaser.GameObjects.GameObjectFactory) {
-        this.treasureList = Array.from({ length: GameConstants.numberOfTreasuresRounds }, _ => {
+        this.treasureList = Array.from({ length: GameConstants.numberOfTreasuresPerRound }, _ => {
             return new Treasure(gameObjectFactory, 0xffff00, false);
         });
     }
@@ -42,6 +42,18 @@ export class TreasuresRoundSupervision implements ISingleRoundSupervision {
 
     extractAppearanceTreasures(): Treasure[] {
         return this.treasureList.filter(t => t.isAppearance());
+    }
+
+    handlePause(): void {
+        this.treasureList.forEach(treasure => {
+            treasure.hide();
+        });
+    }
+
+    handleResume(): void {
+        this.treasureList.forEach(treasure => {
+            treasure.show();
+        });
     }
 
     private setAllTreasuresStateAppearance() {

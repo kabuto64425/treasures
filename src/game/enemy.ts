@@ -74,6 +74,14 @@ export class Enemy implements IFieldActor {
         this.graphics.fillRect(this.column * GameConstants.GRID_SIZE, this.row * GameConstants.GRID_SIZE, GameConstants.GRID_SIZE, GameConstants.GRID_SIZE);
     }
 
+    show() {
+        this.graphics.setVisible(true);
+    }
+
+    hide() {
+        this.graphics.setVisible(false);
+    }
+
     onCollideWithPlayer(): void {
         this.onPlayerCaptured();
     }

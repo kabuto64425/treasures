@@ -16,8 +16,8 @@ export class RetryLongButton {
     // @ts-ignore リクエストを送る処理を必ずいれるので使う
     private readonly requestRetryGameFromUi: () => void;
 
-    private readonly barWidth = 100;
-    private readonly barHeight = 20;
+    private readonly barWidth = 70;
+    private readonly barHeight = 17;
 
     private repeatCount = 0;
 
@@ -36,17 +36,17 @@ export class RetryLongButton {
         this.hasGameStarted = generalSupervision.hasGameStarted;
         this.requestRetryGameFromUi = generalSupervision.getInputCoordinator().requestRetryGameFromUi;
 
-        this.image = gameObjectCreator.image({ x: 1025, y: 550, key: "retry" }, false);
-        this.image.setScale(0.7)
+        this.image = gameObjectCreator.image({ x: 1100, y: 550, key: "retry" }, false);
+        this.image.setScale(0.5);
 
         uiLayer.add(this.image);
 
-        this.progressBox = gameObjectCreator.graphics({ x: 975, y: 450, key: "retry" }, false);
+        this.progressBox = gameObjectCreator.graphics({ x: 1063, y: 490, key: "retry" }, false);
         this.progressBox.setVisible(false);
         this.progressBox.fillStyle(0x222222, 0.8);
         this.progressBox.fillRect(0, 0, this.barWidth, this.barHeight);
         uiLayer.add(this.progressBox);
-        this.progressBar = gameObjectCreator.graphics({ x: 975, y: 450, key: "retry" }, false);
+        this.progressBar = gameObjectCreator.graphics({ x: 1063, y: 490, key: "retry" }, false);
         this.progressBar.setVisible(false);
         this.progressBar.fillStyle(0xffff00, 0.8);
         this.progressBar.fillRect(0, 0, this.barWidth, this.barHeight);

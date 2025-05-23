@@ -19,6 +19,7 @@ export class InputCoordinator {
 
     private isStartGameRequestedFromUi = false;
     private isRetryGameRequestedFromUi = false;
+    private isPauseGameRequestedFromUi = false;
 
     private readonly cursorKeysPressOrderRankMap: Map<string, number>;
 
@@ -127,6 +128,11 @@ export class InputCoordinator {
         this.isRetryGameRequestedFromUi = true;
     }
 
+    readonly requestPauseGameFromUi = () => {
+        Logger.debug("requestPauseGame");
+        this.isPauseGameRequestedFromUi = true;
+    }
+
     // 審査
     approveRequestedAction() {
         // ゲームメニューに関する審査
@@ -134,7 +140,9 @@ export class InputCoordinator {
         let pauseGame = false;
         let retryGame = false;
 
-        if (this.isRetryGameRequestedFromUi) {
+        if(this.isPauseGameRequestedFromUi) {
+            pauseGame = true;
+        }else if (this.isRetryGameRequestedFromUi) {
             retryGame = true;
         } else if (this.isStartGameRequestedFromUi) {
             startGame = true;
@@ -161,6 +169,7 @@ export class InputCoordinator {
         this.isPauseGameRequestedFromKey = false;
         this.isStartGameRequestedFromUi = false;
         this.isRetryGameRequestedFromUi = false;
+        this.isPauseGameRequestedFromUi = false;
     }
 
     // 審査結果は渡せるようにしておく

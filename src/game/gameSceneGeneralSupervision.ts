@@ -113,10 +113,6 @@ export class GameSceneGeneralSupervision {
             }
         }
 
-        this.overlay.fillStyle(0xd20a13, 0.5).fillRect(0, 0, GameConstants.D_WIDTH, GameConstants.D_HEIGHT);
-        this.overlay.setDepth(99);
-        this.overlay.setVisible(false);
-
         // プレイヤー描画
         this.player.setup(this.recorder.getElapsedFrame());
         this.player.draw();
@@ -192,11 +188,27 @@ export class GameSceneGeneralSupervision {
     }
 
     readonly pauseGame = () => {
+        this.overlay.clear();
+        this.overlay.fillStyle(0xffffff, 0.5).fillRect(0, 0, GameConstants.FIELD_WIDTH, GameConstants.FIELD_HEIGHT);
+        this.overlay.setDepth(99);
         this.gameState = GameSceneGeneralSupervision.GAME_STATE.PAUSE;
+
+        this.enemyList.forEach(enemy => {
+            enemy.hide();
+        });
+
+        this.roundsSupervision.getCurrentRoundSupervision().handlePause();
     }
 
     readonly resumeGame = () => {
+        this.overlay.clear();
         this.gameState = GameSceneGeneralSupervision.GAME_STATE.PLAYING;
+
+        this.enemyList.forEach(enemy => {
+            enemy.show();
+        });
+
+        this.roundsSupervision.getCurrentRoundSupervision().handleResume();
     }
 
     getInputCoordinator() {
@@ -206,7 +218,9 @@ export class GameSceneGeneralSupervision {
     // onPlayerCapturedは、「プレーヤーが捕まる」という認識でいいらしい by chatgpt
     readonly onPlayerCaptured = () => {
         if (!this.params.noGameOverMode) {
-            this.overlay.setVisible(true);
+            this.overlay.clear();
+            this.overlay.fillStyle(0xd20a13, 0.5).fillRect(0, 0, GameConstants.FIELD_WIDTH, GameConstants.FIELD_HEIGHT);
+            this.overlay.setDepth(99);
             this.ui.showGameOverText();
             this.gameState = GameSceneGeneralSupervision.GAME_STATE.GAME_OVER;
             this.updateBestRecord(this.isGameComplete(), this.recorder.getNumberOfCollectedTreasures(), this.recorder.getElapsedFrame());

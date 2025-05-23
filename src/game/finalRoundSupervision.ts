@@ -34,6 +34,14 @@ export class FinalRoundSupervision implements ISingleRoundSupervision {
         return [this.goal];
     }
 
+    handlePause(): void {
+        this.goal.hide();
+    }
+
+    handleResume(): void {
+        this.goal.show();
+    }
+
     private setStateAppearance() {
         this.goal.setStateAppearance();
     }

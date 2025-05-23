@@ -26,6 +26,8 @@ export class Ui {
 
     private timerEvent: Phaser.Time.TimerEvent;
 
+    private readonly pause: Phaser.GameObjects.Image;
+
     private readonly retryLongButton: RetryLongButton;
 
     private readonly deleteRecord: Phaser.GameObjects.Image;
@@ -53,6 +55,7 @@ export class Ui {
     private readonly deleteBestRecord: () => void;
 
     private readonly requestStartGameFromUi: () => void;
+    private readonly requestPauseGameFromUi: () => void;
 
     private readonly getApprovedActionInfo: () => {
         startGame: boolean,
@@ -79,6 +82,7 @@ export class Ui {
         this.deleteBestRecord = bestRecord.deleteBestRecord;
 
         this.requestStartGameFromUi = generalSupervision.getInputCoordinator().requestStartGameFromUi;
+        this.requestPauseGameFromUi = generalSupervision.getInputCoordinator().requestPauseGameFromUi;
         this.getApprovedActionInfo = generalSupervision.getInputCoordinator().getApprovedActionInfo;
 
         this.uiLayer = gameObjectFactory.layer();
@@ -128,10 +132,14 @@ export class Ui {
         this.progressBar.fillRect(0, 0, this.barWidth, this.barHeight);
         this.uiLayer.add(this.progressBar);
 
+        this.pause = gameObjectCreator.image({ x: 1000, y: 550, key: "pause" }, false);
+        this.pause.setScale(0.5);
+        this.uiLayer.add(this.pause);
+
         this.retryLongButton = new RetryLongButton(generalSupervision, this.uiLayer, this.clock, this.scenePlugin, gameObjectCreator);
 
         this.deleteRecord = gameObjectCreator.image({ x: 1195, y: 550, key: "delete" }, false);
-        this.deleteRecord.setScale(0.7);
+        this.deleteRecord.setScale(0.5);
         this.uiLayer.add(this.deleteRecord);
 
         this.timeText = gameObjectCreator.bitmapText({ x: 970, y: 10, font: "font", text: "0:00.000" }, false);
@@ -167,8 +175,16 @@ export class Ui {
         this.play.on("pointerout", () => this.play.clearTint());
 
         this.play.on("pointerup", () => {
-            Logger.debug("pointerup");
             this.requestStartGameFromUi();
+        });
+
+        this.pause.setInteractive();
+
+        this.pause.on("pointerover", () => this.pause.setTint(0x44ff44));
+        this.pause.on("pointerout", () => this.pause.clearTint());
+
+        this.pause.on("pointerup", () => {
+            this.requestPauseGameFromUi();
         });
     }
 

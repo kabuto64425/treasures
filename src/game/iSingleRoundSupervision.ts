@@ -8,4 +8,6 @@ export interface ISingleRoundSupervision {
     isRoundCompleted(): boolean;
     isFinalRound(): boolean;
     extractAppearanceTreasures(): IFieldActor[];
+    handlePause(): void;
+    handleResume(): void;
 }
