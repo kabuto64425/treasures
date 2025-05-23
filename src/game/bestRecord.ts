@@ -70,7 +70,7 @@ export class BestRecord {
             try {
                 localStorage.setItem("bestRecord", JSON.stringify({
                     "bestNumberOfCollectedTreasures": this.numberOfCollectedTreasures,
-                    "fastestClearElapsedFrame": this.elapsedFrame,
+                    "fastestCompleteElapsedFrame": this.elapsedFrame,
                 }));
             } catch (e) {
             }
