@@ -30,14 +30,14 @@ export class GameSceneGeneralSupervision {
 
     private overlay: Phaser.GameObjects.Graphics;
 
-    private updateBestRecord: (isGameClear: boolean, currentNumberOfCollectedTreasures: number, currentElapedFrame: number) => boolean;
+    private updateBestRecord: (isGameComplete: boolean, currentNumberOfCollectedTreasures: number, currentElapedFrame: number) => boolean;
 
     private static readonly GAME_STATE = {
         INITIALIZED: -1,
         STANDBY: 0,
         READY: 1,
         PLAYING: 2,
-        GAME_CLEAR: 3,
+        GAME_COMPLETE: 3,
         GAME_OVER: 4,
     };
 
@@ -111,7 +111,6 @@ export class GameSceneGeneralSupervision {
                 }
             }
         }
-
 
         this.overlay.fillStyle(0xd20a13, 0.5).fillRect(0, 0, GameConstants.D_WIDTH, GameConstants.D_HEIGHT);
         this.overlay.setDepth(99);
@@ -201,7 +200,7 @@ export class GameSceneGeneralSupervision {
             this.overlay.setVisible(true);
             this.ui.showGameOverText();
             this.gameState = GameSceneGeneralSupervision.GAME_STATE.GAME_OVER;
-            this.updateBestRecord(this.isGameClear(), this.recorder.getNumberOfCollectedTreasures(), this.recorder.getElapsedFrame());
+            this.updateBestRecord(this.isGameComplete(), this.recorder.getNumberOfCollectedTreasures(), this.recorder.getElapsedFrame());
             this.ui.updateBestRecordText();
         }
     }
@@ -209,8 +208,8 @@ export class GameSceneGeneralSupervision {
     readonly onGameCompleted = () => {
         this.ui.showCongratulationsText();
 
-        this.gameState = GameSceneGeneralSupervision.GAME_STATE.GAME_CLEAR;
-        this.updateBestRecord(this.isGameClear(), this.recorder.getNumberOfCollectedTreasures(), this.recorder.getElapsedFrame());
+        this.gameState = GameSceneGeneralSupervision.GAME_STATE.GAME_COMPLETE;
+        this.updateBestRecord(this.isGameComplete(), this.recorder.getNumberOfCollectedTreasures(), this.recorder.getElapsedFrame());
         this.ui.updateBestRecordText();
     }
 
@@ -237,11 +236,11 @@ export class GameSceneGeneralSupervision {
         return this.gameState === GameSceneGeneralSupervision.GAME_STATE.GAME_OVER;
     }
 
-    private isGameClear = () => {
-        return this.gameState === GameSceneGeneralSupervision.GAME_STATE.GAME_CLEAR;
+    private isGameComplete = () => {
+        return this.gameState === GameSceneGeneralSupervision.GAME_STATE.GAME_COMPLETE;
     }
 
     readonly isGamePlayed = () => {
-        return this.isPlaying() || this.isGameOver() || this.isGameClear();
+        return this.isPlaying() || this.isGameOver() || this.isGameComplete();
     }
 }

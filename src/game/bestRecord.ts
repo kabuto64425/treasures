@@ -21,8 +21,8 @@ export class BestRecord {
             if (bestRecordData.bestNumberOfCollectedTreasures) {
                 this.numberOfCollectedTreasures = bestRecordData.bestNumberOfCollectedTreasures;
             }
-            if (bestRecordData.fastestClearElapsedFrame) {
-                this.elapsedFrame = bestRecordData.fastestClearElapsedFrame;
+            if (bestRecordData.fastestCompleteElapsedFrame) {
+                this.elapsedFrame = bestRecordData.fastestCompleteElapsedFrame;
             }
         }
     }
@@ -36,15 +36,15 @@ export class BestRecord {
     }
 
     readonly createBestRecordStr = () => {
-        let clearTimeStr = "--:--.---";
+        let completeTimeStr = "--:--.---";
         if (this.elapsedFrame) {
-            clearTimeStr = Utils.createFormattedTimeFromFrame(this.elapsedFrame);
+            completeTimeStr = Utils.createFormattedTimeFromFrame(this.elapsedFrame);
         }
-        return `${this.numberOfCollectedTreasures}/${Utils.calculateNumberOfTreasuresInALLRounds()} ${clearTimeStr}`;
+        return `${this.numberOfCollectedTreasures}/${Utils.calculateNumberOfTreasuresInALLRounds()} ${completeTimeStr}`;
     }
 
-    private isNewRecord(isGameClear: boolean, currentNumberOfCollectedTreasures: number, currentElapedFrame: number) {
-        if (isGameClear) {
+    private isNewRecord(isGameComplete: boolean, currentNumberOfCollectedTreasures: number, currentElapedFrame: number) {
+        if (isGameComplete) {
             // ゲームクリアなので、獲得宝数はベストレコードと並ぶはずだが、念の為確認
             if (currentNumberOfCollectedTreasures >= this.numberOfCollectedTreasures) {
                 if (!this.elapsedFrame) {
@@ -57,12 +57,12 @@ export class BestRecord {
         return currentNumberOfCollectedTreasures >= this.numberOfCollectedTreasures;
     }
 
-    readonly updateBestRecord = (isGameClear: boolean, currentNumberOfCollectedTreasures: number, currentElapedFrame: number) => {
-        if (!this.isNewRecord(isGameClear, currentNumberOfCollectedTreasures, currentElapedFrame)) {
+    readonly updateBestRecord = (isGameComplete: boolean, currentNumberOfCollectedTreasures: number, currentElapedFrame: number) => {
+        if (!this.isNewRecord(isGameComplete, currentNumberOfCollectedTreasures, currentElapedFrame)) {
             return false;
         }
         this.numberOfCollectedTreasures = currentNumberOfCollectedTreasures;
-        if (isGameClear) {
+        if (isGameComplete) {
             this.elapsedFrame = currentElapedFrame;
         }
 
