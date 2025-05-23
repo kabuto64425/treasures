@@ -7,15 +7,15 @@ export class PlayerDirectionBuffer {
     private readonly inputPreChargeFrames: number;
     private readonly getLastMoveDirection: () => DIRECTION | undefined;
 
-    constructor(playerMoveCost: number, inputPreChargeFrames: number, getLastMoveDirection: () => DIRECTION| undefined) {
+    constructor(playerMoveCost: number, inputPreChargeFrames: number, getLastMoveDirection: () => DIRECTION | undefined) {
         this.directionBuffer = undefined;
         this.playerMoveCost = playerMoveCost;
         this.inputPreChargeFrames = inputPreChargeFrames;
         this.getLastMoveDirection = getLastMoveDirection;
     }
 
-    trySetDirectionBuffer(direction: DIRECTION, currentCharge: number) : boolean {
-        if(this.getLastMoveDirection() !== undefined && direction === this.getLastMoveDirection()) {
+    trySetDirectionBuffer(direction: DIRECTION, currentCharge: number): boolean {
+        if (this.getLastMoveDirection() !== undefined && direction === this.getLastMoveDirection()) {
             return false;
         }
         if (currentCharge >= this.playerMoveCost - this.inputPreChargeFrames) {

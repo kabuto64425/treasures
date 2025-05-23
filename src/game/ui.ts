@@ -38,8 +38,8 @@ export class Ui {
     private readonly isStandby: () => boolean;
     private readonly setReady: () => void;
 
-    private readonly pauseGame:() => void;
-    private readonly resumeGame:() => void;
+    private readonly pauseGame: () => void;
+    private readonly resumeGame: () => void;
 
     private readonly isPlaying: () => boolean;
     private readonly isPause: () => boolean;
@@ -197,11 +197,11 @@ export class Ui {
             }
         }
 
-        if(approvedActionInfo.pauseGame) {
-            if(this.isPlaying()) {
+        if (approvedActionInfo.pauseGame) {
+            if (this.isPlaying()) {
                 Logger.debug("pause");
                 this.pauseGame();
-            } else if(this.isPause()) {
+            } else if (this.isPause()) {
                 Logger.debug("resume");
                 this.resumeGame();
             }

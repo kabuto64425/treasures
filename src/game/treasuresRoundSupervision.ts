@@ -11,7 +11,7 @@ export class TreasuresRoundSupervision implements ISingleRoundSupervision {
             return new Treasure(gameObjectFactory, 0xffff00, false);
         });
     }
-    
+
     setup(): void {
         this.setupTreasurePositions();
     }

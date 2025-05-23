@@ -77,7 +77,7 @@ export class RetryLongButton {
         if (!this.hasGameStarted()) {
             return;
         }
-        if(approved) {
+        if (approved) {
             this.repeatCount++;
             this.progressBox.setVisible(true);
             this.progressBar.setVisible(true);
@@ -89,7 +89,7 @@ export class RetryLongButton {
 
             this.progressBar.fillRect(0, 0, this.barWidth * progress, this.barHeight);
 
-            if(this.repeatCount >= GameConstants.FPS) {
+            if (this.repeatCount >= GameConstants.FPS) {
                 // 押し続けてたのでシーンリセット実行
                 this.scenePlugin.restart();
             }

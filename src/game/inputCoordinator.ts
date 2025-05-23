@@ -56,12 +56,12 @@ export class InputCoordinator {
 
     private pickDirectionMaxOrderRank() {
         const maxRank = this.maxRankCusorKeysPressOrder();
-        if(maxRank === NO_PRESS_RANK) {
+        if (maxRank === NO_PRESS_RANK) {
             return undefined;
         }
-        for(const direction of DIRECTION.values()) {
+        for (const direction of DIRECTION.values()) {
             const value = this.cursorKeysPressOrderRankMap.get(direction.keyName);
-            if(value === maxRank) {
+            if (value === maxRank) {
                 return direction;
             }
         }
@@ -69,10 +69,10 @@ export class InputCoordinator {
         return undefined;
     }
 
-    private updateCursorKeyRank(cursorKey : Phaser.Input.Keyboard.Key, direction : DIRECTION, maxRank : number, inputInspector:string[]) {
-        if(cursorKey.isDown) {
+    private updateCursorKeyRank(cursorKey: Phaser.Input.Keyboard.Key, direction: DIRECTION, maxRank: number, inputInspector: string[]) {
+        if (cursorKey.isDown) {
             inputInspector.push(direction.keyName);
-            if(this.cursorKeysPressOrderRankMap.get(direction.keyName) === NO_PRESS_RANK) {
+            if (this.cursorKeysPressOrderRankMap.get(direction.keyName) === NO_PRESS_RANK) {
                 this.cursorKeysPressOrderRankMap.set(direction.keyName, maxRank + 1);
             }
         } else {
@@ -94,7 +94,7 @@ export class InputCoordinator {
         const maxRank = Math.max(this.maxRankCusorKeysPressOrder(), 0);
 
         // デバッグ用
-        const inputInspector:string[] = [];
+        const inputInspector: string[] = [];
 
         this.updateCursorKeyRank(this.cursorKey.left, DIRECTION.LEFT, maxRank, inputInspector);
         this.updateCursorKeyRank(this.cursorKey.up, DIRECTION.UP, maxRank, inputInspector);
@@ -138,7 +138,7 @@ export class InputCoordinator {
             retryGame = true;
         } else if (this.isStartGameRequestedFromUi) {
             startGame = true;
-        } else if(this.isPauseGameRequestedFromKey) {
+        } else if (this.isPauseGameRequestedFromKey) {
             pauseGame = true;
         } else if (this.isRetryGameRequestedFromKey) {
             retryGame = true;

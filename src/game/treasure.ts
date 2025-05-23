@@ -67,7 +67,7 @@ export class Treasure implements IFieldActor {
     onCollideWithPlayer(): void {
         this.state = Treasure.TREASURE_STATE.COLLECTED;
         this.clearDisplay();
-        if(!this.isGoal) {
+        if (!this.isGoal) {
             RecorderMediator.notifyTreasureCollected();
         }
     }

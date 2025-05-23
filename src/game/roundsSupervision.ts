@@ -13,12 +13,12 @@ export class RoundsSupervision {
         this.onGameCompleted = onGameCompleted;
         // +1でファイナルラウンドに対応しているのは暫定
         this.singleRoundSupervisionList = Array.from({ length: GameConstants.numberOfTreasuresRounds + 1 }, (_, i) =>
-            (i === GameConstants.numberOfTreasuresRounds - 1)? new FinalRoundSupervision(gameObjectFactory) : new TreasuresRoundSupervision(gameObjectFactory)
+            (i === GameConstants.numberOfTreasuresRounds - 1) ? new FinalRoundSupervision(gameObjectFactory) : new TreasuresRoundSupervision(gameObjectFactory)
         );
     }
 
     setup() {
-        for(const round of this.singleRoundSupervisionList) {
+        for (const round of this.singleRoundSupervisionList) {
             round.setup();
         }
     }

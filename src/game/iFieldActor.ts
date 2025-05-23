@@ -1,5 +1,5 @@
 export interface IFieldActor {
-    position():  {
+    position(): {
         row: number;
         column: number;
     };

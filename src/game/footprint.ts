@@ -48,7 +48,7 @@ export class Footprint {
         this.graphics.clear();
         this.graphics.lineStyle(0, 0x0000ff, 0.3);
         this.graphics.fillStyle(0x0000ff, 0.3);
-        for(const footprint of this.queue) {
+        for (const footprint of this.queue) {
             footprint.position;
             this.graphics.fillRect(footprint.position.column * GameConstants.GRID_SIZE, footprint.position.row * GameConstants.GRID_SIZE, GameConstants.GRID_SIZE, GameConstants.GRID_SIZE);
         }

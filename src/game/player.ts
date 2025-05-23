@@ -49,7 +49,7 @@ export class Player {
         this.footPrint.push(this.position(), currentFrame);
     }
 
-    resolvePlayerFrame(playerDirection: DIRECTION | undefined, currentFrame : number) {
+    resolvePlayerFrame(playerDirection: DIRECTION | undefined, currentFrame: number) {
         // 先行入力設定
         // 2方向入力されている場合は、どちらか一方を先行入力に設定
         if (playerDirection !== undefined) {
@@ -89,7 +89,7 @@ export class Player {
         return true;
     }
 
-    private move(direction: DIRECTION, currentFrame : number) {
+    private move(direction: DIRECTION, currentFrame: number) {
         const nextPosition = Util.calculateNextPosition(this.position(), direction);
         this.row = nextPosition.row;
         this.column = nextPosition.column;
