@@ -64,7 +64,7 @@ export class InputCoordinator {
         return undefined;
     }
 
-    updateCursorKeyRank(cursorKey : Phaser.Input.Keyboard.Key, direction : DIRECTION, maxRank : number, inputInspector:string[]) {
+    private updateCursorKeyRank(cursorKey : Phaser.Input.Keyboard.Key, direction : DIRECTION, maxRank : number, inputInspector:string[]) {
         if(cursorKey.isDown) {
             inputInspector.push(direction.keyName);
             if(this.cursorKeysPressOrderRankMap.get(direction.keyName) === NO_PRESS_RANK) {

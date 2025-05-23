@@ -53,11 +53,6 @@ export class Treasure implements IFieldActor {
         return this.state === Treasure.TREASURE_STATE.COLLECTED;
     }
 
-    place(row: number, column: number) {
-        this.row = row;
-        this.column = column;
-    }
-
     draw() {
         this.graphics.clear();
         this.graphics.lineStyle(0, this.color);
@@ -65,7 +60,7 @@ export class Treasure implements IFieldActor {
         this.graphics.fillRect(this.column * GameConstants.GRID_SIZE, this.row * GameConstants.GRID_SIZE, GameConstants.GRID_SIZE, GameConstants.GRID_SIZE);
     }
 
-    clearDisplay() {
+    private clearDisplay() {
         this.graphics.clear();
     }
 

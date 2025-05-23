@@ -39,15 +39,15 @@ export class RoundsSupervision {
         return this.currentRound;
     }
 
-    isFinalRound() {
+    private isFinalRound() {
         return this.getCurrentRoundSupervision().isFinalRound();
     }
 
-    isCompletedCurrentRound() {
+    private isCompletedCurrentRound() {
         return this.getCurrentRoundSupervision().isRoundCompleted();
     }
 
-    advanceRound() {
+    private advanceRound() {
         if (!this.isFinalRound()) {
             this.currentRound++;
         }
@@ -55,9 +55,5 @@ export class RoundsSupervision {
 
     getCurrentRoundSupervision() {
         return this.singleRoundSupervisionList[this.currentRound];
-    }
-
-    setRoundSupervision(round: number, singleRoundSupervision: ISingleRoundSupervision) {
-        this.singleRoundSupervisionList[round] = singleRoundSupervision;
     }
 }
