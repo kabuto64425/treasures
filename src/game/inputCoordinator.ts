@@ -11,9 +11,11 @@ export class InputCoordinator {
     private readonly cursorKey: Phaser.Types.Input.Keyboard.CursorKeys;
     private readonly enterKey: Phaser.Input.Keyboard.Key;
     private readonly spaceKey: Phaser.Input.Keyboard.Key;
+    private readonly shiftKey: Phaser.Input.Keyboard.Key;
 
     private isStartGameRequestedFromKey = false;
     private isRetryGameRequestedFromKey = false;
+    private isPauseGameRequestedFromKey = false;
 
     private isStartGameRequestedFromUi = false;
     private isRetryGameRequestedFromUi = false;
@@ -22,6 +24,7 @@ export class InputCoordinator {
 
     private approvedActionInfo: {
         readonly startGame: boolean,
+        readonly pauseGame: boolean,
         readonly retryGame: boolean,
         readonly playerDirection: DIRECTION | undefined
     };
@@ -34,9 +37,11 @@ export class InputCoordinator {
         this.cursorKey = this.inputPlugin.keyboard.createCursorKeys();
         this.enterKey = this.inputPlugin.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ENTER);
         this.spaceKey = this.inputPlugin.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
+        this.shiftKey = this.inputPlugin.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SHIFT);
 
         this.approvedActionInfo = {
             startGame: false,
+            pauseGame: false,
             retryGame: false,
             playerDirection: undefined
         }
@@ -76,11 +81,14 @@ export class InputCoordinator {
     }
 
     handleKeyboardInputs() {
-        if (this.enterKey.isDown) {
+        if (Phaser.Input.Keyboard.JustDown(this.enterKey)) {
             this.requestStartGameFromKey();
         }
-        if (this.spaceKey.isDown) {
+        if (this.shiftKey.isDown) {
             this.requestRetryGameFromKey();
+        }
+        if (Phaser.Input.Keyboard.JustDown(this.spaceKey)) {
+            this.requestPauseGameFromKey();
         }
 
         const maxRank = Math.max(this.maxRankCusorKeysPressOrder(), 0);
@@ -104,6 +112,11 @@ export class InputCoordinator {
         this.isRetryGameRequestedFromKey = true;
     }
 
+    private readonly requestPauseGameFromKey = () => {
+        Logger.debug("requestPauseGame");
+        this.isPauseGameRequestedFromKey = true;
+    }
+
     readonly requestStartGameFromUi = () => {
         Logger.debug("requestStartGame");
         this.isStartGameRequestedFromUi = true;
@@ -118,12 +131,15 @@ export class InputCoordinator {
     approveRequestedAction() {
         // ゲームメニューに関する審査
         let startGame = false;
+        let pauseGame = false;
         let retryGame = false;
 
         if (this.isRetryGameRequestedFromUi) {
             retryGame = true;
         } else if (this.isStartGameRequestedFromUi) {
             startGame = true;
+        } else if(this.isPauseGameRequestedFromKey) {
+            pauseGame = true;
         } else if (this.isRetryGameRequestedFromKey) {
             retryGame = true;
         } else if (this.isStartGameRequestedFromKey) {
@@ -133,6 +149,7 @@ export class InputCoordinator {
         // 審査結果
         this.approvedActionInfo = {
             startGame: startGame,
+            pauseGame: pauseGame,
             retryGame: retryGame,
             playerDirection: this.pickDirectionMaxOrderRank()
         }
@@ -141,6 +158,7 @@ export class InputCoordinator {
         // 申請に関するフラグをリセット
         this.isStartGameRequestedFromKey = false;
         this.isRetryGameRequestedFromKey = false;
+        this.isPauseGameRequestedFromKey = false;
         this.isStartGameRequestedFromUi = false;
         this.isRetryGameRequestedFromUi = false;
     }

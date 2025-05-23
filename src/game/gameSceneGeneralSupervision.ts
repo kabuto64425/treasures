@@ -39,6 +39,7 @@ export class GameSceneGeneralSupervision {
         PLAYING: 2,
         GAME_COMPLETE: 3,
         GAME_OVER: 4,
+        PAUSE: 5
     };
 
     constructor(scene: GameScene) {
@@ -190,6 +191,14 @@ export class GameSceneGeneralSupervision {
         }
     }
 
+    readonly pauseGame = () => {
+        this.gameState = GameSceneGeneralSupervision.GAME_STATE.PAUSE;
+    }
+
+    readonly resumeGame = () => {
+        this.gameState = GameSceneGeneralSupervision.GAME_STATE.PLAYING;
+    }
+
     getInputCoordinator() {
         return this.inputCoordinator;
     }
@@ -240,7 +249,15 @@ export class GameSceneGeneralSupervision {
         return this.gameState === GameSceneGeneralSupervision.GAME_STATE.GAME_COMPLETE;
     }
 
-    readonly isGamePlayed = () => {
-        return this.isPlaying() || this.isGameOver() || this.isGameComplete();
+    readonly isPause = () => {
+        return this.gameState === GameSceneGeneralSupervision.GAME_STATE.PAUSE;
+    }
+
+    readonly setPause = () => {
+        this.gameState = GameSceneGeneralSupervision.GAME_STATE.PAUSE;
+    }
+
+    readonly hasGameStarted = () => {
+        return this.isPlaying() || this.isGameOver() || this.isGameComplete() || this.isPause();
     }
 }

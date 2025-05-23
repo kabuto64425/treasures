@@ -11,7 +11,7 @@ export class RetryLongButton {
     private readonly progressBox: Phaser.GameObjects.Graphics;
     private readonly progressBar: Phaser.GameObjects.Graphics;
 
-    private readonly isGamePlayed: () => boolean;
+    private readonly hasGameStarted: () => boolean;
 
     // @ts-ignore リクエストを送る処理を必ずいれるので使う
     private readonly requestRetryGameFromUi: () => void;
@@ -33,7 +33,7 @@ export class RetryLongButton {
     constructor(generalSupervision: GameSceneGeneralSupervision, uiLayer: Phaser.GameObjects.Layer, clock: Phaser.Time.Clock, scenePlugin: Phaser.Scenes.ScenePlugin, gameObjectCreator: Phaser.GameObjects.GameObjectCreator) {
         this.clock = clock;
         this.scenePlugin = scenePlugin;
-        this.isGamePlayed = generalSupervision.isGamePlayed;
+        this.hasGameStarted = generalSupervision.hasGameStarted;
         this.requestRetryGameFromUi = generalSupervision.getInputCoordinator().requestRetryGameFromUi;
 
         this.image = gameObjectCreator.image({ x: 1025, y: 550, key: "retry" }, false);
@@ -74,7 +74,7 @@ export class RetryLongButton {
     }
 
     handleApprovedAction(approved: boolean) {
-        if (!this.isGamePlayed()) {
+        if (!this.hasGameStarted()) {
             return;
         }
         if(approved) {

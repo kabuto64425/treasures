@@ -38,6 +38,12 @@ export class Ui {
     private readonly isStandby: () => boolean;
     private readonly setReady: () => void;
 
+    private readonly pauseGame:() => void;
+    private readonly resumeGame:() => void;
+
+    private readonly isPlaying: () => boolean;
+    private readonly isPause: () => boolean;
+
     private readonly queryCurrentRecord: () => {
         elapsedFrame: number,
         numberOfCollectedTreasures: number
@@ -50,7 +56,8 @@ export class Ui {
 
     private readonly getApprovedActionInfo: () => {
         startGame: boolean,
-        retryGame: boolean
+        pauseGame: boolean,
+        retryGame: boolean,
     };
 
     constructor(generalSupervision: GameSceneGeneralSupervision, gameObjectFactory: Phaser.GameObjects.GameObjectFactory, gameObjectCreator: Phaser.GameObjects.GameObjectCreator, clock: Phaser.Time.Clock, scenePlugin: Phaser.Scenes.ScenePlugin, bestRecord: BestRecord) {
@@ -59,6 +66,12 @@ export class Ui {
 
         this.isStandby = generalSupervision.isStandby;
         this.setReady = generalSupervision.setReady;
+
+        this.pauseGame = generalSupervision.pauseGame;
+        this.resumeGame = generalSupervision.resumeGame;
+
+        this.isPlaying = generalSupervision.isPlaying;
+        this.isPause = generalSupervision.isPause;
 
         this.queryCurrentRecord = generalSupervision.queryCurrentRecord;
 
@@ -176,13 +189,25 @@ export class Ui {
     }
 
     handleApprovedAction() {
-        if(this.getApprovedActionInfo().startGame) {
-            if(this.isStandby()) {
+        const approvedActionInfo = this.getApprovedActionInfo();
+        if (approvedActionInfo.startGame) {
+            if (this.isStandby()) {
                 Logger.debug("startgame");
                 this.executeStartGameAction();
             }
         }
-        this.retryLongButton.handleApprovedAction(this.getApprovedActionInfo().retryGame);
+
+        if(approvedActionInfo.pauseGame) {
+            if(this.isPlaying()) {
+                Logger.debug("pause");
+                this.pauseGame();
+            } else if(this.isPause()) {
+                Logger.debug("resume");
+                this.resumeGame();
+            }
+        }
+
+        this.retryLongButton.handleApprovedAction(approvedActionInfo.retryGame);
     }
 
     private executeStartGameAction() {
