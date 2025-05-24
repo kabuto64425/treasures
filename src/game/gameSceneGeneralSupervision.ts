@@ -7,6 +7,8 @@ import { RoundsSupervision } from "./roundsSupervision";
 import { Ui } from "./ui";
 import { Recorder, RecorderMediator } from "./recoder";
 import { InputCoordinator } from "./inputCoordinator";
+import * as Util from "./utils"
+import { Logger } from "./logger";
 
 export class GameSceneGeneralSupervision {
     // これを使用してゲームの物体を生成すると、シーンに自動的に加わる
@@ -66,12 +68,12 @@ export class GameSceneGeneralSupervision {
         this.player = new Player(this.gameObjectFactory, GameConstants.parameterPlayer.row, GameConstants.parameterPlayer.column, this.params);
 
         //フィールド評価
-        this.fieldEvaluation = new FieldEvalution(scene.add, this.params.visibleFieldEvaluation);
+        this.fieldEvaluation = new FieldEvalution(this.gameObjectFactory, this.params.visibleFieldEvaluation);
 
         // 敵
         this.enemyList = [];
         for (let i = 0; i < GameConstants.numberOfEnemyies; i++) {
-            const enemy = new Enemy(scene.add, GameConstants.parametersOfEnemies[i].row, GameConstants.parametersOfEnemies[i].column,
+            const enemy = new Enemy(this.gameObjectFactory, GameConstants.parametersOfEnemies[i].row, GameConstants.parametersOfEnemies[i].column,
                 this.params.enemyMoveCost, GameConstants.parametersOfEnemies[i].priorityScanDirections, this.onPlayerCaptured,
                 this.player.getFootPrint().getFirstPrint, this.player.getFootPrint().onSteppedOnByEnemy
             );
@@ -100,16 +102,44 @@ export class GameSceneGeneralSupervision {
                 fieldGraphics.strokeRect(j * GameConstants.GRID_SIZE, i * GameConstants.GRID_SIZE, GameConstants.GRID_SIZE, GameConstants.GRID_SIZE);
             }
         }
-        
-        this.gameObjectFactory.text(3 * GameConstants.GRID_SIZE + 5, 0 * GameConstants.GRID_SIZE, "↑", {fontSize: "22px", color: "#000000"});
-        this.gameObjectFactory.text(4 * GameConstants.GRID_SIZE + 5, 0 * GameConstants.GRID_SIZE, "↑", {fontSize: "22px", color: "#000000"});
-        this.gameObjectFactory.text(37 * GameConstants.GRID_SIZE + 5, 0 * GameConstants.GRID_SIZE, "↑", {fontSize: "22px", color: "#000000"});
-        this.gameObjectFactory.text(38 * GameConstants.GRID_SIZE + 5, 0 * GameConstants.GRID_SIZE, "↑", {fontSize: "22px", color: "#000000"});
 
-        this.gameObjectFactory.text(3 * GameConstants.GRID_SIZE + 5, 31 * GameConstants.GRID_SIZE, "↓", {fontSize: "22px", color: "#000000"});
-        this.gameObjectFactory.text(4 * GameConstants.GRID_SIZE + 5, 31 * GameConstants.GRID_SIZE, "↓", {fontSize: "22px", color: "#000000"});
-        this.gameObjectFactory.text(37 * GameConstants.GRID_SIZE + 5, 31 * GameConstants.GRID_SIZE, "↓", {fontSize: "22px", color: "#000000"});
-        this.gameObjectFactory.text(38 * GameConstants.GRID_SIZE + 5, 31 * GameConstants.GRID_SIZE, "↓", {fontSize: "22px", color: "#000000"});
+        const roomGraphics = this.gameObjectFactory.graphics({
+            lineStyle: { width: 1, color: 0x000000, alpha: 1 },
+            fillStyle: { color: 0xffffff, alpha: 1 },
+        });
+        roomGraphics.setDepth(-1);
+        for (let i = 0; i < GameConstants.H; i++) {
+            for (let j = 0; j < GameConstants.W; j++) {
+                const roomRow = Util.findRoomRowIndex(i);
+                const roomColumn = Util.findRoomColumnIndex(j);
+
+                // 2次元グラデーション
+                const ratioY = roomRow / (GameConstants.ROOM_ROW_COUNT); // 縦方向の割合
+                const ratioX = roomColumn / (GameConstants.ROOM_COLUMN_COUNT); // 横方向の割合
+
+                // 左上(赤)→右下(青)のグラデーション
+                const r = Math.round(255 * (1 - ratioX) * (1 - ratioY));
+                const g = Math.round(255 * ratioX * (1 - ratioY));
+                const b = Math.round(255 * ratioY);
+
+                const color = (r << 16) | (g << 8) | b;
+
+                Logger.debug(roomColumn + roomRow * GameConstants.ROOM_COLUMN_COUNT, color, roomRow, roomColumn);
+
+                roomGraphics.fillStyle(color, 0.5);
+                roomGraphics.fillRect(j * GameConstants.GRID_SIZE, i * GameConstants.GRID_SIZE, GameConstants.GRID_SIZE, GameConstants.GRID_SIZE);
+            }
+        }
+
+        this.gameObjectFactory.text(3 * GameConstants.GRID_SIZE + 5, 0 * GameConstants.GRID_SIZE, "↑", { fontSize: "22px", color: "#000000" });
+        this.gameObjectFactory.text(4 * GameConstants.GRID_SIZE + 5, 0 * GameConstants.GRID_SIZE, "↑", { fontSize: "22px", color: "#000000" });
+        this.gameObjectFactory.text(37 * GameConstants.GRID_SIZE + 5, 0 * GameConstants.GRID_SIZE, "↑", { fontSize: "22px", color: "#000000" });
+        this.gameObjectFactory.text(38 * GameConstants.GRID_SIZE + 5, 0 * GameConstants.GRID_SIZE, "↑", { fontSize: "22px", color: "#000000" });
+
+        this.gameObjectFactory.text(3 * GameConstants.GRID_SIZE + 5, 31 * GameConstants.GRID_SIZE, "↓", { fontSize: "22px", color: "#000000" });
+        this.gameObjectFactory.text(4 * GameConstants.GRID_SIZE + 5, 31 * GameConstants.GRID_SIZE, "↓", { fontSize: "22px", color: "#000000" });
+        this.gameObjectFactory.text(37 * GameConstants.GRID_SIZE + 5, 31 * GameConstants.GRID_SIZE, "↓", { fontSize: "22px", color: "#000000" });
+        this.gameObjectFactory.text(38 * GameConstants.GRID_SIZE + 5, 31 * GameConstants.GRID_SIZE, "↓", { fontSize: "22px", color: "#000000" });
 
         // 壁描画
         for (let i = 0; i < GameConstants.H; i++) {

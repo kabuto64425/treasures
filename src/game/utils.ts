@@ -37,3 +37,23 @@ export function calculateNextPosition(position: Position, direction: DIRECTION):
 export function isSamePosition(positionA: Position, positionB: Position) {
     return positionA.row === positionB.row && positionA.column === positionB.column;
 }
+
+// 線形探索である
+export function findRoomRowIndex(i: number): number {
+    for (let row = 0; row < GameConstants.ROOM_ROW_COUNT - 1; row++) {
+        if (i < GameConstants.ROOM_ROW_BORDERS[row]) {
+            return row;
+        }
+    }
+    return GameConstants.ROOM_ROW_COUNT - 1;
+}
+
+// 線形探索である
+export function findRoomColumnIndex(i: number): number {
+    for (let column = 0; column < GameConstants.ROOM_COLUMN_COUNT - 1; column++) {
+        if (i < GameConstants.ROOM_COLUMN_BORDERS[column]) {
+            return column;
+        }
+    }
+    return GameConstants.ROOM_COLUMN_COUNT - 1;
+}

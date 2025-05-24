@@ -73,5 +73,14 @@ export const FIELD = [
     [1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1]
 ];
 
+// 上下端、左右端はBORDERSに含めてないことに注意
+export const ROOM_ROW_BORDERS = [11, 21];
+export const ROOM_COLUMN_BORDERS = [11, 21, 31];
+
+export const ROOM_ROW_COUNT = ROOM_ROW_BORDERS.length + 1;
+export const ROOM_COLUMN_COUNT = ROOM_COLUMN_BORDERS.length + 1;
+
+export const ROOM_COUNT = ROOM_ROW_COUNT * ROOM_COLUMN_COUNT;
+
 export const READY_DISPLAY_DURATION = 1000;
 export const GO_DISPLAY_DURATION = 500; 
