@@ -103,31 +103,33 @@ export class GameSceneGeneralSupervision {
             }
         }
 
-        const roomGraphics = this.gameObjectFactory.graphics({
-            lineStyle: { width: 1, color: 0x000000, alpha: 1 },
-            fillStyle: { color: 0xffffff, alpha: 1 },
-        });
-        roomGraphics.setDepth(-1);
-        for (let i = 0; i < GameConstants.H; i++) {
-            for (let j = 0; j < GameConstants.W; j++) {
-                const roomRow = Util.findRoomRowIndex(i);
-                const roomColumn = Util.findRoomColumnIndex(j);
+        if (this.params.enableVisibleRoomRanges) {
+            const roomGraphics = this.gameObjectFactory.graphics({
+                lineStyle: { width: 1, color: 0x000000, alpha: 1 },
+                fillStyle: { color: 0xffffff, alpha: 1 },
+            });
+            roomGraphics.setDepth(-1);
+            for (let i = 0; i < GameConstants.H; i++) {
+                for (let j = 0; j < GameConstants.W; j++) {
+                    const roomRow = Util.findRoomRowIndex(i);
+                    const roomColumn = Util.findRoomColumnIndex(j);
 
-                // 2次元グラデーション
-                const ratioY = roomRow / (GameConstants.ROOM_ROW_COUNT); // 縦方向の割合
-                const ratioX = roomColumn / (GameConstants.ROOM_COLUMN_COUNT); // 横方向の割合
+                    // 2次元グラデーション
+                    const ratioY = roomRow / (GameConstants.ROOM_ROW_COUNT); // 縦方向の割合
+                    const ratioX = roomColumn / (GameConstants.ROOM_COLUMN_COUNT); // 横方向の割合
 
-                // 左上(赤)→右下(青)のグラデーション
-                const r = Math.round(255 * (1 - ratioX) * (1 - ratioY));
-                const g = Math.round(255 * ratioX * (1 - ratioY));
-                const b = Math.round(255 * ratioY);
+                    // 左上(赤)→右下(青)のグラデーション
+                    const r = Math.round(255 * (1 - ratioX) * (1 - ratioY));
+                    const g = Math.round(255 * ratioX * (1 - ratioY));
+                    const b = Math.round(255 * ratioY);
 
-                const color = (r << 16) | (g << 8) | b;
+                    const color = (r << 16) | (g << 8) | b;
 
-                Logger.debug(roomColumn + roomRow * GameConstants.ROOM_COLUMN_COUNT, color, roomRow, roomColumn);
+                    Logger.debug(roomColumn + roomRow * GameConstants.ROOM_COLUMN_COUNT, color, roomRow, roomColumn);
 
-                roomGraphics.fillStyle(color, 0.5);
-                roomGraphics.fillRect(j * GameConstants.GRID_SIZE, i * GameConstants.GRID_SIZE, GameConstants.GRID_SIZE, GameConstants.GRID_SIZE);
+                    roomGraphics.fillStyle(color, 0.5);
+                    roomGraphics.fillRect(j * GameConstants.GRID_SIZE, i * GameConstants.GRID_SIZE, GameConstants.GRID_SIZE, GameConstants.GRID_SIZE);
+                }
             }
         }
 

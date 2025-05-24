@@ -6,5 +6,6 @@
     "enemyMoveCost": 15,
     "visibleFootPrint": false,
     "footPrintLimitFrame": 30,
+    "enableVisibleRoomRanges": false,
     "logLevel": "DEBUG"
 }

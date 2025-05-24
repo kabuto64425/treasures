@@ -1,0 +1,11 @@
+{
+    "noGameOverMode": true,
+    "visibleFieldEvaluation": true,
+    "enableUsingLocalstorage": true,
+    "playerMoveCost": 6,
+    "enemyMoveCost": 15,
+    "visibleFootPrint": true,
+    "footPrintLimitFrame": 30,
+    "enableVisibleRoomRanges": true,
+    "logLevel": "DEBUG"
+}
