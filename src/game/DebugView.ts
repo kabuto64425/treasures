@@ -1,21 +1,23 @@
 import GUI from "lil-gui";
-import { GameScene } from "./gameScene";
+import { DebugData } from "./debugData";
 
 export class DebugView {
     private readonly gui;
-    readonly getUpdateDuration: () => number;
-    readonly getFrameDelta: () => number;
+    private readonly data: DebugData;
 
-    constructor(scene: GameScene) {
+    constructor(data: DebugData) {
         this.gui = new GUI();
-        this.getUpdateDuration = scene.getUpdateDuration.bind(scene);
-        this.getFrameDelta = scene.getFrameDelta.bind(scene);
+        this.data = data;
     }
 
     setup() {
-        const view = this;
+        const view = this; // ← this をキャプチャして保持
+        this.gui.add(this.data, "updateDuration").listen();
+        this.gui.add(this.data, "frameDelta").listen();
+        this.gui.add({ get fps() { return 1000 / (view.data.frameDelta); }}, "fps").listen();
+        /*const view = this;
         this.gui.add({ get updateDuration() { return view.getUpdateDuration(); }}, "updateDuration").listen();
-        this.gui.add({ get frameDelta() { return view.getFrameDelta(); }}, "frameDelta").listen();
+        this.gui.add({ get frameDelta() { return view.getFrameDelta(); }}, "frameDelta").listen();*/
     }
 
     // 読み取り専用なら setter は不要

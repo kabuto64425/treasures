@@ -1,8 +1,8 @@
 import Phaser from "phaser";
 import { GameSceneGeneralSupervision } from "./gameSceneGeneralSupervision";
 import { BestRecord } from "./bestRecord";
-import { Logger } from "./logger";
 import { DebugView } from "./debugView";
+import { DebugData } from "./debugData";
 
 export class GameScene extends Phaser.Scene {
 
@@ -12,13 +12,13 @@ export class GameScene extends Phaser.Scene {
     // create内で、必ず初期化しておくこと
     private gameSceneGeneralSupervision!: GameSceneGeneralSupervision;
 
-    private updateDuration: number = 0;
-    private frameDelta: number = 0;
+    private debugData: DebugData;
 
     constructor(params: any, bestRecord: BestRecord) {
         super("gameScene");
         this.params = params;
         this.bestRecoed = bestRecord;
+        this.debugData = new DebugData();
     }
 
     preload() {
@@ -40,7 +40,7 @@ export class GameScene extends Phaser.Scene {
     }
 
     create() {
-        const view = new DebugView(this);
+        const view = new DebugView(this.debugData);
         Phaser.GameObjects.BitmapText.ParseFromAtlas(this, "font", "fontatlas", "azo-fire", "azoXML");
 
         this.gameSceneGeneralSupervision = new GameSceneGeneralSupervision(this);
@@ -58,9 +58,8 @@ export class GameScene extends Phaser.Scene {
         let now = performance.now();
         const gameSceneGeneralSupervision = this.gameSceneGeneralSupervision;
         gameSceneGeneralSupervision.updatePerFrame();
-        this.updateDuration = performance.now() - now;
-        this.frameDelta = _delta;
-        Logger.all(performance.now() - now, _delta, _time, this.time.now);
+        this.debugData.frameDelta = _delta;
+        this.debugData.updateDuration = performance.now() - now;
     }
 
     getParams() {
@@ -69,13 +68,5 @@ export class GameScene extends Phaser.Scene {
 
     getBestRecord() {
         return this.bestRecoed;
-    }
-
-    getUpdateDuration() {
-        return this.updateDuration;
-    }
-
-    getFrameDelta() {
-        return this.frameDelta;
     }
 }
