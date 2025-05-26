@@ -207,7 +207,7 @@ export class GameSceneGeneralSupervision {
 
         // 敵
         for (const enemy of this.enemyList) {
-            enemy.resolvePlayerFrame(this.fieldEvaluation);
+            enemy.resolveEnemyFrame(this.fieldEvaluation);
             enemy.draw();
         }
         DebugDataMediator.setEnemiesDebugValue(

@@ -54,7 +54,7 @@ export class Enemy implements IFieldActor {
 
     }
 
-    resolvePlayerFrame(fieldEvaluation: FieldEvalution) {
+    resolveEnemyFrame(fieldEvaluation: FieldEvalution) {
         if (this.isChargeCompleted()) {
             const direction = this.decideMoveDirection(fieldEvaluation);
             this.move(direction);
