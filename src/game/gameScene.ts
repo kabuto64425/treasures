@@ -16,7 +16,7 @@ export class GameScene extends Phaser.Scene {
 
     private debugData: DebugData;
 
-    private isDebugStepMode = true;
+    private isDebugStepMode = false;
     private doStepOnce = false;
 
     constructor(params: any, bestRecord: BestRecord) {
