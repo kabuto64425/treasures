@@ -54,10 +54,5 @@ export class DebugView {
             }, "row").listen();
         }
 
-        /*const view = this;
-        this.gui.add({ get updateDuration() { return view.getUpdateDuration(); }}, "updateDuration").listen();
-        this.gui.add({ get frameDelta() { return view.getFrameDelta(); }}, "frameDelta").listen();*/
     }
-
-    // 読み取り専用なら setter は不要
 }
