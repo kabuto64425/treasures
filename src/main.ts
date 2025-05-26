@@ -1,13 +1,9 @@
 import Phaser from "phaser";
 import * as Game from "./game";
 import { Logger } from "./game/logger";
+import * as Util from "./game/utils"
 
-const urlParams = new URLSearchParams(window.location.search);
-
-const env = urlParams.get("env") || "prod"; // デフォルト を'prod'にしておく
-
-const configFile = `/treasures//config/${(env === "dev") ? "dev.json" : "prod.json"}`
-
+const configFile = `/treasures//config/${(Util.isDebugEnv()) ? "dev.json" : "prod.json"}`
 
 fetch(configFile)
     .then(res => res.json())

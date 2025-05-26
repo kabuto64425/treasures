@@ -63,3 +63,7 @@ export function findRoomId(position: Position) {
     const roomColumn = findRoomColumnIndex(position.column);
     return roomColumn + roomRow * GameConstants.ROOM_COLUMN_COUNT;
 }
+
+export function isDebugEnv() {
+    return (import.meta.env.MODE === "development");
+}

@@ -3,6 +3,8 @@ import { GameSceneGeneralSupervision } from "./gameSceneGeneralSupervision";
 import { BestRecord } from "./bestRecord";
 import { DebugView } from "./debugView";
 import { DebugData, DebugDataMediator } from "./debugData";
+import * as Util from "./utils";
+import { Logger } from "./logger";
 
 export class GameScene extends Phaser.Scene {
 
@@ -13,6 +15,9 @@ export class GameScene extends Phaser.Scene {
     private gameSceneGeneralSupervision!: GameSceneGeneralSupervision;
 
     private debugData: DebugData;
+
+    private isDebugStepMode = true;
+    private doStepOnce = false;
 
     constructor(params: any, bestRecord: BestRecord) {
         super("gameScene");
@@ -46,9 +51,16 @@ export class GameScene extends Phaser.Scene {
 
         this.gameSceneGeneralSupervision = new GameSceneGeneralSupervision(this);
         this.gameSceneGeneralSupervision.setupSupervision();
-        if (import.meta.env.MODE === "development") {
+        if (Util.isDebugEnv()) {
             const view = new DebugView(this.debugData);
             view.setup();
+        }
+
+        if (Util.isDebugEnv()) {
+            this.input.keyboard.on('keydown-N', () => {
+                Logger.debug("n")
+                this.doStepOnce = true;
+            });
         }
     }
 
@@ -59,11 +71,19 @@ export class GameScene extends Phaser.Scene {
     }
 
     update(_time: number, _delta: number) {
+        if (this.isDebugStepMode && !this.doStepOnce) {
+            return; // スキップ（何もせず）
+        }
+
         let now = performance.now();
         const gameSceneGeneralSupervision = this.gameSceneGeneralSupervision;
         gameSceneGeneralSupervision.updatePerFrame();
         this.debugData.frameDelta = _delta;
         this.debugData.updateDuration = performance.now() - now;
+        
+        if (this.isDebugStepMode) {
+            this.doStepOnce = false;
+        }
     }
 
     getParams() {

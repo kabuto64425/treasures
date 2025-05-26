@@ -164,8 +164,9 @@ export class GameSceneGeneralSupervision {
         this.fieldEvaluation.updateEvaluation(this.player.position().row, this.player.position().column);
         this.fieldEvaluation.draw();
 
-        // 敵描画
+        // 敵
         for (const enemy of this.enemyList) {
+            enemy.setup();
             enemy.draw();
         }
         DebugDataMediator.setEnemiesDebugValue(
