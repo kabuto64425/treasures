@@ -57,3 +57,9 @@ export function findRoomColumnIndex(i: number): number {
     }
     return GameConstants.ROOM_COLUMN_COUNT - 1;
 }
+
+export function findRoomId(position: Position) {
+    const roomRow = findRoomRowIndex(position.row);
+    const roomColumn = findRoomColumnIndex(position.column);
+    return roomColumn + roomRow * GameConstants.ROOM_COLUMN_COUNT;
+}

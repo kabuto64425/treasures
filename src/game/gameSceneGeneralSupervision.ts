@@ -206,14 +206,7 @@ export class GameSceneGeneralSupervision {
 
         // 敵
         for (const enemy of this.enemyList) {
-            if (enemy.isChargeCompleted()) {
-                let enemyDist = enemy.decideMoveDirection(this.fieldEvaluation);
-                enemy.move(enemyDist);
-            } else {
-                enemy.charge();
-            }
-            enemy.handleFirstFootprintStep();
-
+            enemy.resolvePlayerFrame(this.fieldEvaluation);
             enemy.draw();
         }
         DebugDataMediator.setEnemiesDebugValue(

@@ -8,6 +8,7 @@ export class DebugData {
     player: {
         chargeAmount?: number,
         position?: Position,
+        roomId?: number,
         lastMoveDirection?: DIRECTION
     } = {
             chargeAmount: undefined,
@@ -18,6 +19,7 @@ export class DebugData {
     enemies: {
         chargeAmount?: number,
         position?: Position,
+        roomId?: number
     }[] = [];
 }
 

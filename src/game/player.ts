@@ -4,13 +4,13 @@ import { Footprint } from "./footprint";
 import * as GameConstants from "./gameConstants";
 import { IFieldActor } from "./iFieldActor";
 import { PlayerDirectionBuffer } from "./playerDirectionBuffer";
-import * as Utils from "./utils"
 import { DebugDataMediator } from "./debugData";
 
 export class Player {
     private readonly graphics: Phaser.GameObjects.Graphics;
     private row: number;
     private column: number;
+    private roomId: number;
     private chargeAmount: number;
     private readonly moveCost: number;
 
@@ -23,6 +23,7 @@ export class Player {
         this.graphics = gameObjectFactory.graphics();
         this.row = iniRow;
         this.column = iniColumn;
+        this.roomId = Util.findRoomId({row: this.row, column: this.column});
         this.chargeAmount = 0;
         this.moveCost = params.playerMoveCost;
         // 先行入力受付は、暫定チャージ中いつでもできるように第２引数を指定している。多分これで確定しそう。
@@ -75,6 +76,7 @@ export class Player {
             this.charge();
         }
 
+        this.roomId = Util.findRoomId(this.position());
         this.footPrint.resolveFootprintPerFrame(currentFrame);
 
         this.updateDebugData();
@@ -92,6 +94,7 @@ export class Player {
         return {
             chargeAmount: this.chargeAmount,
             position: this.position(),
+            roomId: this.roomId,
             lastMoveDirection: this.lastMoveDirection
         };
     }
@@ -125,7 +128,7 @@ export class Player {
     }
 
     handleCollisionWith(actor: IFieldActor) {
-        if (Utils.isSamePosition(this.position(), actor.position())) {
+        if (Util.isSamePosition(this.position(), actor.position())) {
             actor.onCollideWithPlayer();
         }
     }

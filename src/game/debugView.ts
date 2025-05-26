@@ -34,6 +34,11 @@ export class DebugView {
             }
         }, "column").listen();
         playerFolder.add({
+            get roomId() {
+                return view.data.player.roomId ?? "NONE"
+            }
+        }, "roomId").listen();
+        playerFolder.add({
             get lastMoveDirection() {
                 return view.data.player.lastMoveDirection?.keyName ?? "NONE"
             }
@@ -52,6 +57,16 @@ export class DebugView {
                     return enemy.position?.row ?? "NONE"
                 }
             }, "row").listen();
+            enemyFolder.add({
+                get column() {
+                    return enemy.position?.column ?? "NONE"
+                }
+            }, "column").listen();
+            enemyFolder.add({
+                get roomId() {
+                    return enemy.roomId ?? "NONE"
+                }
+            }, "roomId").listen();
         }
 
     }

@@ -8,6 +8,7 @@ export class Enemy implements IFieldActor {
     private readonly graphics: Phaser.GameObjects.Graphics;
     private row: number;
     private column: number;
+    private roomId: number;
     private readonly moveCost: number;
 
     private chargeAmount: number;
@@ -24,7 +25,8 @@ export class Enemy implements IFieldActor {
         this.graphics.depth = 10;
         this.row = iniRow;
         this.column = iniColumn;
-        this.moveCost = moveCost
+        this.roomId = Util.findRoomId({ row: this.row, column: this.column });
+        this.moveCost = moveCost;
 
         this.chargeAmount = 0;
         this.priorityScanDirections = priorityScanDirections;
@@ -46,6 +48,21 @@ export class Enemy implements IFieldActor {
             return true;
         }
         return false;
+    }
+
+    setup() {
+
+    }
+
+    resolvePlayerFrame(fieldEvaluation: FieldEvalution) {
+        if (this.isChargeCompleted()) {
+            const direction = this.decideMoveDirection(fieldEvaluation);
+            this.move(direction);
+        } else {
+            this.charge();
+        }
+        this.handleFirstFootprintStep();
+        this.roomId = Util.findRoomId(this.position());
     }
 
     decideMoveDirection(fieldEvaluation: FieldEvalution) {
@@ -71,6 +88,7 @@ export class Enemy implements IFieldActor {
         return {
             chargeAmount: this.chargeAmount,
             position: this.position(),
+            roomId: this.roomId
         };
     }
 
@@ -94,9 +112,8 @@ export class Enemy implements IFieldActor {
     }
 
     handleFirstFootprintStep() {
-        this.getFirstFootprint()
-        if(Util.isSamePosition(this.position(), this.getFirstFootprint())) {
-            this.stepOnFirstFootprint()
+        if (Util.isSamePosition(this.position(), this.getFirstFootprint())) {
+            this.stepOnFirstFootprint();
         }
     }
 }
