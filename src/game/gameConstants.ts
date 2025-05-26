@@ -30,7 +30,7 @@ export const numberOfTreasuresPerRound = 5;
 export const numberOfTreasuresRounds = 6;
 
 export const parametersOfEnemies = [
-    { row: 30, column: 40, priorityScanDirections: [DIRECTION.RIGHT, DIRECTION.DOWN, DIRECTION.LEFT, DIRECTION.UP] },
+    { row: 1, column: 2, priorityScanDirections: [DIRECTION.RIGHT, DIRECTION.DOWN, DIRECTION.LEFT, DIRECTION.UP] },
     { row: 30, column: 40, priorityScanDirections: [DIRECTION.DOWN, DIRECTION.LEFT, DIRECTION.UP, DIRECTION.RIGHT] },
     { row: 30, column: 40, priorityScanDirections: [DIRECTION.LEFT, DIRECTION.UP, DIRECTION.RIGHT, DIRECTION.DOWN] },
     { row: 30, column: 40, priorityScanDirections: [DIRECTION.UP, DIRECTION.RIGHT, DIRECTION.DOWN, DIRECTION.LEFT] }
