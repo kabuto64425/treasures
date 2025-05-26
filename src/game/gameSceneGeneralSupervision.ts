@@ -196,11 +196,39 @@ export class GameSceneGeneralSupervision {
         // input調整役から
         // 承認されたプレイヤーの方向を取得
         let playerDirection = this.inputCoordinator.getApprovedActionInfo().playerDirection;
-        // プレイヤー
+        // プレイヤーのターン
         this.player.resolvePlayerFrame(playerDirection, this.recorder.getElapsedFrame());
         this.player.draw();
         this.player.getFootPrint().draw();
 
+        // 敵との接触判定・ゲームオーバー更新
+        for (const enemy of this.enemyList) {
+            this.player.handleCollisionWith(enemy);
+        }
+
+        // 敵と接触しているとゲームステータスが変わるから
+        if (!this.isPlaying()) {
+            return;
+        }
+
+        for (const treasure of this.roundsSupervision.getCurrentRoundSupervision().extractAppearanceTreasures()) {
+            this.player.handleCollisionWith(treasure);
+        }
+
+        // 宝の数が更新されるから
+        this.ui.updateCollectedTreasuresText();
+
+        // ラウンド進行
+        this.roundsSupervision.updateProgressPerFrame();
+
+        // ゲームをクリアしているとゲームステータスが変わるから
+        if (!this.isPlaying()) {
+            return;
+        }
+
+        // プレイヤーのターン終了
+
+        // 敵のターン
         // フィールド評価
         this.fieldEvaluation.updateEvaluation(this.player.getFootPrint().getFirstPrint().row, this.player.getFootPrint().getFirstPrint().column);
         this.fieldEvaluation.draw();
@@ -214,20 +242,16 @@ export class GameSceneGeneralSupervision {
             this.enemyList.map(e => {return e.getPlayerDebugValueData()})
         );
 
-        for (const treasure of this.roundsSupervision.getCurrentRoundSupervision().extractAppearanceTreasures()) {
-            this.player.handleCollisionWith(treasure);
-        }
-
-        // 宝の数が更新されるから
-        this.ui.updateCollectedTreasuresText();
-
-        // ラウンド進行
-        this.roundsSupervision.updateProgressPerFrame();
-
         // 敵との接触判定・ゲームオーバー更新
         for (const enemy of this.enemyList) {
             this.player.handleCollisionWith(enemy);
         }
+        // 敵と接触しているとステータスが変わるから
+        // 意味はないが、ゲームステータスが変わるから書いとく
+        if (!this.isPlaying()) {
+            return;
+        }
+        // 敵のターン終了
     }
 
     readonly pauseGame = () => {
