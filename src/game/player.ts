@@ -5,6 +5,7 @@ import * as GameConstants from "./gameConstants";
 import { IFieldActor } from "./iFieldActor";
 import { PlayerDirectionBuffer } from "./playerDirectionBuffer";
 import * as Utils from "./utils"
+import { DebugDataMediator } from "./debugData";
 
 export class Player {
     private readonly graphics: Phaser.GameObjects.Graphics;
@@ -75,10 +76,22 @@ export class Player {
         }
 
         this.footPrint.resolveFootprintPerFrame(currentFrame);
+
+        this.updateDebugData();
     }
 
     getFootPrint() {
         return this.footPrint;
+    }
+
+    updateDebugData() {
+        DebugDataMediator.setPlayerDebugValue(this.getPlayerDebugValueData());
+    }
+
+    private getPlayerDebugValueData() {
+        return {
+            chargeAmount: this.chargeAmount
+        };
     }
 
     private canMove(direction: DIRECTION) {

@@ -15,6 +15,10 @@ export class DebugView {
         this.gui.add(this.data, "updateDuration").listen();
         this.gui.add(this.data, "frameDelta").listen();
         this.gui.add({ get fps() { return 1000 / (view.data.frameDelta); }}, "fps").listen();
+
+        const playerFolder = this.gui.addFolder('player');
+
+        playerFolder.add(this.data.player, "chargeAmount").listen();
         /*const view = this;
         this.gui.add({ get updateDuration() { return view.getUpdateDuration(); }}, "updateDuration").listen();
         this.gui.add({ get frameDelta() { return view.getFrameDelta(); }}, "frameDelta").listen();*/

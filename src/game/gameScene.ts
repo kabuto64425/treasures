@@ -2,7 +2,7 @@ import Phaser from "phaser";
 import { GameSceneGeneralSupervision } from "./gameSceneGeneralSupervision";
 import { BestRecord } from "./bestRecord";
 import { DebugView } from "./debugView";
-import { DebugData } from "./debugData";
+import { DebugData, DebugDataMediator } from "./debugData";
 
 export class GameScene extends Phaser.Scene {
 
@@ -40,6 +40,7 @@ export class GameScene extends Phaser.Scene {
     }
 
     create() {
+        DebugDataMediator.setDebugData(this.debugData);
         const view = new DebugView(this.debugData);
         Phaser.GameObjects.BitmapText.ParseFromAtlas(this, "font", "fontatlas", "azo-fire", "azoXML");
 
