@@ -40,13 +40,16 @@ export class GameScene extends Phaser.Scene {
     }
 
     create() {
-        DebugDataMediator.setDebugData(this.debugData);
-        const view = new DebugView(this.debugData);
         Phaser.GameObjects.BitmapText.ParseFromAtlas(this, "font", "fontatlas", "azo-fire", "azoXML");
+
+        DebugDataMediator.setDebugData(this.debugData);
 
         this.gameSceneGeneralSupervision = new GameSceneGeneralSupervision(this);
         this.gameSceneGeneralSupervision.setupSupervision();
-        view.setup();
+        if (import.meta.env.MODE === "development") {
+            const view = new DebugView(this.debugData);
+            view.setup();
+        }
     }
 
     // @ts-ignore: デバッグ用
