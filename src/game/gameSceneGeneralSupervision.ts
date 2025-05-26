@@ -9,6 +9,7 @@ import { Recorder, RecorderMediator } from "./recoder";
 import { InputCoordinator } from "./inputCoordinator";
 import * as Util from "./utils"
 import { Logger } from "./logger";
+import { DebugDataMediator } from "./debugData";
 
 export class GameSceneGeneralSupervision {
     // これを使用してゲームの物体を生成すると、シーンに自動的に加わる
@@ -167,6 +168,9 @@ export class GameSceneGeneralSupervision {
         for (const enemy of this.enemyList) {
             enemy.draw();
         }
+        DebugDataMediator.setEnemiesDebugValue(
+            this.enemyList.map(e => {return e.getPlayerDebugValueData()})
+        );
 
         // ゲーム進行管理
         this.roundsSupervision.setup();
@@ -212,6 +216,9 @@ export class GameSceneGeneralSupervision {
 
             enemy.draw();
         }
+        DebugDataMediator.setEnemiesDebugValue(
+            this.enemyList.map(e => {return e.getPlayerDebugValueData()})
+        );
 
         for (const treasure of this.roundsSupervision.getCurrentRoundSupervision().extractAppearanceTreasures()) {
             this.player.handleCollisionWith(treasure);

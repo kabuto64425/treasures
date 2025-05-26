@@ -16,7 +16,7 @@ export class DebugView {
         this.gui.add(this.data, "frameDelta").listen();
         this.gui.add({ get fps() { return 1000 / (view.data.frameDelta); } }, "fps").listen();
 
-        const playerFolder = this.gui.addFolder('player');
+        const playerFolder = this.gui.addFolder("player");
 
         playerFolder.add({
             get chargeAmount() {
@@ -38,6 +38,22 @@ export class DebugView {
                 return view.data.player.lastMoveDirection?.keyName ?? "NONE"
             }
         }, "lastMoveDirection").listen();
+
+        const enemiesFolder = this.gui.addFolder("enemies");
+        for (const [index, enemy] of view.data.enemies.entries()) {
+            const enemyFolder = enemiesFolder.addFolder(`enemy${index}`);
+            enemyFolder.add({
+                get chargeAmount() {
+                    return enemy.chargeAmount ?? "NONE"
+                }
+            }, "chargeAmount").listen();
+            enemyFolder.add({
+                get row() {
+                    return enemy.position?.row ?? "NONE"
+                }
+            }, "row").listen();
+        }
+
         /*const view = this;
         this.gui.add({ get updateDuration() { return view.getUpdateDuration(); }}, "updateDuration").listen();
         this.gui.add({ get frameDelta() { return view.getFrameDelta(); }}, "frameDelta").listen();*/

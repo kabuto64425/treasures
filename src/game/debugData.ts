@@ -14,6 +14,11 @@ export class DebugData {
             position: undefined,
             lastMoveDirection: undefined
         };
+
+    enemies: {
+        chargeAmount?: number,
+        position?: Position,
+    }[] = [];
 }
 
 export class DebugDataMediator {
@@ -29,5 +34,19 @@ export class DebugDataMediator {
             return;
         }
         Object.assign(this.data.player, data);
+    }
+
+    static setEnemiesDebugValue(datas: Partial<DebugData["enemies"]>[number][]) {
+        if (!this.data) {
+            console.warn("DebugData is not set yet.");
+            return;
+        }
+        for (const [index, data] of datas.entries()) {
+            // 必要なら配列を拡張して安全にアクセス
+            while (this.data.enemies.length <= index) {
+                this.data.enemies.push({});
+            }
+            Object.assign(this.data.enemies[index], data);
+        }
     }
 }

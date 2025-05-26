@@ -67,6 +67,13 @@ export class Enemy implements IFieldActor {
         this.chargeAmount = 0;
     }
 
+    getPlayerDebugValueData() {
+        return {
+            chargeAmount: this.chargeAmount,
+            position: this.position(),
+        };
+    }
+
     draw() {
         this.graphics.clear();
         this.graphics.lineStyle(0, 0xff0000);
