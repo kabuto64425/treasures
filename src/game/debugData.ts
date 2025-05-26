@@ -1,12 +1,18 @@
+import { DIRECTION } from "./drection";
+import { Position } from "./utils";
 
 export class DebugData {
     updateDuration: number = 0;
     frameDelta: number = 0;
 
     player: {
-        chargeAmount: number
+        chargeAmount?: number,
+        position?: Position,
+        lastMoveDirection?: DIRECTION
     } = {
-            chargeAmount: 0
+            chargeAmount: undefined,
+            position: undefined,
+            lastMoveDirection: undefined
         };
 }
 

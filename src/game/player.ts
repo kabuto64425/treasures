@@ -90,7 +90,9 @@ export class Player {
 
     private getPlayerDebugValueData() {
         return {
-            chargeAmount: this.chargeAmount
+            chargeAmount: this.chargeAmount,
+            position: this.position(),
+            lastMoveDirection: this.lastMoveDirection
         };
     }
 
