@@ -1,7 +1,7 @@
 import { GameScene } from "./gameScene"
 import { Player } from "./player"
 import * as GameConstants from "./gameConstants"
-import { FieldEvalution } from "./fieldEvalution";
+import { FieldEvaluation } from "./fieldEvaluation";
 import { Enemy } from "./enemy";
 import { RoundsSupervision } from "./roundsSupervision";
 import { Ui } from "./ui";
@@ -24,7 +24,7 @@ export class GameSceneGeneralSupervision {
     private readonly ui: Ui;
 
     private readonly player: Player;
-    private readonly fieldEvaluation: FieldEvalution;
+    private readonly fieldEvaluation: FieldEvaluation;
     private readonly enemyList: Enemy[];
     private roundsSupervision: RoundsSupervision;
     private gameState: number;
@@ -69,13 +69,13 @@ export class GameSceneGeneralSupervision {
         this.player = new Player(this.gameObjectFactory, GameConstants.parameterPlayer.row, GameConstants.parameterPlayer.column, this.params);
 
         //フィールド評価
-        this.fieldEvaluation = new FieldEvalution(this.gameObjectFactory, this.params.visibleFieldEvaluation);
+        this.fieldEvaluation = new FieldEvaluation(this.gameObjectFactory, this.params.visibleFieldEvaluation);
 
         // 敵
         this.enemyList = [];
         for (let i = 0; i < GameConstants.numberOfEnemyies; i++) {
             const enemy = new Enemy(this.gameObjectFactory, GameConstants.parametersOfEnemies[i].row, GameConstants.parametersOfEnemies[i].column,
-                this.params.enemyMoveCost, GameConstants.parametersOfEnemies[i].priorityScanDirections, this.onPlayerCaptured,
+                this.params, GameConstants.parametersOfEnemies[i].priorityScanDirections, this.onPlayerCaptured,
                 this.player.getFootPrint().getFirstPrint, this.player.getFootPrint().onSteppedOnByEnemy
             );
             this.enemyList.push(enemy);
@@ -235,7 +235,7 @@ export class GameSceneGeneralSupervision {
 
         // 敵
         for (const enemy of this.enemyList) {
-            enemy.resolveEnemyFrame(this.fieldEvaluation);
+            enemy.resolveEnemyFrame(this.fieldEvaluation, this.player.getRoomId());
             enemy.draw();
         }
         DebugDataMediator.setEnemiesDebugValue(

@@ -3,9 +3,11 @@
     "visibleFieldEvaluation": false,
     "enableUsingLocalstorage": true,
     "playerMoveCost": 6,
-    "enemyMoveCost": 15,
+    "enemyMoveCostSearching": 15,
+    "enemyMoveCostChasing": 10,
     "visibleFootPrint": true,
     "footPrintLimitFrame": 30,
     "enableVisibleRoomRanges": false,
+    "isDebugStepMode": false,
     "logLevel": "DEBUG"
 }

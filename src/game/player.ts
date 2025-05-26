@@ -23,7 +23,7 @@ export class Player {
         this.graphics = gameObjectFactory.graphics();
         this.row = iniRow;
         this.column = iniColumn;
-        this.roomId = Util.findRoomId({row: this.row, column: this.column});
+        this.roomId = Util.findRoomId({ row: this.row, column: this.column });
         this.chargeAmount = 0;
         this.moveCost = params.playerMoveCost;
         // 先行入力受付は、暫定チャージ中いつでもできるように第２引数を指定している。多分これで確定しそう。
@@ -125,6 +125,10 @@ export class Player {
 
     readonly getLastMoveDirection = () => {
         return this.lastMoveDirection;
+    }
+
+    readonly getRoomId = () => {
+        return this.roomId;
     }
 
     handleCollisionWith(actor: IFieldActor) {

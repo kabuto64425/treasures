@@ -1,7 +1,7 @@
 import { DIRECTION } from "./drection";
 import * as GameConstants from "./gameConstants";
 
-export class FieldEvalution {
+export class FieldEvaluation {
     private readonly shortestDirectionMaps: Map<string, boolean>[][];
     private readonly graphics: Phaser.GameObjects.Graphics;
 

@@ -48,6 +48,11 @@ export class DebugView {
         for (const [index, enemy] of view.data.enemies.entries()) {
             const enemyFolder = enemiesFolder.addFolder(`enemy${index}`);
             enemyFolder.add({
+                get state() {
+                    return enemy.state ?? "NONE"
+                }
+            }, "state").listen();
+            enemyFolder.add({
                 get chargeAmount() {
                     return enemy.chargeAmount ?? "NONE"
                 }

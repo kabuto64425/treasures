@@ -17,6 +17,7 @@ export class DebugData {
         };
 
     enemies: {
+        state?: string,
         chargeAmount?: number,
         position?: Position,
         roomId?: number

@@ -2,7 +2,7 @@ export * from "./bestRecord";
 export * from "./logger"
 export * from "./drection";
 export * from "./enemy";
-export * from "./fieldEvalution";
+export * from "./fieldEvaluation";
 export * from "./footprint"
 export * from "./gameConstants";
 export * from "./gameScene";

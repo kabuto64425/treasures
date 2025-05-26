@@ -4,7 +4,6 @@ import { BestRecord } from "./bestRecord";
 import { DebugView } from "./debugView";
 import { DebugData, DebugDataMediator } from "./debugData";
 import * as Util from "./utils";
-import { Logger } from "./logger";
 
 export class GameScene extends Phaser.Scene {
 
@@ -16,12 +15,14 @@ export class GameScene extends Phaser.Scene {
 
     private debugData: DebugData;
 
-    private isDebugStepMode = false;
+    private isDebugStepMode;
     private doStepOnce = false;
 
     constructor(params: any, bestRecord: BestRecord) {
         super("gameScene");
         this.params = params;
+        // デバッグステップモードは、開発環境でしか使用できないようにする
+        this.isDebugStepMode = Util.isDebugEnv() && (this.params.isDebugStepMode ?? false);
         this.bestRecoed = bestRecord;
         this.debugData = new DebugData();
     }
@@ -55,10 +56,8 @@ export class GameScene extends Phaser.Scene {
             const view = new DebugView(this.debugData);
             view.setup();
         }
-
-        if (Util.isDebugEnv()) {
+        if (this.isDebugStepMode) {
             this.input.keyboard.on('keydown-N', () => {
-                Logger.debug("n")
                 this.doStepOnce = true;
             });
         }
@@ -80,7 +79,7 @@ export class GameScene extends Phaser.Scene {
         gameSceneGeneralSupervision.updatePerFrame();
         this.debugData.frameDelta = _delta;
         this.debugData.updateDuration = performance.now() - now;
-        
+
         if (this.isDebugStepMode) {
             this.doStepOnce = false;
         }
