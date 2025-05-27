@@ -1,4 +1,5 @@
 import { DIRECTION } from "./drection";
+import { Position } from "./utils";
 
 export const D_WIDTH = 1280;
 export const D_HEIGHT = 720;
@@ -82,5 +83,24 @@ export const ROOM_COLUMN_COUNT = ROOM_COLUMN_BORDERS.length + 1;
 
 export const ROOM_COUNT = ROOM_ROW_COUNT * ROOM_COLUMN_COUNT;
 
+export const ENEMY_SEARCH_WAYPOINTS: Record<number, Position[]> = {
+    // 各部屋の左上・左下・右下・右上で時計回りにひとまずしておく。問題なければ確定
+    0: [{ row: 3, column: 3 }, { row: 7, column: 3 }, { row: 7, column: 7 }, { row: 3, column: 7 }],
+    1: [{ row: 3, column: 13 }, { row: 7, column: 13 }, { row: 7, column: 17 }, { row: 3, column: 17 }],
+    2: [{ row: 3, column: 24 }, { row: 7, column: 24 }, { row: 7, column: 28 }, { row: 3, column: 28 }],
+    3: [{ row: 3, column: 34 }, { row: 7, column: 34 }, { row: 7, column: 38 }, { row: 3, column: 38 }],
+    4: [{ row: 14, column: 3 }, { row: 17, column: 3 }, { row: 17, column: 7 }, { row: 14, column: 7 }],
+    5: [{ row: 14, column: 13 }, { row: 17, column: 13 }, { row: 17, column: 17 }, { row: 14, column: 17 }],
+    6: [{ row: 14, column: 24 }, { row: 17, column: 24 }, { row: 17, column: 28 }, { row: 14, column: 28 }],
+    7: [{ row: 14, column: 34 }, { row: 17, column: 34 }, { row: 17, column: 38 }, { row: 14, column: 38 }],
+    8: [{ row: 24, column: 3 }, { row: 28, column: 3 }, { row: 28, column: 7 }, { row: 24, column: 7 }],
+    9: [{ row: 24, column: 13 }, { row: 28, column: 13 }, { row: 28, column: 17 }, { row: 24, column: 17 }],
+    10: [{ row: 24, column: 24 }, { row: 28, column: 24 }, { row: 28, column: 28 }, { row: 24, column: 28 }],
+    11: [{ row: 24, column: 34 }, { row: 28, column: 34 }, { row: 28, column: 38 }, { row: 24, column: 38 }]
+};
+
+export const PATROL_ENEMY_ROOM_ROUTE: number[] = [8, 0, 3, 11];
+
+// READY_DISPLAY_DURATION今使ってない。数値改良して使うようにする。
 export const READY_DISPLAY_DURATION = 1000;
 export const GO_DISPLAY_DURATION = 500;

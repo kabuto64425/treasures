@@ -80,6 +80,8 @@ export class Enemy implements IFieldActor {
             // 2部屋以上離れたら索敵にする
             if (Util.culculateRoomDistanceManhattan(this.roomId, this.getPlayerRoomId()) >= 2) {
                 this.state = EnemyState.SEARCHING;
+                // 索敵に変わると、更新する
+                this.strategy.updateStrategyInfo();
             }
         }
 
@@ -89,6 +91,11 @@ export class Enemy implements IFieldActor {
             const targetPosition = behavior.decideTagetPosition(this);
             const direction = this.decideMoveDirection(targetPosition);
             this.move(direction);
+            // 更新条件判定処理は、必要になればbehaviorを使って索敵モード時のみに実施するようにする。(今のところ不要だった)
+            if(Util.isSamePosition(this.position(), this.strategy.getTargetPosition())) {
+                // 目的地に到達したので更新
+                this.strategy.updateStrategyInfo();
+            }
         } else {
             this.charge();
         }
@@ -167,7 +174,7 @@ export class Enemy implements IFieldActor {
     }
 
     decideTagetPositionSearching() {
-        return this.strategy.decideTagetPosition(this);
+        return this.strategy.getTargetPosition();
     }
 
     decideTagetPositionChasing() {
@@ -208,11 +215,42 @@ class ChasingBehavior implements EnemyBehavior {
 }
 
 interface SearchingStrategy {
-    decideTagetPosition(enemy: Enemy): Util.Position;
+    updateStrategyInfo(): void;
+    getTargetPosition(): Util.Position;
 }
 
 export class PatrolStrategy implements SearchingStrategy {
-    decideTagetPosition(_enemy: Enemy): Util.Position {
-        return { row: 30, column: 40 };
+    private targetPosition: Util.Position;
+    private targetRoomId: number;
+    // patrolRouteIndexとwayPointRouteという変数名で意味合いは間違ってないみたい by chatgpt
+    private patrolRouteIndex: number;
+    private wayPointRouteIndex: number;
+
+    constructor() {
+        this.patrolRouteIndex = 0;
+        this.wayPointRouteIndex = 0;
+
+        this.targetRoomId = GameConstants.PATROL_ENEMY_ROOM_ROUTE[this.patrolRouteIndex];
+        const wayPoints = GameConstants.ENEMY_SEARCH_WAYPOINTS[this.targetRoomId];
+        this.targetPosition = wayPoints[this.wayPointRouteIndex];
+    }
+
+    updateStrategyInfo() {
+        this.patrolRouteIndex = (this.patrolRouteIndex + 1) % (GameConstants.PATROL_ENEMY_ROOM_ROUTE.length);
+        const newTargetRoomId = GameConstants.PATROL_ENEMY_ROOM_ROUTE[this.patrolRouteIndex];
+        const wayPoints = GameConstants.ENEMY_SEARCH_WAYPOINTS[newTargetRoomId];
+
+        if (this.targetRoomId === newTargetRoomId) {
+            this.wayPointRouteIndex = (this.wayPointRouteIndex + 1) % (wayPoints.length);
+        } else {
+            this.wayPointRouteIndex = 0;
+        }
+        this.targetRoomId = newTargetRoomId;
+
+        this.targetPosition = wayPoints[this.wayPointRouteIndex];
+    }
+
+    getTargetPosition(): Util.Position {
+        return this.targetPosition;
     }
 }
