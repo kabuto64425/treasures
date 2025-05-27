@@ -5,6 +5,7 @@ import * as GameConstants from "./gameConstants";
 import { IFieldActor } from "./iFieldActor";
 import { PlayerDirectionBuffer } from "./playerDirectionBuffer";
 import { DebugDataMediator } from "./debugData";
+import { EnemiesSupervision } from "./enemiesSupervision";
 
 export class Player {
     private readonly graphics: Phaser.GameObjects.Graphics;
@@ -50,6 +51,7 @@ export class Player {
     setup(currentFrame: number) {
         this.footPrint.push(this.position(), currentFrame);
         this.draw();
+        this.updateDebugData();
     }
 
     resolvePlayerFrame(playerDirection: DIRECTION | undefined, currentFrame: number) {
@@ -131,6 +133,12 @@ export class Player {
 
     readonly getRoomId = () => {
         return this.roomId;
+    }
+
+    handleCollisionWithEnemies(enemiesSupervision : EnemiesSupervision) {
+        for(const enemy of enemiesSupervision.getEnemyList()) {
+            this.handleCollisionWith(enemy);
+        }
     }
 
     handleCollisionWith(actor: IFieldActor) {

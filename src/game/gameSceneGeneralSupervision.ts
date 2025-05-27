@@ -2,14 +2,13 @@ import { GameScene } from "./gameScene"
 import { Player } from "./player"
 import * as GameConstants from "./gameConstants"
 import { FieldEvaluation } from "./fieldEvaluation";
-import { Enemy, PatrolStrategy } from "./enemy";
 import { RoundsSupervision } from "./roundsSupervision";
 import { Ui } from "./ui";
 import { Recorder, RecorderMediator } from "./recoder";
 import { InputCoordinator } from "./inputCoordinator";
 import * as Util from "./utils"
 import { Logger } from "./logger";
-import { DebugDataMediator } from "./debugData";
+import { EnemiesSupervision } from "./enemiesSupervision";
 
 export class GameSceneGeneralSupervision {
     // これを使用してゲームの物体を生成すると、シーンに自動的に加わる
@@ -25,7 +24,7 @@ export class GameSceneGeneralSupervision {
 
     private readonly player: Player;
     private readonly fieldEvaluation: FieldEvaluation;
-    private readonly enemyList: Enemy[];
+    private readonly enemiesSupervision: EnemiesSupervision
     private roundsSupervision: RoundsSupervision;
     private gameState: number;
 
@@ -72,15 +71,11 @@ export class GameSceneGeneralSupervision {
         this.fieldEvaluation = new FieldEvaluation(this.gameObjectFactory, this.params.visibleFieldEvaluation, this.player.getFootPrint().getFirstPrint);
 
         // 敵
-        this.enemyList = [];
-        for (let i = 0; i < GameConstants.numberOfEnemyies; i++) {
-            const enemy = new Enemy(this.gameObjectFactory, GameConstants.parametersOfEnemies[i].row, GameConstants.parametersOfEnemies[i].column,
-                this.params, GameConstants.parametersOfEnemies[i].priorityScanDirections, new PatrolStrategy(),
-                this.onPlayerCaptured,
-                this.player.getFootPrint().getFirstPrint, this.player.getFootPrint().onSteppedOnByEnemy
-            );
-            this.enemyList.push(enemy);
-        }
+        this.enemiesSupervision = new EnemiesSupervision(
+            this.gameObjectFactory, this.params, this.onPlayerCaptured,
+            this.player.getFootPrint(), this.fieldEvaluation.isShortestDirection,
+            this.player.getRoomId
+        );
 
         // ラウンド進行監督
         this.roundsSupervision = new RoundsSupervision(this.gameObjectFactory, this.onGameCompleted);
@@ -164,12 +159,7 @@ export class GameSceneGeneralSupervision {
         this.fieldEvaluation.setup();
 
         // 敵
-        for (const enemy of this.enemyList) {
-            enemy.setup();
-        }
-        DebugDataMediator.setEnemiesDebugValue(
-            this.enemyList.map(e => {return e.getDebugValueData()})
-        );
+        this.enemiesSupervision.setup();
 
         // ゲーム進行管理
         this.roundsSupervision.setup();
@@ -198,9 +188,7 @@ export class GameSceneGeneralSupervision {
         this.player.resolvePlayerFrame(playerDirection, this.recorder.getElapsedFrame());
 
         // 敵との接触判定・ゲームオーバー更新
-        for (const enemy of this.enemyList) {
-            this.player.handleCollisionWith(enemy);
-        }
+        this.player.handleCollisionWithEnemies(this.enemiesSupervision);
 
         // 敵と接触しているとゲームステータスが変わるから
         if (!this.isPlaying()) {
@@ -229,17 +217,11 @@ export class GameSceneGeneralSupervision {
         this.fieldEvaluation.resolveFrame();
 
         // 敵
-        for (const enemy of this.enemyList) {
-            enemy.resolveEnemyFrame(this.fieldEvaluation, this.player.getRoomId());
-        }
-        DebugDataMediator.setEnemiesDebugValue(
-            this.enemyList.map(e => {return e.getDebugValueData()})
-        );
+        this.enemiesSupervision.resolveFrame();
 
         // 敵との接触判定・ゲームオーバー更新
-        for (const enemy of this.enemyList) {
-            this.player.handleCollisionWith(enemy);
-        }
+        this.player.handleCollisionWithEnemies(this.enemiesSupervision);
+
         // 敵と接触しているとステータスが変わるから
         // 意味はないが、ゲームステータスが変わるから書いとく
         if (!this.isPlaying()) {
@@ -254,10 +236,7 @@ export class GameSceneGeneralSupervision {
         this.overlay.setDepth(99);
         this.gameState = GameSceneGeneralSupervision.GAME_STATE.PAUSE;
 
-        this.enemyList.forEach(enemy => {
-            enemy.hide();
-        });
-
+        this.enemiesSupervision.handlePause();
         this.roundsSupervision.getCurrentRoundSupervision().handlePause();
     }
 
@@ -265,10 +244,7 @@ export class GameSceneGeneralSupervision {
         this.overlay.clear();
         this.gameState = GameSceneGeneralSupervision.GAME_STATE.PLAYING;
 
-        this.enemyList.forEach(enemy => {
-            enemy.show();
-        });
-
+        this.enemiesSupervision.handleResume();
         this.roundsSupervision.getCurrentRoundSupervision().handleResume();
     }
 

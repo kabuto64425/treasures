@@ -25,13 +25,14 @@ export class FieldEvaluation {
         this.draw();
     }
 
-    isShortestDirection(from: Position, to: Position, direction: DIRECTION) {
+    isShortestDirection = (from: Position, to: Position, direction: DIRECTION) => {
         const mapKey = this.createMapKeyFromPosition(to);
         if(!this.evaluationMap.has(mapKey)) {
             this.evaluationMap.set(mapKey, this.createEvaluation(to));
         }
         // if内の処理によって、確実にgetで要素が取れてこれてるはずなので、アサーションつけても大丈夫なはず
-        return this.evaluationMap.get(mapKey)![from.row][from.column].get(direction.keyName);
+        // undefinedを返さないために、??falseとしている。問題にはならないはず
+        return this.evaluationMap.get(mapKey)![from.row][from.column].get(direction.keyName)??false;
     }
 
     private createMapKeyFromPosition(position : Position) {

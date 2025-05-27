@@ -1,7 +1,6 @@
 import * as Util from "./utils";
 import { DIRECTION } from "./drection";
 import * as GameConstants from "./gameConstants";
-import { FieldEvaluation } from "./fieldEvaluation";
 import { IFieldActor } from "./iFieldActor";
 
 enum EnemyState {
@@ -29,11 +28,15 @@ export class Enemy implements IFieldActor {
     private readonly onPlayerCaptured: () => void;
     private readonly getFirstFootprint: () => Util.Position;
     private readonly stepOnFirstFootprint: () => void;
+    private readonly isShortestDirection: (from: Util.Position, to: Util.Position, direction: DIRECTION) => boolean;
+    private readonly getPlayerRoomId: () => number
 
     constructor(gameObjectFactory: Phaser.GameObjects.GameObjectFactory, iniRow: number,
-        iniColumn: number, params: any, priorityScanDirections: DIRECTION[], strategy: SearchingStrategy,
-        onPlayerCaptured: () => void,
-        getFirstFootprint: () => Util.Position, stepOnFirstFootprint: () => void
+        iniColumn: number, params: any, priorityScanDirections: DIRECTION[],
+        strategy: SearchingStrategy, onPlayerCaptured: () => void,
+        getFirstFootprint: () => Util.Position, stepOnFirstFootprint: () => void,
+        isShortestDirection: (from: Util.Position, to: Util.Position, direction: DIRECTION) => boolean,
+        getPlayerRoomId: () => number
     ) {
         this.graphics = gameObjectFactory.graphics();
         this.graphics.depth = 10;
@@ -50,6 +53,8 @@ export class Enemy implements IFieldActor {
         this.onPlayerCaptured = onPlayerCaptured;
         this.getFirstFootprint = getFirstFootprint;
         this.stepOnFirstFootprint = stepOnFirstFootprint;
+        this.isShortestDirection = isShortestDirection;
+        this.getPlayerRoomId = getPlayerRoomId;
     }
 
     position() {
@@ -64,16 +69,16 @@ export class Enemy implements IFieldActor {
         this.draw();
     }
 
-    resolveEnemyFrame(fieldEvaluation: FieldEvaluation, playerRoomId: number) {
+    resolveEnemyFrame() {
         // 敵の状態変更判定
         if (this.isSearching()) {
             // プレイヤーと同室したら、追跡にする。
-            if (this.roomId === playerRoomId) {
+            if (this.roomId === this.getPlayerRoomId()) {
                 this.state = EnemyState.CHASING;
             }
         } else if (this.isChasing()) {
             // 2部屋以上離れたら索敵にする
-            if (Util.culculateRoomDistanceManhattan(this.roomId, playerRoomId) >= 2) {
+            if (Util.culculateRoomDistanceManhattan(this.roomId, this.getPlayerRoomId()) >= 2) {
                 this.state = EnemyState.SEARCHING;
             }
         }
@@ -82,7 +87,7 @@ export class Enemy implements IFieldActor {
 
         if (behavior.isChargeCompleted(this)) {
             const targetPosition = behavior.decideTagetPosition(this);
-            const direction = this.decideMoveDirection(targetPosition, fieldEvaluation);
+            const direction = this.decideMoveDirection(targetPosition);
             this.move(direction);
         } else {
             this.charge();
@@ -169,9 +174,9 @@ export class Enemy implements IFieldActor {
         return this.getFirstFootprint();
     }
 
-    private decideMoveDirection(targetPosition: Util.Position, fieldEvaluation: FieldEvaluation) {
+    private decideMoveDirection(targetPosition: Util.Position) {
         for (const d of this.priorityScanDirections) {
-            if (fieldEvaluation.isShortestDirection({ row: this.row, column: this.column }, targetPosition, d)) {
+            if (this.isShortestDirection({ row: this.row, column: this.column }, targetPosition, d)) {
                 return d;
             }
         }
@@ -208,6 +213,6 @@ interface SearchingStrategy {
 
 export class PatrolStrategy implements SearchingStrategy {
     decideTagetPosition(_enemy: Enemy): Util.Position {
-        return {row:30, column:40};
+        return { row: 30, column: 40 };
     }
 }
