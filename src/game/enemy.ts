@@ -103,6 +103,8 @@ export class Enemy implements IFieldActor {
         this.handleFirstFootprintStep();
         this.roomId = Util.findRoomId(this.position());
         this.draw();
+
+        this.strategy.resolveFrame();
     }
 
     move(direction: DIRECTION | undefined) {
@@ -217,6 +219,7 @@ class ChasingBehavior implements EnemyBehavior {
 interface SearchingStrategy {
     updateStrategyInfo(): void;
     getTargetPosition(): Util.Position;
+    resolveFrame(): void;
 }
 
 export class PatrolStrategy implements SearchingStrategy {
@@ -226,6 +229,8 @@ export class PatrolStrategy implements SearchingStrategy {
     private patrolRouteIndex: number;
     private wayPointRouteIndex: number;
 
+    private framesSinceLastDestinationUpdate: number;
+
     constructor() {
         this.patrolRouteIndex = 0;
         this.wayPointRouteIndex = 0;
@@ -233,6 +238,15 @@ export class PatrolStrategy implements SearchingStrategy {
         this.targetRoomId = GameConstants.PATROL_ENEMY_ROOM_ROUTE[this.patrolRouteIndex];
         const wayPoints = GameConstants.ENEMY_SEARCH_WAYPOINTS[this.targetRoomId];
         this.targetPosition = wayPoints[this.wayPointRouteIndex];
+        this.framesSinceLastDestinationUpdate = 0;
+    }
+
+    resolveFrame() {
+        this.framesSinceLastDestinationUpdate++;
+        // 規定秒数経過で、目的地到達有無にかかわらず目的地更新
+        if(this.framesSinceLastDestinationUpdate >= GameConstants.DESTINATION_FORCE_UPDATE_INTERVAL * GameConstants.FPS) {
+            this.updateStrategyInfo();
+        }
     }
 
     updateStrategyInfo() {
@@ -248,6 +262,7 @@ export class PatrolStrategy implements SearchingStrategy {
         this.targetRoomId = newTargetRoomId;
 
         this.targetPosition = wayPoints[this.wayPointRouteIndex];
+        this.framesSinceLastDestinationUpdate = 0;
     }
 
     getTargetPosition(): Util.Position {

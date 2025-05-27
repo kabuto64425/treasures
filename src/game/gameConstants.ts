@@ -101,6 +101,9 @@ export const ENEMY_SEARCH_WAYPOINTS: Record<number, Position[]> = {
 
 export const PATROL_ENEMY_ROOM_ROUTE: number[] = [8, 0, 3, 11];
 
+// 敵が索敵時に目的地到達の有無に関わらず、目的地を更新する秒数。
+export const DESTINATION_FORCE_UPDATE_INTERVAL: number = 20;
+
 // READY_DISPLAY_DURATION今使ってない。数値改良して使うようにする。
 export const READY_DISPLAY_DURATION = 1000;
 export const GO_DISPLAY_DURATION = 500;
