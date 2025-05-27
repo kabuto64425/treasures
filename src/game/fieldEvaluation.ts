@@ -1,11 +1,16 @@
 import { DIRECTION } from "./drection";
 import * as GameConstants from "./gameConstants";
+import { Position } from "./utils";
 
 export class FieldEvaluation {
+    private readonly aaaa: Map<Position, Map<DIRECTION, boolean>[][]>;
+
     private readonly shortestDirectionMaps: Map<string, boolean>[][];
     private readonly graphics: Phaser.GameObjects.Graphics;
 
     constructor(gameObjectFactory: Phaser.GameObjects.GameObjectFactory, isVisible: boolean) {
+        this.aaaa = new Map<Position, Map<DIRECTION, boolean>[][]>();
+
         this.shortestDirectionMaps = [...Array(GameConstants.H)].map(() => [...Array(GameConstants.W)].map(() => this.generateDirectionFlagMap() as Map<string, boolean>));
         this.graphics = gameObjectFactory.graphics();
         this.graphics.depth = 99;
