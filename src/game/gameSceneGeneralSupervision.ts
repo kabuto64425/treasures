@@ -2,7 +2,7 @@ import { GameScene } from "./gameScene"
 import { Player } from "./player"
 import * as GameConstants from "./gameConstants"
 import { FieldEvaluation } from "./fieldEvaluation";
-import { Enemy } from "./enemy";
+import { Enemy, PatrolStrategy } from "./enemy";
 import { RoundsSupervision } from "./roundsSupervision";
 import { Ui } from "./ui";
 import { Recorder, RecorderMediator } from "./recoder";
@@ -75,7 +75,8 @@ export class GameSceneGeneralSupervision {
         this.enemyList = [];
         for (let i = 0; i < GameConstants.numberOfEnemyies; i++) {
             const enemy = new Enemy(this.gameObjectFactory, GameConstants.parametersOfEnemies[i].row, GameConstants.parametersOfEnemies[i].column,
-                this.params, GameConstants.parametersOfEnemies[i].priorityScanDirections, this.onPlayerCaptured,
+                this.params, GameConstants.parametersOfEnemies[i].priorityScanDirections, new PatrolStrategy(),
+                this.onPlayerCaptured,
                 this.player.getFootPrint().getFirstPrint, this.player.getFootPrint().onSteppedOnByEnemy
             );
             this.enemyList.push(enemy);

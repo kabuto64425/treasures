@@ -25,12 +25,14 @@ export class Enemy implements IFieldActor {
 
     private chargeAmount: number;
     private readonly priorityScanDirections: DIRECTION[];
+    private readonly strategy: SearchingStrategy;
     private readonly onPlayerCaptured: () => void;
     private readonly getFirstFootprint: () => Util.Position;
     private readonly stepOnFirstFootprint: () => void;
 
     constructor(gameObjectFactory: Phaser.GameObjects.GameObjectFactory, iniRow: number,
-        iniColumn: number, params: any, priorityScanDirections: DIRECTION[], onPlayerCaptured: () => void,
+        iniColumn: number, params: any, priorityScanDirections: DIRECTION[], strategy: SearchingStrategy,
+        onPlayerCaptured: () => void,
         getFirstFootprint: () => Util.Position, stepOnFirstFootprint: () => void
     ) {
         this.graphics = gameObjectFactory.graphics();
@@ -44,6 +46,7 @@ export class Enemy implements IFieldActor {
 
         this.chargeAmount = 0;
         this.priorityScanDirections = priorityScanDirections;
+        this.strategy = strategy;
         this.onPlayerCaptured = onPlayerCaptured;
         this.getFirstFootprint = getFirstFootprint;
         this.stepOnFirstFootprint = stepOnFirstFootprint;
@@ -157,18 +160,17 @@ export class Enemy implements IFieldActor {
         return this.chargeAmount >= cost;
     }
 
-    // 仮実装
     decideTagetPositionSearching() {
-        return this.getFirstFootprint();
+        return this.strategy.decideTagetPosition(this);
     }
 
     decideTagetPositionChasing() {
         return this.getFirstFootprint();
     }
 
-    private decideMoveDirection(targetPosition : Util.Position, fieldEvaluation: FieldEvaluation) {
+    private decideMoveDirection(targetPosition: Util.Position, fieldEvaluation: FieldEvaluation) {
         for (const d of this.priorityScanDirections) {
-            if (fieldEvaluation.isShortestDirection({row : this.row, column : this.column}, targetPosition, d)) {
+            if (fieldEvaluation.isShortestDirection({ row: this.row, column: this.column }, targetPosition, d)) {
                 return d;
             }
         }
@@ -178,7 +180,7 @@ export class Enemy implements IFieldActor {
 
 interface EnemyBehavior {
     isChargeCompleted(enemy: Enemy): boolean;
-    decideTagetPosition(enemy: Enemy):Util.Position;
+    decideTagetPosition(enemy: Enemy): Util.Position;
 }
 
 class SearchingBehavior implements EnemyBehavior {
@@ -196,5 +198,15 @@ class ChasingBehavior implements EnemyBehavior {
     }
     decideTagetPosition(enemy: Enemy): Util.Position {
         return enemy.decideTagetPositionChasing();
+    }
+}
+
+interface SearchingStrategy {
+    decideTagetPosition(enemy: Enemy): Util.Position;
+}
+
+export class PatrolStrategy implements SearchingStrategy {
+    decideTagetPosition(_enemy: Enemy): Util.Position {
+        return {row:30, column:40};
     }
 }
