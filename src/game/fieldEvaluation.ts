@@ -3,43 +3,39 @@ import * as GameConstants from "./gameConstants";
 import { Position } from "./utils";
 
 export class FieldEvaluation {
-    private readonly aaaa: Map<Position, Map<DIRECTION, boolean>[][]>;
+    private readonly evaluationMap: Map<string, Map<string, boolean>[][]>;
 
-    private readonly shortestDirectionMaps: Map<string, boolean>[][];
     private readonly graphics: Phaser.GameObjects.Graphics;
 
     constructor(gameObjectFactory: Phaser.GameObjects.GameObjectFactory, isVisible: boolean) {
-        this.aaaa = new Map<Position, Map<DIRECTION, boolean>[][]>();
+        this.evaluationMap = new Map<string, Map<string, boolean>[][]>();
 
-        this.shortestDirectionMaps = [...Array(GameConstants.H)].map(() => [...Array(GameConstants.W)].map(() => this.generateDirectionFlagMap() as Map<string, boolean>));
         this.graphics = gameObjectFactory.graphics();
         this.graphics.depth = 99;
         this.graphics.setVisible(isVisible);
     }
 
-    private generateDirectionFlagMap() {
-        const pairs = DIRECTION.values().map(d => [d.keyName, false] as [string, boolean]);
-        return new Map<string, boolean>(pairs);
+    isShortestDirection(from: Position, to: Position, direction: DIRECTION) {
+        const mapKey = this.createMapKeyFromPosition(to);
+        if(!this.evaluationMap.has(mapKey)) {
+            this.evaluationMap.set(mapKey, this.createEvaluation(to));
+        }
+        // if内の処理によって、確実にgetで要素が取れてこれてるはずなので、アサーションつけても大丈夫なはず
+        return this.evaluationMap.get(mapKey)![from.row][from.column].get(direction.keyName);
     }
 
-    private resetMapValues<K, V>(dir: Map<K, V>, value: V) {
-        Array.from(dir.entries()).forEach(([key,]) => {
-            dir.set(key, value);
-        });
+    private createMapKeyFromPosition(position : Position) {
+        return `${position.row},${position.column}`;
     }
 
-    isShortestDirection(row: number, column: number, direction: DIRECTION) {
-        return this.shortestDirectionMaps[row][column].get(direction.keyName);
-    }
-
-    updateEvaluation(startRow: number, startColumn: number) {
-        this.shortestDirectionMaps.forEach(n => n.forEach(dir => { this.resetMapValues(dir, false) }));
+    private createEvaluation(centerPosition: Position) {
+        const map = [...Array(GameConstants.H)].map(() => [...Array(GameConstants.W)].map(() => this.generateDirectionFlagMap() as Map<string, boolean>));
 
         const queue = [];
         const dist = [...Array(GameConstants.H)].map(() => [...Array(GameConstants.W)].fill(-1));
 
-        queue.push([startRow, startColumn]);
-        dist[startRow][startColumn] = 0;
+        queue.push([centerPosition.row, centerPosition.column]);
+        dist[centerPosition.row][centerPosition.column] = 0;
 
         while (queue.length > 0) {
             // 直前で空チェックしてるので、アサーションでもいけるはず
@@ -55,25 +51,33 @@ export class FieldEvaluation {
 
                 if (dist[next_row][next_column] !== -1) {
                     if (dist[next_row][next_column] === dist[v[0]][v[1]] + 1) {
-                        this.shortestDirectionMaps[next_row][next_column].set(d.reverse().keyName, true);
+                        map[next_row][next_column].set(d.reverse().keyName, true);
                     }
                     continue;
                 }
                 queue.push([next_row, next_column]);
                 dist[next_row][next_column] = dist[v[0]][v[1]] + 1;
-                this.shortestDirectionMaps[next_row][next_column].set(d.reverse().keyName, true);
+                map[next_row][next_column].set(d.reverse().keyName, true);
             }
         }
+
+        return map;
+    }
+    
+
+    private generateDirectionFlagMap() {
+        const pairs = DIRECTION.values().map(d => [d.keyName, false] as [string, boolean]);
+        return new Map<string, boolean>(pairs);
     }
 
     draw() {
         this.graphics.clear();
         this.graphics.lineStyle(0, 0x00ff00);
         this.graphics.fillStyle(0x00ff00);
-        for (let i = 0; i < GameConstants.H; i++) {
+       /* for (let i = 0; i < GameConstants.H; i++) {
             for (let j = 0; j < GameConstants.W; j++) {
                 if (this.shortestDirectionMaps[i][j].get(DIRECTION.LEFT.keyName)) {
-                    this.graphics.fillRect(j * GameConstants.GRID_SIZE, i * GameConstants.GRID_SIZE + GameConstants.GRID_SIZE / 2 -GameConstants. GRID_SIZE / 10, GameConstants.GRID_SIZE / 5, GameConstants.GRID_SIZE / 5);
+                    this.graphics.fillRect(j * GameConstants.GRID_SIZE, i * GameConstants.GRID_SIZE + GameConstants.GRID_SIZE / 2 - GameConstants.GRID_SIZE / 10, GameConstants.GRID_SIZE / 5, GameConstants.GRID_SIZE / 5);
                 }
                 if (this.shortestDirectionMaps[i][j].get(DIRECTION.UP.keyName)) {
                     this.graphics.fillRect(j * GameConstants.GRID_SIZE + GameConstants.GRID_SIZE / 2 - GameConstants.GRID_SIZE / 10, i * GameConstants.GRID_SIZE, GameConstants.GRID_SIZE / 5, GameConstants.GRID_SIZE / 5);
@@ -82,9 +86,9 @@ export class FieldEvaluation {
                     this.graphics.fillRect((j + 1) * GameConstants.GRID_SIZE - GameConstants.GRID_SIZE / 5, i * GameConstants.GRID_SIZE + GameConstants.GRID_SIZE / 2 - GameConstants.GRID_SIZE / 10, GameConstants.GRID_SIZE / 5, GameConstants.GRID_SIZE / 5);
                 }
                 if (this.shortestDirectionMaps[i][j].get(DIRECTION.DOWN.keyName)) {
-                    this.graphics.fillRect(j * GameConstants.GRID_SIZE + GameConstants.GRID_SIZE / 2 -GameConstants. GRID_SIZE / 10, (i + 1) * GameConstants.GRID_SIZE - GameConstants.GRID_SIZE / 5, GameConstants.GRID_SIZE / 5, GameConstants.GRID_SIZE / 5);
+                    this.graphics.fillRect(j * GameConstants.GRID_SIZE + GameConstants.GRID_SIZE / 2 - GameConstants.GRID_SIZE / 10, (i + 1) * GameConstants.GRID_SIZE - GameConstants.GRID_SIZE / 5, GameConstants.GRID_SIZE / 5, GameConstants.GRID_SIZE / 5);
                 }
             }
-        }
+        }*/
     }
 }
