@@ -11,14 +11,14 @@ export class EnemiesSupervision {
     constructor(gameObjectFactory: Phaser.GameObjects.GameObjectFactory, params: any,
         onPlayerCaptured: () => void, footprint: Footprint,
         isShortestDirection: (from: Util.Position, to: Util.Position, direction: DIRECTION) => boolean,
-        getPlayerRoomId: () => number
+        getPlayerRoomId: () => number, isFinalRound: () => boolean
     ) {
 
         this.enemyList = Array.from({ length: GameConstants.numberOfEnemyies }, (_, i) => new Enemy(
             gameObjectFactory, GameConstants.parametersOfEnemies[i].row, GameConstants.parametersOfEnemies[i].column,
             params, GameConstants.parametersOfEnemies[i].priorityScanDirections, new PatrolStrategy(),
             onPlayerCaptured, footprint.getFirstPrint, footprint.onSteppedOnByEnemy,
-            isShortestDirection, getPlayerRoomId
+            isShortestDirection, getPlayerRoomId, isFinalRound
         ));
     }
 

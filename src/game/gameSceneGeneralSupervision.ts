@@ -70,15 +70,15 @@ export class GameSceneGeneralSupervision {
         //フィールド評価
         this.fieldEvaluation = new FieldEvaluation(this.gameObjectFactory, this.params.visibleFieldEvaluation, this.player.getFootPrint().getFirstPrint);
 
+        // ラウンド進行監督
+        this.roundsSupervision = new RoundsSupervision(this.gameObjectFactory, this.onGameCompleted);
+
         // 敵
         this.enemiesSupervision = new EnemiesSupervision(
             this.gameObjectFactory, this.params, this.onPlayerCaptured,
             this.player.getFootPrint(), this.fieldEvaluation.isShortestDirection,
-            this.player.getRoomId
+            this.player.getRoomId, this.roundsSupervision.isFinalRound
         );
-
-        // ラウンド進行監督
-        this.roundsSupervision = new RoundsSupervision(this.gameObjectFactory, this.onGameCompleted);
     }
 
     setupSupervision() {
@@ -188,7 +188,9 @@ export class GameSceneGeneralSupervision {
         this.player.resolvePlayerFrame(playerDirection, this.recorder.getElapsedFrame());
 
         // 敵との接触判定・ゲームオーバー更新
-        this.player.handleCollisionWithEnemies(this.enemiesSupervision);
+        for(const enemy of this.enemiesSupervision.getEnemyList()) {
+            this.player.handleCollisionWith(enemy);
+        }
 
         // 敵と接触しているとゲームステータスが変わるから
         if (!this.isPlaying()) {
@@ -220,7 +222,9 @@ export class GameSceneGeneralSupervision {
         this.enemiesSupervision.resolveFrame();
 
         // 敵との接触判定・ゲームオーバー更新
-        this.player.handleCollisionWithEnemies(this.enemiesSupervision);
+        for(const enemy of this.enemiesSupervision.getEnemyList()) {
+            this.player.handleCollisionWith(enemy);
+        }
 
         // 敵と接触しているとステータスが変わるから
         // 意味はないが、ゲームステータスが変わるから書いとく

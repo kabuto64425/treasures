@@ -40,7 +40,7 @@ export class RoundsSupervision {
         return this.currentRound;
     }
 
-    private isFinalRound() {
+    isFinalRound = () => {
         return this.getCurrentRoundSupervision().isFinalRound();
     }
 

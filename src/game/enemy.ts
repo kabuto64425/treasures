@@ -29,14 +29,15 @@ export class Enemy implements IFieldActor {
     private readonly getFirstFootprint: () => Util.Position;
     private readonly stepOnFirstFootprint: () => void;
     private readonly isShortestDirection: (from: Util.Position, to: Util.Position, direction: DIRECTION) => boolean;
-    private readonly getPlayerRoomId: () => number
+    private readonly getPlayerRoomId: () => number;
+    private readonly isFinalRound: () => boolean;
 
     constructor(gameObjectFactory: Phaser.GameObjects.GameObjectFactory, iniRow: number,
         iniColumn: number, params: any, priorityScanDirections: DIRECTION[],
         strategy: SearchingStrategy, onPlayerCaptured: () => void,
         getFirstFootprint: () => Util.Position, stepOnFirstFootprint: () => void,
         isShortestDirection: (from: Util.Position, to: Util.Position, direction: DIRECTION) => boolean,
-        getPlayerRoomId: () => number
+        getPlayerRoomId: () => number, isFinalRound: () => boolean
     ) {
         this.graphics = gameObjectFactory.graphics();
         this.graphics.depth = 10;
@@ -55,6 +56,7 @@ export class Enemy implements IFieldActor {
         this.stepOnFirstFootprint = stepOnFirstFootprint;
         this.isShortestDirection = isShortestDirection;
         this.getPlayerRoomId = getPlayerRoomId;
+        this.isFinalRound = isFinalRound;
     }
 
     position() {
@@ -73,15 +75,18 @@ export class Enemy implements IFieldActor {
         // 敵の状態変更判定
         if (this.isSearching()) {
             // プレイヤーと同室したら、追跡にする。
-            if (this.roomId === this.getPlayerRoomId()) {
+            if (this.roomId === this.getPlayerRoomId() || this.isFinalRound()) {
                 this.state = EnemyState.CHASING;
             }
         } else if (this.isChasing()) {
-            // 2部屋以上離れたら索敵にする
-            if (Util.culculateRoomDistanceManhattan(this.roomId, this.getPlayerRoomId()) >= 2) {
-                this.state = EnemyState.SEARCHING;
-                // 索敵に変わると、更新する
-                this.strategy.updateStrategyInfo();
+            // ファイナルラウンドの場合は常時追跡
+            if (!this.isFinalRound()) {
+                // 2部屋以上離れたら索敵にする
+                if (Util.culculateRoomDistanceManhattan(this.roomId, this.getPlayerRoomId()) >= 2) {
+                    this.state = EnemyState.SEARCHING;
+                    // 索敵に変わると、更新する
+                    this.strategy.updateStrategyInfo();
+                }
             }
         }
 
@@ -92,7 +97,7 @@ export class Enemy implements IFieldActor {
             const direction = this.decideMoveDirection(targetPosition);
             this.move(direction);
             // 更新条件判定処理は、必要になればbehaviorを使って索敵モード時のみに実施するようにする。(今のところ不要だった)
-            if(Util.isSamePosition(this.position(), this.strategy.getTargetPosition())) {
+            if (Util.isSamePosition(this.position(), this.strategy.getTargetPosition())) {
                 // 目的地に到達したので更新
                 this.strategy.updateStrategyInfo();
             }
@@ -244,7 +249,7 @@ export class PatrolStrategy implements SearchingStrategy {
     resolveFrame() {
         this.framesSinceLastDestinationUpdate++;
         // 規定秒数経過で、目的地到達有無にかかわらず目的地更新
-        if(this.framesSinceLastDestinationUpdate >= GameConstants.DESTINATION_FORCE_UPDATE_INTERVAL * GameConstants.FPS) {
+        if (this.framesSinceLastDestinationUpdate >= GameConstants.DESTINATION_FORCE_UPDATE_INTERVAL * GameConstants.FPS) {
             this.updateStrategyInfo();
         }
     }
