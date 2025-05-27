@@ -159,7 +159,7 @@ export class Enemy implements IFieldActor {
     // 仮実装
     decideMoveDirectionSearching(fieldEvaluation: FieldEvaluation) {
         for (const d of this.priorityScanDirections) {
-            if (fieldEvaluation.isShortestDirection(this.row, this.column, d)) {
+            if (fieldEvaluation.isShortestDirection({row : this.row, column : this.column}, this.getFirstFootprint(), d)) {
                 return d;
             }
         }
@@ -168,7 +168,7 @@ export class Enemy implements IFieldActor {
 
     decideMoveDirectionChasing(fieldEvaluation: FieldEvaluation) {
         for (const d of this.priorityScanDirections) {
-            if (fieldEvaluation.isShortestDirection(this.row, this.column, d)) {
+            if (fieldEvaluation.isShortestDirection({row : this.row, column : this.column}, this.getFirstFootprint(), d)) {
                 return d;
             }
         }

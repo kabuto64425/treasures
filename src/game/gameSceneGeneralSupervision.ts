@@ -161,8 +161,8 @@ export class GameSceneGeneralSupervision {
         this.player.draw();
 
         // フィールド評価
-        this.fieldEvaluation.updateEvaluation(this.player.position().row, this.player.position().column);
-        this.fieldEvaluation.draw();
+        //this.fieldEvaluation.updateEvaluation(this.player.position().row, this.player.position().column);
+        //this.fieldEvaluation.draw();
 
         // 敵
         for (const enemy of this.enemyList) {
@@ -230,8 +230,8 @@ export class GameSceneGeneralSupervision {
 
         // 敵のターン
         // フィールド評価
-        this.fieldEvaluation.updateEvaluation(this.player.getFootPrint().getFirstPrint().row, this.player.getFootPrint().getFirstPrint().column);
-        this.fieldEvaluation.draw();
+        //this.fieldEvaluation.updateEvaluation(this.player.getFootPrint().getFirstPrint().row, this.player.getFootPrint().getFirstPrint().column);
+        //this.fieldEvaluation.draw();
 
         // 敵
         for (const enemy of this.enemyList) {
