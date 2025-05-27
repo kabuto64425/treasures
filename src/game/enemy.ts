@@ -64,14 +64,13 @@ export class Enemy implements IFieldActor {
     resolveEnemyFrame(fieldEvaluation: FieldEvaluation, playerRoomId: number) {
         // 敵の状態変更判定
         if (this.isSearching()) {
-            // プレイヤーと同室したら、追いかける。
+            // プレイヤーと同室したら、追跡にする。
             if (this.roomId === playerRoomId) {
                 this.state = EnemyState.CHASING;
             }
         } else if (this.isChasing()) {
-            // 今は仮実装
-            // 2部屋以上離れたら探索にする予定
-            if (this.roomId !== playerRoomId) {
+            // 2部屋以上離れたら索敵にする
+            if (Util.culculateRoomDistanceManhattan(this.roomId, playerRoomId) >= 2) {
                 this.state = EnemyState.SEARCHING;
             }
         }

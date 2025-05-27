@@ -67,3 +67,13 @@ export function findRoomId(position: Position) {
 export function isDebugEnv() {
     return (import.meta.env.MODE === "development");
 }
+
+export function culculateRoomDistanceManhattan(roomId1 : number, roomId2 : number) {
+    const room1Row = Math.floor(roomId1 / GameConstants.ROOM_COLUMN_COUNT);
+    const room1Column = roomId1 % GameConstants.ROOM_COLUMN_COUNT;
+
+    const room2Row = Math.floor(roomId2 / GameConstants.ROOM_COLUMN_COUNT);
+    const room2Column = roomId2 % GameConstants.ROOM_COLUMN_COUNT;
+
+    return Math.abs(room1Row - room2Row) + Math.abs(room1Column - room2Column);
+}
