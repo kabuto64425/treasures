@@ -17,6 +17,14 @@ export class FieldEvaluation {
         this.getFirstPrint = getFirstPrint;
     }
 
+    setup() {
+        this.draw();
+    }
+
+    resolveFrame() {
+        this.draw();
+    }
+
     isShortestDirection(from: Position, to: Position, direction: DIRECTION) {
         const mapKey = this.createMapKeyFromPosition(to);
         if(!this.evaluationMap.has(mapKey)) {
@@ -72,7 +80,7 @@ export class FieldEvaluation {
         return new Map<string, boolean>(pairs);
     }
 
-    draw() {
+    private draw() {
         this.graphics.clear();
         this.graphics.lineStyle(0, 0x00ff00);
         this.graphics.fillStyle(0x00ff00);

@@ -61,7 +61,7 @@ export class Enemy implements IFieldActor {
     }
 
     setup() {
-
+        this.draw();
     }
 
     resolveEnemyFrame(fieldEvaluation: FieldEvaluation, playerRoomId: number) {
@@ -90,6 +90,7 @@ export class Enemy implements IFieldActor {
 
         this.handleFirstFootprintStep();
         this.roomId = Util.findRoomId(this.position());
+        this.draw();
     }
 
     move(direction: DIRECTION | undefined) {
@@ -102,7 +103,7 @@ export class Enemy implements IFieldActor {
         this.chargeAmount = 0;
     }
 
-    getPlayerDebugValueData() {
+    getDebugValueData() {
         return {
             state: EnemyState[this.state],
             chargeAmount: this.chargeAmount,
@@ -111,7 +112,7 @@ export class Enemy implements IFieldActor {
         };
     }
 
-    draw() {
+    private draw() {
         this.graphics.clear();
         this.graphics.lineStyle(0, 0xff0000);
         this.graphics.fillStyle(0xff0000);

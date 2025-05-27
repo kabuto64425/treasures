@@ -157,20 +157,18 @@ export class GameSceneGeneralSupervision {
             }
         }
 
-        // プレイヤー描画
+        // プレイヤー
         this.player.setup(this.recorder.getElapsedFrame());
-        this.player.draw();
 
         // フィールド評価
-        this.fieldEvaluation.draw();
+        this.fieldEvaluation.setup();
 
         // 敵
         for (const enemy of this.enemyList) {
             enemy.setup();
-            enemy.draw();
         }
         DebugDataMediator.setEnemiesDebugValue(
-            this.enemyList.map(e => {return e.getPlayerDebugValueData()})
+            this.enemyList.map(e => {return e.getDebugValueData()})
         );
 
         // ゲーム進行管理
@@ -198,8 +196,6 @@ export class GameSceneGeneralSupervision {
         let playerDirection = this.inputCoordinator.getApprovedActionInfo().playerDirection;
         // プレイヤーのターン
         this.player.resolvePlayerFrame(playerDirection, this.recorder.getElapsedFrame());
-        this.player.draw();
-        this.player.getFootPrint().draw();
 
         // 敵との接触判定・ゲームオーバー更新
         for (const enemy of this.enemyList) {
@@ -230,15 +226,14 @@ export class GameSceneGeneralSupervision {
 
         // 敵のターン
         // フィールド評価
-        this.fieldEvaluation.draw();
+        this.fieldEvaluation.resolveFrame();
 
         // 敵
         for (const enemy of this.enemyList) {
             enemy.resolveEnemyFrame(this.fieldEvaluation, this.player.getRoomId());
-            enemy.draw();
         }
         DebugDataMediator.setEnemiesDebugValue(
-            this.enemyList.map(e => {return e.getPlayerDebugValueData()})
+            this.enemyList.map(e => {return e.getDebugValueData()})
         );
 
         // 敵との接触判定・ゲームオーバー更新

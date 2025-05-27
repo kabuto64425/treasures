@@ -42,9 +42,10 @@ export class Footprint {
         }
         // 次のフレームに備えてフラグをリセット
         this.isFirstPrintStepped = false;
+        this.draw();
     }
 
-    draw() {
+    private draw() {
         this.graphics.clear();
         this.graphics.lineStyle(0, 0x0000ff, 0.3);
         this.graphics.fillStyle(0x0000ff, 0.3);

@@ -49,6 +49,7 @@ export class Player {
 
     setup(currentFrame: number) {
         this.footPrint.push(this.position(), currentFrame);
+        this.draw();
     }
 
     resolvePlayerFrame(playerDirection: DIRECTION | undefined, currentFrame: number) {
@@ -77,8 +78,9 @@ export class Player {
         }
 
         this.roomId = Util.findRoomId(this.position());
+        this.draw();
+        
         this.footPrint.resolveFootprintPerFrame(currentFrame);
-
         this.updateDebugData();
     }
 
@@ -116,7 +118,7 @@ export class Player {
         this.chargeAmount = 0;
     }
 
-    draw() {
+    private draw() {
         this.graphics.clear();
         this.graphics.lineStyle(0, 0x0000ff);
         this.graphics.fillStyle(0x0000ff);
