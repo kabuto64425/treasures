@@ -69,7 +69,7 @@ export class GameSceneGeneralSupervision {
         this.player = new Player(this.gameObjectFactory, GameConstants.parameterPlayer.row, GameConstants.parameterPlayer.column, this.params);
 
         //フィールド評価
-        this.fieldEvaluation = new FieldEvaluation(this.gameObjectFactory, this.params.visibleFieldEvaluation);
+        this.fieldEvaluation = new FieldEvaluation(this.gameObjectFactory, this.params.visibleFieldEvaluation, this.player.getFootPrint().getFirstPrint);
 
         // 敵
         this.enemyList = [];
@@ -162,8 +162,7 @@ export class GameSceneGeneralSupervision {
         this.player.draw();
 
         // フィールド評価
-        //this.fieldEvaluation.updateEvaluation(this.player.position().row, this.player.position().column);
-        //this.fieldEvaluation.draw();
+        this.fieldEvaluation.draw();
 
         // 敵
         for (const enemy of this.enemyList) {
@@ -231,8 +230,7 @@ export class GameSceneGeneralSupervision {
 
         // 敵のターン
         // フィールド評価
-        //this.fieldEvaluation.updateEvaluation(this.player.getFootPrint().getFirstPrint().row, this.player.getFootPrint().getFirstPrint().column);
-        //this.fieldEvaluation.draw();
+        this.fieldEvaluation.draw();
 
         // 敵
         for (const enemy of this.enemyList) {

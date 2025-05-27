@@ -6,13 +6,15 @@ export class FieldEvaluation {
     private readonly evaluationMap: Map<string, Map<string, boolean>[][]>;
 
     private readonly graphics: Phaser.GameObjects.Graphics;
+    private readonly getFirstPrint: () => Position;
 
-    constructor(gameObjectFactory: Phaser.GameObjects.GameObjectFactory, isVisible: boolean) {
+    constructor(gameObjectFactory: Phaser.GameObjects.GameObjectFactory, isVisible: boolean, getFirstPrint: () => Position) {
         this.evaluationMap = new Map<string, Map<string, boolean>[][]>();
 
         this.graphics = gameObjectFactory.graphics();
         this.graphics.depth = 99;
         this.graphics.setVisible(isVisible);
+        this.getFirstPrint = getFirstPrint;
     }
 
     isShortestDirection(from: Position, to: Position, direction: DIRECTION) {
@@ -74,21 +76,22 @@ export class FieldEvaluation {
         this.graphics.clear();
         this.graphics.lineStyle(0, 0x00ff00);
         this.graphics.fillStyle(0x00ff00);
-       /* for (let i = 0; i < GameConstants.H; i++) {
+        for (let i = 0; i < GameConstants.H; i++) {
             for (let j = 0; j < GameConstants.W; j++) {
-                if (this.shortestDirectionMaps[i][j].get(DIRECTION.LEFT.keyName)) {
+                this.isShortestDirection({row: i, column:j}, this.getFirstPrint(), DIRECTION.LEFT);
+                if (this.isShortestDirection({row: i, column:j}, this.getFirstPrint(), DIRECTION.LEFT)) {
                     this.graphics.fillRect(j * GameConstants.GRID_SIZE, i * GameConstants.GRID_SIZE + GameConstants.GRID_SIZE / 2 - GameConstants.GRID_SIZE / 10, GameConstants.GRID_SIZE / 5, GameConstants.GRID_SIZE / 5);
                 }
-                if (this.shortestDirectionMaps[i][j].get(DIRECTION.UP.keyName)) {
+                if (this.isShortestDirection({row: i, column:j}, this.getFirstPrint(), DIRECTION.UP)) {
                     this.graphics.fillRect(j * GameConstants.GRID_SIZE + GameConstants.GRID_SIZE / 2 - GameConstants.GRID_SIZE / 10, i * GameConstants.GRID_SIZE, GameConstants.GRID_SIZE / 5, GameConstants.GRID_SIZE / 5);
                 }
-                if (this.shortestDirectionMaps[i][j].get(DIRECTION.RIGHT.keyName)) {
+                if (this.isShortestDirection({row: i, column:j}, this.getFirstPrint(), DIRECTION.RIGHT)) {
                     this.graphics.fillRect((j + 1) * GameConstants.GRID_SIZE - GameConstants.GRID_SIZE / 5, i * GameConstants.GRID_SIZE + GameConstants.GRID_SIZE / 2 - GameConstants.GRID_SIZE / 10, GameConstants.GRID_SIZE / 5, GameConstants.GRID_SIZE / 5);
                 }
-                if (this.shortestDirectionMaps[i][j].get(DIRECTION.DOWN.keyName)) {
+                if (this.isShortestDirection({row: i, column:j}, this.getFirstPrint(), DIRECTION.DOWN)) {
                     this.graphics.fillRect(j * GameConstants.GRID_SIZE + GameConstants.GRID_SIZE / 2 - GameConstants.GRID_SIZE / 10, (i + 1) * GameConstants.GRID_SIZE - GameConstants.GRID_SIZE / 5, GameConstants.GRID_SIZE / 5, GameConstants.GRID_SIZE / 5);
                 }
             }
-        }*/
+        }
     }
 }
