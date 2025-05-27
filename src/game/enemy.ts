@@ -78,7 +78,8 @@ export class Enemy implements IFieldActor {
         const behavior = this.behaviorMap[this.state];
 
         if (behavior.isChargeCompleted(this)) {
-            const direction = behavior.decideMoveDirection(this, fieldEvaluation);
+            const targetPosition = behavior.decideTagetPosition(this);
+            const direction = this.decideMoveDirection(targetPosition, fieldEvaluation);
             this.move(direction);
         } else {
             this.charge();
@@ -157,18 +158,17 @@ export class Enemy implements IFieldActor {
     }
 
     // 仮実装
-    decideMoveDirectionSearching(fieldEvaluation: FieldEvaluation) {
-        for (const d of this.priorityScanDirections) {
-            if (fieldEvaluation.isShortestDirection({row : this.row, column : this.column}, this.getFirstFootprint(), d)) {
-                return d;
-            }
-        }
-        return undefined;
+    decideTagetPositionSearching() {
+        return this.getFirstFootprint();
     }
 
-    decideMoveDirectionChasing(fieldEvaluation: FieldEvaluation) {
+    decideTagetPositionChasing() {
+        return this.getFirstFootprint();
+    }
+
+    private decideMoveDirection(targetPosition : Util.Position, fieldEvaluation: FieldEvaluation) {
         for (const d of this.priorityScanDirections) {
-            if (fieldEvaluation.isShortestDirection({row : this.row, column : this.column}, this.getFirstFootprint(), d)) {
+            if (fieldEvaluation.isShortestDirection({row : this.row, column : this.column}, targetPosition, d)) {
                 return d;
             }
         }
@@ -178,15 +178,15 @@ export class Enemy implements IFieldActor {
 
 interface EnemyBehavior {
     isChargeCompleted(enemy: Enemy): boolean;
-    decideMoveDirection(enemy: Enemy, fieldEvaluation: FieldEvaluation): DIRECTION | undefined;
+    decideTagetPosition(enemy: Enemy):Util.Position;
 }
 
 class SearchingBehavior implements EnemyBehavior {
     isChargeCompleted(enemy: Enemy): boolean {
         return enemy.isChargeCompletedSearching();
     }
-    decideMoveDirection(enemy: Enemy, fe: FieldEvaluation): DIRECTION | undefined {
-        return enemy.decideMoveDirectionSearching(fe);
+    decideTagetPosition(enemy: Enemy): Util.Position {
+        return enemy.decideTagetPositionSearching();
     }
 }
 
@@ -194,7 +194,7 @@ class ChasingBehavior implements EnemyBehavior {
     isChargeCompleted(enemy: Enemy): boolean {
         return enemy.isChargeCompletedChasing();
     }
-    decideMoveDirection(enemy: Enemy, fe: FieldEvaluation): DIRECTION | undefined {
-        return enemy.decideMoveDirectionChasing(fe);
+    decideTagetPosition(enemy: Enemy): Util.Position {
+        return enemy.decideTagetPositionChasing();
     }
 }
