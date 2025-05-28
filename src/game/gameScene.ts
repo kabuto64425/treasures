@@ -84,6 +84,7 @@ export class GameScene extends Phaser.Scene {
         gameSceneGeneralSupervision.updatePerFrame();
         this.debugData.frameDelta = _delta;
         this.debugData.updateDuration = performance.now() - now;
+        this.debugData.fps = this.game.loop.actualFps.toFixed(1);
 
         if (this.isDebugStepMode) {
             this.doStepOnce = false;

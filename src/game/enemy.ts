@@ -32,13 +32,15 @@ export class Enemy implements IFieldActor {
     private readonly getPlayerRoomId: () => number;
     private readonly isFinalRound: () => boolean;
     private readonly onPlayerSpotted: (spottedRoomId: number) => void;
+    private readonly getEnemyList: () => Enemy[];
 
     constructor(gameObjectFactory: Phaser.GameObjects.GameObjectFactory, iniRow: number,
         iniColumn: number, params: any, priorityScanDirections: DIRECTION[],
         strategy: SearchingStrategy, onPlayerCaptured: () => void,
         getFirstFootprint: () => Util.Position, stepOnFirstFootprint: () => void,
         isShortestDirection: (from: Util.Position, to: Util.Position, direction: DIRECTION) => boolean,
-        getPlayerRoomId: () => number, isFinalRound: () => boolean, onPlayerSpotted: (spottedRoomId: number) => void
+        getPlayerRoomId: () => number, isFinalRound: () => boolean, onPlayerSpotted: (spottedRoomId: number) => void,
+        getEnemyList: () => Enemy[]
     ) {
         this.graphics = gameObjectFactory.graphics();
         this.graphics.depth = 10;
@@ -59,6 +61,7 @@ export class Enemy implements IFieldActor {
         this.getPlayerRoomId = getPlayerRoomId;
         this.isFinalRound = isFinalRound;
         this.onPlayerSpotted = onPlayerSpotted;
+        this.getEnemyList = getEnemyList;
     }
 
     position() {
@@ -71,6 +74,7 @@ export class Enemy implements IFieldActor {
 
     setup() {
         this.draw();
+        this.strategy.setup();
     }
 
     resolveEnemyFrame() {
@@ -98,8 +102,17 @@ export class Enemy implements IFieldActor {
 
         if (behavior.isChargeCompleted(this)) {
             const targetPosition = behavior.decideTagetPosition(this);
-            const direction = this.decideMoveDirection(targetPosition);
-            this.move(direction);
+            const firstDirection = this.decideMoveDirection(targetPosition);
+            if (firstDirection !== undefined) {
+                // 基本は最短方向に移動するが、敵同士が互いに衝突した場合に備えて、
+                // 時計回りで移動できる方向を調べて移動することで移動先を譲れるようにする
+                for (const d of firstDirection.clockwiseFrom()) {
+                    if (this.canMove(d)) {
+                        this.move(d);
+                        break;
+                    }
+                }
+            }
             // 更新条件判定処理は、必要になればbehaviorを使って索敵モード時のみに実施するようにする。(今のところ不要だった)
             if (Util.isSamePosition(this.position(), this.strategy.getTargetPosition())) {
                 // 目的地に到達したので更新
@@ -116,7 +129,23 @@ export class Enemy implements IFieldActor {
         this.strategy.resolveFrame();
     }
 
-    move(direction: DIRECTION | undefined) {
+    private canMove(direction: DIRECTION | undefined) {
+        if (direction === undefined) {
+            return false;
+        }
+        const nextPosition = Util.calculateNextPosition(this.position(), direction);
+        // 他の敵との衝突回避
+        for (const enemy of this.getEnemyList()) {
+            if (this !== enemy) {
+                if (Util.isSamePosition(nextPosition, enemy.position())) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    private move(direction: DIRECTION | undefined) {
         if (direction === undefined) {
             return;
         }
@@ -226,6 +255,7 @@ class ChasingBehavior implements EnemyBehavior {
 }
 
 export interface SearchingStrategy {
+    setup(): void;
     resolveFrame(): void;
     updateStrategyInfo(): void;
     getTargetPosition(): Util.Position;
@@ -249,6 +279,7 @@ abstract class BaseStrategy implements SearchingStrategy {
         }
     }
 
+    abstract setup(): void;
     abstract updateStrategyInfo(): void;
     abstract getTargetPosition(): Util.Position;
 }
@@ -271,6 +302,9 @@ export class PatrolStrategy extends BaseStrategy {
         const wayPoints = GameConstants.ENEMY_SEARCH_WAYPOINTS[this.targetRoomId];
         this.targetPosition = wayPoints[this.wayPointRouteIndex];
         this.framesSinceLastDestinationUpdate = 0;
+    }
+
+    setup() {
     }
 
     updateStrategyInfo() {
@@ -315,6 +349,9 @@ export class FollowerStrategy extends BaseStrategy {
         this.framesSinceLastDestinationUpdate = 0;
     }
 
+    setup() {
+    }
+
     resolveFrame(): void {
         this.framesSinceLastDestinationUpdate++;
         // 規定秒数経過で、目的地到達有無にかかわらず目的地更新
@@ -346,10 +383,83 @@ export class FollowerStrategy extends BaseStrategy {
 // 先回り型
 // 最も宝の数が多い部屋へ向かう
 export class InterceptStrategy extends BaseStrategy {
-    updateStrategyInfo(): void {
-        throw new Error("Method not implemented.");
+    private targetPosition?: Util.Position;
+    private targetRoomId?: number;
+
+    private wayPointRouteIndex: number;
+
+    private findRoomIdWithMostTreasures: () => number;
+
+    constructor(findRoomIdWithMostTreasures: () => number) {
+        super();
+        this.wayPointRouteIndex = 0;
+
+        this.findRoomIdWithMostTreasures = findRoomIdWithMostTreasures;
     }
+
+    setup() {
+        this.updateStrategyInfo();
+    }
+
+    updateStrategyInfo(): void {
+        const newTargetRoomId = this.findRoomIdWithMostTreasures();
+        const wayPoints = GameConstants.ENEMY_SEARCH_WAYPOINTS[newTargetRoomId];
+
+        if (this.targetRoomId === newTargetRoomId) {
+            this.wayPointRouteIndex = (this.wayPointRouteIndex + 1) % (wayPoints.length);
+        } else {
+            this.wayPointRouteIndex = 0;
+        }
+        this.targetRoomId = newTargetRoomId;
+
+        this.targetPosition = wayPoints[this.wayPointRouteIndex];
+        this.framesSinceLastDestinationUpdate = 0;
+    }
+
     getTargetPosition(): Util.Position {
-        throw new Error("Method not implemented.");
+        // undefined時に返すポジションは、考える。(??にする必要があるかも含めて)
+        return this.targetPosition ?? { row: GameConstants.H - 2, column: GameConstants.W - 2 };
+    }
+}
+
+// 裏取り型
+// 敵が誰もいない部屋へ向かう
+// (更新時は、現在の自分の部屋も含めて、敵が誰もいない部屋へ向かわせる。)
+export class FlankingStrategy extends BaseStrategy {
+    private targetPosition?: Util.Position;
+    private targetRoomId?: number;
+
+    private wayPointRouteIndex: number;
+
+    private findRoomIdWithoutEnemies: () => number;
+
+    constructor(findRoomIdWithoutEnemies: () => number) {
+        super();
+        this.wayPointRouteIndex = 0;
+        this.findRoomIdWithoutEnemies = findRoomIdWithoutEnemies;
+    }
+
+    setup(): void {
+        this.updateStrategyInfo();
+    }
+
+    updateStrategyInfo(): void {
+        const newTargetRoomId = this.findRoomIdWithoutEnemies();
+        const wayPoints = GameConstants.ENEMY_SEARCH_WAYPOINTS[newTargetRoomId];
+
+        if (this.targetRoomId === newTargetRoomId) {
+            this.wayPointRouteIndex = (this.wayPointRouteIndex + 1) % (wayPoints.length);
+        } else {
+            this.wayPointRouteIndex = 0;
+        }
+        this.targetRoomId = newTargetRoomId;
+
+        this.targetPosition = wayPoints[this.wayPointRouteIndex];
+        this.framesSinceLastDestinationUpdate = 0;
+    }
+
+    getTargetPosition(): Util.Position {
+        // undefined時に返すポジションは、考える。(??にする必要があるかも含めて)
+        return this.targetPosition ?? { row: GameConstants.H - 2, column: GameConstants.W - 2 };
     }
 }

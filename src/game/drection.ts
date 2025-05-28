@@ -24,4 +24,11 @@ export class DIRECTION {
     static values(): DIRECTION[] {
         return [DIRECTION.LEFT, DIRECTION.UP, DIRECTION.RIGHT, DIRECTION.DOWN] as const;
     }
+
+    // ある方向から時計回りで方向リストを取得
+    clockwiseFrom(): DIRECTION[] {
+        const directions = DIRECTION.values();
+        const startIndex = directions.indexOf(this);
+        return [...directions.slice(startIndex), ...directions.slice(0, startIndex)];
+    }
 }

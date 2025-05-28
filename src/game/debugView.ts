@@ -14,7 +14,7 @@ export class DebugView {
         const view = this; // ← this をキャプチャして保持
         this.gui.add(this.data, "updateDuration").listen();
         this.gui.add(this.data, "frameDelta").listen();
-        this.gui.add({ get fps() { return 1000 / (view.data.frameDelta); } }, "fps").listen();
+        this.gui.add(this.data, "fps").listen();
 
         const playerFolder = this.gui.addFolder("player");
 

@@ -4,6 +4,7 @@ import { Position } from "./utils";
 export class DebugData {
     updateDuration: number = 0;
     frameDelta: number = 0;
+    fps: string = "";
 
     player: {
         chargeAmount?: number,

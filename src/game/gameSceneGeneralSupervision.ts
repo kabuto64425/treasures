@@ -77,7 +77,8 @@ export class GameSceneGeneralSupervision {
         this.enemiesSupervision = new EnemiesSupervision(
             this.gameObjectFactory, this.params, this.onPlayerCaptured,
             this.player.getFootPrint(), this.fieldEvaluation.isShortestDirection,
-            this.player.getRoomId, this.roundsSupervision.isFinalRound
+            this.player.getRoomId, this.roundsSupervision.isFinalRound,
+            this.roundsSupervision.extractCurrentAppearanceTreasures
         );
     }
 
@@ -158,11 +159,11 @@ export class GameSceneGeneralSupervision {
         // フィールド評価
         this.fieldEvaluation.setup();
 
-        // 敵
-        this.enemiesSupervision.setup();
-
         // ゲーム進行管理
         this.roundsSupervision.setup();
+
+        // 敵
+        this.enemiesSupervision.setup();
     }
 
     startGame() {
