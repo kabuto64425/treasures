@@ -188,7 +188,7 @@ export class GameSceneGeneralSupervision {
         this.player.resolvePlayerFrame(playerDirection, this.recorder.getElapsedFrame());
 
         // 敵との接触判定・ゲームオーバー更新
-        for(const enemy of this.enemiesSupervision.getEnemyList()) {
+        for (const enemy of this.enemiesSupervision.getEnemyList()) {
             this.player.handleCollisionWith(enemy);
         }
 
@@ -197,7 +197,7 @@ export class GameSceneGeneralSupervision {
             return;
         }
 
-        for (const treasure of this.roundsSupervision.getCurrentRoundSupervision().extractAppearanceTreasures()) {
+        for (const treasure of this.roundsSupervision.extractCurrentAppearanceTreasures()) {
             this.player.handleCollisionWith(treasure);
         }
 
@@ -222,7 +222,7 @@ export class GameSceneGeneralSupervision {
         this.enemiesSupervision.resolveFrame();
 
         // 敵との接触判定・ゲームオーバー更新
-        for(const enemy of this.enemiesSupervision.getEnemyList()) {
+        for (const enemy of this.enemiesSupervision.getEnemyList()) {
             this.player.handleCollisionWith(enemy);
         }
 

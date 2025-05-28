@@ -57,4 +57,8 @@ export class RoundsSupervision {
     getCurrentRoundSupervision() {
         return this.singleRoundSupervisionList[this.currentRound];
     }
+
+    extractCurrentAppearanceTreasures() {
+        return this.getCurrentRoundSupervision().extractAppearanceTreasures();
+    }
 }
