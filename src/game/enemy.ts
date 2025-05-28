@@ -31,13 +31,14 @@ export class Enemy implements IFieldActor {
     private readonly isShortestDirection: (from: Util.Position, to: Util.Position, direction: DIRECTION) => boolean;
     private readonly getPlayerRoomId: () => number;
     private readonly isFinalRound: () => boolean;
+    private readonly onPlayerSpotted: (spottedRoomId: number) => void;
 
     constructor(gameObjectFactory: Phaser.GameObjects.GameObjectFactory, iniRow: number,
         iniColumn: number, params: any, priorityScanDirections: DIRECTION[],
         strategy: SearchingStrategy, onPlayerCaptured: () => void,
         getFirstFootprint: () => Util.Position, stepOnFirstFootprint: () => void,
         isShortestDirection: (from: Util.Position, to: Util.Position, direction: DIRECTION) => boolean,
-        getPlayerRoomId: () => number, isFinalRound: () => boolean
+        getPlayerRoomId: () => number, isFinalRound: () => boolean, onPlayerSpotted: (spottedRoomId: number) => void
     ) {
         this.graphics = gameObjectFactory.graphics();
         this.graphics.depth = 10;
@@ -57,6 +58,7 @@ export class Enemy implements IFieldActor {
         this.isShortestDirection = isShortestDirection;
         this.getPlayerRoomId = getPlayerRoomId;
         this.isFinalRound = isFinalRound;
+        this.onPlayerSpotted = onPlayerSpotted;
     }
 
     position() {
@@ -77,6 +79,8 @@ export class Enemy implements IFieldActor {
             // プレイヤーと同室したら、追跡にする。
             if (this.roomId === this.getPlayerRoomId() || this.isFinalRound()) {
                 this.state = EnemyState.CHASING;
+                // プレーヤー同室 = 発見とみなすから
+                this.onPlayerSpotted(this.getPlayerRoomId());
             }
         } else if (this.isChasing()) {
             // ファイナルラウンドの場合は常時追跡
@@ -221,10 +225,10 @@ class ChasingBehavior implements EnemyBehavior {
     }
 }
 
-interface SearchingStrategy {
+export interface SearchingStrategy {
+    resolveFrame(): void;
     updateStrategyInfo(): void;
     getTargetPosition(): Util.Position;
-    resolveFrame(): void;
 }
 
 export class PatrolStrategy implements SearchingStrategy {
@@ -257,6 +261,54 @@ export class PatrolStrategy implements SearchingStrategy {
     updateStrategyInfo() {
         this.patrolRouteIndex = (this.patrolRouteIndex + 1) % (GameConstants.PATROL_ENEMY_ROOM_ROUTE.length);
         const newTargetRoomId = GameConstants.PATROL_ENEMY_ROOM_ROUTE[this.patrolRouteIndex];
+        const wayPoints = GameConstants.ENEMY_SEARCH_WAYPOINTS[newTargetRoomId];
+
+        if (this.targetRoomId === newTargetRoomId) {
+            this.wayPointRouteIndex = (this.wayPointRouteIndex + 1) % (wayPoints.length);
+        } else {
+            this.wayPointRouteIndex = 0;
+        }
+        this.targetRoomId = newTargetRoomId;
+
+        this.targetPosition = wayPoints[this.wayPointRouteIndex];
+        this.framesSinceLastDestinationUpdate = 0;
+    }
+
+    getTargetPosition(): Util.Position {
+        return this.targetPosition;
+    }
+}
+
+export class FollowerStrategy implements SearchingStrategy {
+    private targetPosition: Util.Position;
+    private targetRoomId: number;
+
+    private wayPointRouteIndex: number;
+
+    private framesSinceLastDestinationUpdate: number;
+
+    private getLastSpottedRoomId: () => number;
+
+    constructor(firstTargetRoomId: number, getLastSpottedRoomId: () => number) {
+        this.wayPointRouteIndex = 0;
+        this.targetRoomId = firstTargetRoomId;
+        this.getLastSpottedRoomId = getLastSpottedRoomId;
+        const wayPoints = GameConstants.ENEMY_SEARCH_WAYPOINTS[this.targetRoomId];
+        this.targetPosition = wayPoints[this.targetRoomId];
+
+        this.framesSinceLastDestinationUpdate = 0;
+    }
+
+    resolveFrame(): void {
+        this.framesSinceLastDestinationUpdate++;
+        // 規定秒数経過で、目的地到達有無にかかわらず目的地更新
+        if (this.framesSinceLastDestinationUpdate >= GameConstants.DESTINATION_FORCE_UPDATE_INTERVAL * GameConstants.FPS) {
+            this.updateStrategyInfo();
+        }
+    }
+
+    updateStrategyInfo(): void {
+        const newTargetRoomId = this.getLastSpottedRoomId();
         const wayPoints = GameConstants.ENEMY_SEARCH_WAYPOINTS[newTargetRoomId];
 
         if (this.targetRoomId === newTargetRoomId) {
