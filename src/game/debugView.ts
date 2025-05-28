@@ -75,4 +75,8 @@ export class DebugView {
         }
 
     }
+
+    destroy() {
+        this.gui.destroy(); // ← これで lil-gui の DOM/リスナーが全て消える
+    }
 }

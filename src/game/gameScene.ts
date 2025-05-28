@@ -55,6 +55,9 @@ export class GameScene extends Phaser.Scene {
         if (Util.isDebugEnv()) {
             const view = new DebugView(this.debugData);
             view.setup();
+            this.events.once("shutdown", () => {
+                view.destroy();
+            });
         }
         if (this.isDebugStepMode) {
             this.input.keyboard.on('keydown-N', () => {
