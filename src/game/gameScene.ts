@@ -56,6 +56,8 @@ export class GameScene extends Phaser.Scene {
             const view = new DebugView(this.debugData);
             view.setup();
             this.events.once("shutdown", () => {
+                // restartしたときに、destroyしておかないとrestart前のデバッグビューが残り
+                // restartを繰り返すうちに処理が重くなるから
                 view.destroy();
             });
         }
