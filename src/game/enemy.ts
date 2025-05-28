@@ -231,16 +231,39 @@ export interface SearchingStrategy {
     getTargetPosition(): Util.Position;
 }
 
-export class PatrolStrategy implements SearchingStrategy {
+//継承を使うべきか迷ったときは以下のように考えること：
+// ★「AはBの一種である（is-a関係）」が成り立つ
+// ★共通状態と共通ロジックがある
+
+// → 今回は「FollowerStrategy等すれぞれのストラテジはBaseStrategyの一種」
+// →framesSinceLastDestinationUpdate と resolveFrame() と共通ロジックがある
+// なので、考えるべき点2つを両方満たしてるので、継承はありらしい。 by chatgpt
+abstract class BaseStrategy implements SearchingStrategy {
+    protected framesSinceLastDestinationUpdate = 0;
+
+    resolveFrame(): void {
+        this.framesSinceLastDestinationUpdate++;
+        if (this.framesSinceLastDestinationUpdate >= GameConstants.DESTINATION_FORCE_UPDATE_INTERVAL * GameConstants.FPS) {
+            this.updateStrategyInfo();
+            this.framesSinceLastDestinationUpdate = 0;
+        }
+    }
+
+    abstract updateStrategyInfo(): void;
+    abstract getTargetPosition(): Util.Position;
+}
+
+// パトロール型
+// 隅の部屋を巡回する
+export class PatrolStrategy extends BaseStrategy {
     private targetPosition: Util.Position;
     private targetRoomId: number;
     // patrolRouteIndexとwayPointRouteという変数名で意味合いは間違ってないみたい by chatgpt
     private patrolRouteIndex: number;
     private wayPointRouteIndex: number;
 
-    private framesSinceLastDestinationUpdate: number;
-
     constructor() {
+        super();
         this.patrolRouteIndex = 0;
         this.wayPointRouteIndex = 0;
 
@@ -248,14 +271,6 @@ export class PatrolStrategy implements SearchingStrategy {
         const wayPoints = GameConstants.ENEMY_SEARCH_WAYPOINTS[this.targetRoomId];
         this.targetPosition = wayPoints[this.wayPointRouteIndex];
         this.framesSinceLastDestinationUpdate = 0;
-    }
-
-    resolveFrame() {
-        this.framesSinceLastDestinationUpdate++;
-        // 規定秒数経過で、目的地到達有無にかかわらず目的地更新
-        if (this.framesSinceLastDestinationUpdate >= GameConstants.DESTINATION_FORCE_UPDATE_INTERVAL * GameConstants.FPS) {
-            this.updateStrategyInfo();
-        }
     }
 
     updateStrategyInfo() {
@@ -279,17 +294,18 @@ export class PatrolStrategy implements SearchingStrategy {
     }
 }
 
-export class FollowerStrategy implements SearchingStrategy {
+// 後追い型
+// 最後にプレイヤーが見つかった部屋へ向かう
+export class FollowerStrategy extends BaseStrategy {
     private targetPosition: Util.Position;
     private targetRoomId: number;
 
     private wayPointRouteIndex: number;
 
-    private framesSinceLastDestinationUpdate: number;
-
     private getLastSpottedRoomId: () => number;
 
     constructor(firstTargetRoomId: number, getLastSpottedRoomId: () => number) {
+        super();
         this.wayPointRouteIndex = 0;
         this.targetRoomId = firstTargetRoomId;
         this.getLastSpottedRoomId = getLastSpottedRoomId;
@@ -324,5 +340,16 @@ export class FollowerStrategy implements SearchingStrategy {
 
     getTargetPosition(): Util.Position {
         return this.targetPosition;
+    }
+}
+
+// 先回り型
+// 最も宝の数が多い部屋へ向かう
+export class InterceptStrategy extends BaseStrategy {
+    updateStrategyInfo(): void {
+        throw new Error("Method not implemented.");
+    }
+    getTargetPosition(): Util.Position {
+        throw new Error("Method not implemented.");
     }
 }
