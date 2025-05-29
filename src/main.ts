@@ -3,6 +3,16 @@ import * as Game from "./game";
 import { Logger } from "./game/logger";
 import * as Util from "./game/utils"
 
+import { JSX as JSXDom } from "jsx-dom";
+
+// Add global JSX namespace for jsx-dom
+declare global {
+    namespace JSX {
+        interface IntrinsicElements extends JSXDom.IntrinsicElements { }
+        interface Element extends HTMLElement { }
+    }
+}
+
 const configFile = `/treasures//config/${(Util.isDebugEnv()) ? "dev.json" : "prod.json"}`
 
 fetch(configFile)
@@ -26,6 +36,10 @@ function initGame(params: any) {
         fps: {
             target: Game.FPS,// フレームレート
             forceSetTimeOut: false
+        },
+        parent: "phaser",
+        dom: {
+            createContainer: true, // ← これがないと DOM 要素が表示されない
         },
         physics: {
             default: "arcade",

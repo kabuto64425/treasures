@@ -4,6 +4,16 @@ import { BestRecord } from "./bestRecord";
 import { GameSceneGeneralSupervision } from "./gameSceneGeneralSupervision";
 import { RetryLongButton } from "./retryLongButton";
 import { Logger } from "./logger";
+import ConfirmDeleteModal from "../tsx/confirmDeleteModal";
+
+import { JSX as JSXDom } from "jsx-dom";
+
+declare global {
+    namespace JSX {
+        interface IntrinsicElements extends JSXDom.IntrinsicElements { }
+        interface Element extends HTMLElement { }
+    }
+}
 
 export class Ui {
     private readonly clock: Phaser.Time.Clock;
@@ -31,6 +41,7 @@ export class Ui {
     private readonly retryLongButton: RetryLongButton;
 
     private readonly deleteRecord: Phaser.GameObjects.Image;
+    private readonly deleteModal: Phaser.GameObjects.DOMElement;
 
     private readonly bestRecordText: Phaser.GameObjects.BitmapText;
 
@@ -142,6 +153,10 @@ export class Ui {
         this.deleteRecord.setScale(0.5);
         this.uiLayer.add(this.deleteRecord);
 
+        this.deleteModal = gameObjectFactory.dom(200, 200, ConfirmDeleteModal).setOrigin(0, 0);
+        this.deleteModal.setOrigin(0, 0);
+        this.deleteModal.setVisible(false);
+
         this.timeText = gameObjectCreator.bitmapText({ x: 970, y: 10, font: "font", text: "0:00.000" }, false);
         this.timeText.setScale(0.4);
         this.uiLayer.add(this.timeText);
@@ -198,9 +213,10 @@ export class Ui {
         this.deleteRecord.on("pointerover", () => this.deleteRecord.setTint(0x44ff44));
         this.deleteRecord.on("pointerout", () => this.deleteRecord.clearTint());
 
-        this.deleteRecord.on("pointerdown", () => {
-            this.deleteBestRecord();
-            this.updateBestRecordText();
+        this.deleteRecord.on("pointerup", () => {
+            this.deleteModal.setVisible(true);
+            //this.deleteBestRecord();
+            //this.updateBestRecordText();
         });
     }
 
