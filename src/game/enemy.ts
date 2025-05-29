@@ -142,6 +142,9 @@ export class Enemy implements IFieldActor {
                 }
             }
         }
+        if (GameConstants.FIELD[nextPosition.row][nextPosition.column] === 1) {
+            return false;
+        }
         return true;
     }
 
