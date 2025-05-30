@@ -1,7 +1,7 @@
 import * as GameConstants from "./gameConstants";
 import { GameSceneGeneralSupervision } from "./gameSceneGeneralSupervision";
 
-export class RetryLongButton {
+export class RestartButton {
     private readonly image: Phaser.GameObjects.Image;
     private readonly clock: Phaser.Time.Clock;
 
@@ -13,7 +13,6 @@ export class RetryLongButton {
     private readonly restartGame: () => void;
     private readonly hasGameStarted: () => boolean;
 
-    // @ts-ignore リクエストを送る処理を必ずいれるので使う
     private readonly requestRetryGameFromUi: () => void;
 
     private readonly barWidth = 70;
@@ -25,7 +24,7 @@ export class RetryLongButton {
         delay: 0,
         loop: true,
         callbackScope: this,
-        callback: function (this: RetryLongButton) {
+        callback: function (this: RestartButton) {
             this.requestRetryGameFromUi();
         },
     }
@@ -58,7 +57,7 @@ export class RetryLongButton {
         this.timerEvent = new Phaser.Time.TimerEvent(this.timerEventConfig);
     }
 
-    setupButton() {
+    setup() {
         this.image.setInteractive();
 
         this.image.on("pointerdown", () => {

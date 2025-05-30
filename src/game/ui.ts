@@ -2,7 +2,7 @@ import * as Utils from "./utils"
 import * as GameConstants from "./gameConstants";
 import { BestRecord } from "./bestRecord";
 import { GameSceneGeneralSupervision } from "./gameSceneGeneralSupervision";
-import { RetryLongButton } from "./retryLongButton";
+import { RestartButton } from "./restartButton";
 import { Logger } from "./logger";
 import ConfirmDeleteModal from "../tsx/confirmDeleteModal";
 
@@ -38,7 +38,7 @@ export class Ui {
 
     private readonly pause: Phaser.GameObjects.Image;
 
-    private readonly retryLongButton: RetryLongButton;
+    private readonly restartButton: RestartButton;
 
     private readonly deleteRecord: Phaser.GameObjects.Image;
     private readonly deleteModal: Phaser.GameObjects.DOMElement;
@@ -102,7 +102,7 @@ export class Ui {
         this.uiLayer = gameObjectFactory.layer();
         this.uiLayer.setDepth(98);
 
-        this.play = gameObjectCreator.image({ x: 214, y: 214, key: "play" }, false);
+        this.play = gameObjectCreator.image({ x: 214, y: 214, key: "play" }, false).setOrigin(0, 0);
         this.uiLayer.add(this.play);
 
         this.timerEvent = new Phaser.Time.TimerEvent({
@@ -130,8 +130,8 @@ export class Ui {
             },
         });
 
-        this.readyGoText = gameObjectCreator.bitmapText({ x: 214, y: 214, font: "font", text: "READY" }, false);
-        this.readyGoText.setVisible(false);
+        this.readyGoText = gameObjectCreator.bitmapText({ x: 214, y: 214, font: "font", text: "READY" }, false).setOrigin(0.5, 0.5);
+        this.readyGoText.setVisible(true);
         this.uiLayer.add(this.readyGoText);
 
         this.progressBox = gameObjectCreator.graphics({ x: 214, y: 320 }, false);
@@ -150,7 +150,7 @@ export class Ui {
         this.pause.setScale(0.5);
         this.uiLayer.add(this.pause);
 
-        this.retryLongButton = new RetryLongButton(generalSupervision, this.uiLayer, this.clock, gameObjectCreator);
+        this.restartButton = new RestartButton(generalSupervision, this.uiLayer, this.clock, gameObjectCreator);
 
         this.deleteRecord = gameObjectCreator.image({ x: 1195, y: 550, key: "delete" }, false);
         this.deleteRecord.setScale(0.5);
@@ -217,7 +217,7 @@ export class Ui {
     }
 
     setupRetryLongButton() {
-        this.retryLongButton.setupButton();
+        this.restartButton.setup();
     }
 
     setupDeleteRecordButton(overlay: Phaser.GameObjects.Graphics) {
@@ -232,8 +232,6 @@ export class Ui {
             overlay.setDepth(99);
             this.scenePlugin.pause();
             this.deleteModal.setVisible(true);
-            //this.deleteBestRecord();
-            //this.updateBestRecordText();
         });
     }
 
@@ -256,7 +254,7 @@ export class Ui {
             }
         }
 
-        this.retryLongButton.handleApprovedAction(approvedActionInfo.retryGame);
+        this.restartButton.handleApprovedAction(approvedActionInfo.retryGame);
     }
 
     private executeStartGameAction() {
