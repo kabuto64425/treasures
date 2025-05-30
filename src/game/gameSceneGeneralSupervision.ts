@@ -55,7 +55,7 @@ export class GameSceneGeneralSupervision {
         this.inputCoordinator = new InputCoordinator();
 
         // ゲームオーバー等に表示するオーバレイ
-        this.overlay = SceneServices.make.graphics({})
+        this.overlay = SceneServices.add.graphics();
 
         this.ui = new Ui(this, scene.getBestRecord());
 
@@ -81,10 +81,6 @@ export class GameSceneGeneralSupervision {
         this.gameState = GameSceneGeneralSupervision.GAME_STATE.STANDBY;
         this.fieldContainer.setPosition(30, 8);
         RecorderMediator.setRecoder(this.recorder);
-
-        this.ui.setupPlayButton();
-        this.ui.setupRetryLongButton();
-        this.ui.setupDeleteRecordButton(this.overlay);
 
         // フィールド描画
         const fieldGraphics = SceneServices.make.graphics({
@@ -151,6 +147,11 @@ export class GameSceneGeneralSupervision {
                 }
             }
         }
+
+        this.ui.setupPlayButton(this.fieldContainer);
+        this.ui.setupReadyGoTextWithBar(this.fieldContainer);
+        this.ui.setupRetryLongButton();
+        this.ui.setupDeleteRecordButton(this.overlay);
 
         // プレイヤー
         this.player.setup(this.fieldContainer, this.recorder.getElapsedFrame(), this.params.visibleFootPrint);
@@ -236,7 +237,7 @@ export class GameSceneGeneralSupervision {
 
     readonly pauseGame = () => {
         this.overlay.clear();
-        this.overlay.fillStyle(0xffffff, 0.5).fillRect(0, 0, GameConstants.FIELD_WIDTH, GameConstants.FIELD_HEIGHT);
+        this.overlay.fillStyle(0xffffff, 0.5).fillRect(30, 8, GameConstants.FIELD_WIDTH, GameConstants.FIELD_HEIGHT);
         this.overlay.setDepth(99);
         this.gameState = GameSceneGeneralSupervision.GAME_STATE.PAUSE;
 
@@ -260,7 +261,7 @@ export class GameSceneGeneralSupervision {
     readonly onPlayerCaptured = () => {
         if (!this.params.noGameOverMode) {
             this.overlay.clear();
-            this.overlay.fillStyle(0xd20a13, 0.5).fillRect(0, 0, GameConstants.FIELD_WIDTH, GameConstants.FIELD_HEIGHT);
+            this.overlay.fillStyle(0xd20a13, 0.5).fillRect(30, 8, GameConstants.FIELD_WIDTH, GameConstants.FIELD_HEIGHT);
             this.overlay.setDepth(99);
             this.ui.showGameOverText();
             this.gameState = GameSceneGeneralSupervision.GAME_STATE.GAME_OVER;

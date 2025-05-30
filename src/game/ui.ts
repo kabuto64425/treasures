@@ -20,7 +20,7 @@ export class Ui {
     private readonly clock: Phaser.Time.Clock;
     private readonly scenePlugin: Phaser.Scenes.ScenePlugin;
 
-    private readonly uiLayer: Phaser.GameObjects.Container;
+    private readonly uiContainer: Phaser.GameObjects.Container;
 
     private readonly readyGoText: Phaser.GameObjects.BitmapText;
 
@@ -96,12 +96,11 @@ export class Ui {
         this.requestPauseGameFromUi = generalSupervision.getInputCoordinator().requestPauseGameFromUi;
         this.getApprovedActionInfo = generalSupervision.getInputCoordinator().getApprovedActionInfo;
 
-        this.uiLayer = SceneServices.add.container();
-        this.uiLayer.setDepth(98);
+        this.uiContainer = SceneServices.add.container();
+        this.uiContainer.setPosition(954, 0);
+        this.uiContainer.setDepth(98);
 
         this.play = SceneServices.make.image({ x: 214, y: 214, key: "play" }, false);
-        this.play.setOrigin(0, 0);
-        this.uiLayer.add(this.play);
 
         this.timerEvent = new Phaser.Time.TimerEvent({
             delay: 0,
@@ -129,32 +128,22 @@ export class Ui {
         });
 
         this.readyGoText = SceneServices.make.bitmapText({ x: 214, y: 214, font: "font", text: "READY" }, false);
-        this.readyGoText.setVisible(false);
-        this.uiLayer.add(this.readyGoText);
 
         this.progressBox = SceneServices.make.graphics({ x: 214, y: 320 }, false);
-        this.progressBox.setVisible(false);
-        this.progressBox.fillStyle(0x222222, 0.8);
-        this.progressBox.fillRect(0, 0, this.barWidth, this.barHeight);
-        this.uiLayer.add(this.progressBox);
 
         this.progressBar = SceneServices.make.graphics({ x: 214, y: 320 }, false);
-        this.progressBar.setVisible(false);
-        this.progressBar.fillStyle(0xffff00, 0.8);
-        this.progressBar.fillRect(0, 0, this.barWidth, this.barHeight);
-        this.uiLayer.add(this.progressBar);
 
-        this.pause = SceneServices.make.image({ x: 1000, y: 550, key: "pause" }, false);
+        this.pause = SceneServices.make.image({ x: 46, y: 550, key: "pause" }, false);
         this.pause.setOrigin(0, 0);
         this.pause.setScale(0.5);
-        this.uiLayer.add(this.pause);
+        this.uiContainer.add(this.pause);
 
-        this.restartButton = new RestartButton(generalSupervision, this.uiLayer, this.clock);
+        this.restartButton = new RestartButton(generalSupervision, this.uiContainer, this.clock);
 
-        this.deleteRecord = SceneServices.make.image({ x: 1195, y: 550, key: "delete" }, false);
+        this.deleteRecord = SceneServices.make.image({ x: 241, y: 550, key: "delete" }, false);
         this.deleteRecord.setOrigin(0, 0);
         this.deleteRecord.setScale(0.5);
-        this.uiLayer.add(this.deleteRecord);
+        this.uiContainer.add(this.deleteRecord);
 
         this.deleteModal = SceneServices.add.dom(200, 200, ConfirmDeleteModal({
             onConfirm: () => {
@@ -170,33 +159,37 @@ export class Ui {
         this.deleteModal.setOrigin(0, 0);
         this.deleteModal.setVisible(false);
 
-        this.timeText = SceneServices.make.bitmapText({ x: 970, y: 10, font: "font", text: "0:00.000" }, false);
+        this.timeText = SceneServices.make.bitmapText({ x: 16, y: 10, font: "font", text: "0:00.000" }, false);
         this.timeText.setScale(0.4);
-        this.uiLayer.add(this.timeText);
+        this.uiContainer.add(this.timeText);
 
-        this.collectedTreasuresText = SceneServices.make.bitmapText({ x: 970, y: 92, font: "font", text: `0/${Utils.calculateNumberOfTreasuresInALLRounds()}` }, false);
+        this.collectedTreasuresText = SceneServices.make.bitmapText({ x: 16, y: 92, font: "font", text: `0/${Utils.calculateNumberOfTreasuresInALLRounds()}` }, false);
         this.collectedTreasuresText.setScale(0.4);
-        this.uiLayer.add(this.collectedTreasuresText);
+        this.uiContainer.add(this.collectedTreasuresText);
 
-        this.gameOverText = SceneServices.make.bitmapText({ x: 970, y: 174, font: "font", text: "GAME OVER!" }, false);
+        this.gameOverText = SceneServices.make.bitmapText({ x: 16, y: 174, font: "font", text: "GAME OVER!" }, false);
         this.gameOverText.setVisible(false);
         this.gameOverText.setScale(0.4);
-        this.uiLayer.add(this.gameOverText);
+        this.uiContainer.add(this.gameOverText);
 
-        this.congratulationsText = SceneServices.make.bitmapText({ x: 970, y: 174, font: "font", text: "CONGRATULATIONS!" }, false);
+        this.congratulationsText = SceneServices.make.bitmapText({ x: 16, y: 174, font: "font", text: "CONGRATULATIONS!" }, false);
         this.congratulationsText.setVisible(false);
         this.congratulationsText.setScale(0.4);
-        this.uiLayer.add(this.congratulationsText);
+        this.uiContainer.add(this.congratulationsText);
 
-        const bestText = SceneServices.make.bitmapText({ x: 970, y: 256, font: "font", text: "BEST" }, false);
-        this.uiLayer.add(bestText);
+        const bestText = SceneServices.make.bitmapText({ x: 16, y: 256, font: "font", text: "BEST" }, false);
+        this.uiContainer.add(bestText);
         bestText.setScale(0.4);
-        this.bestRecordText = SceneServices.make.bitmapText({ x: 970, y: 338, font: "font", text: this.createBestRecordStr() }, false);
+        this.bestRecordText = SceneServices.make.bitmapText({ x: 16, y: 338, font: "font", text: this.createBestRecordStr() }, false);
         this.bestRecordText.setScale(0.4);
-        this.uiLayer.add(this.bestRecordText);
+        this.uiContainer.add(this.bestRecordText);
     }
 
-    setupPlayButton() {
+    setupPlayButton(fieldContainer: Phaser.GameObjects.Container) {
+        this.play.setOrigin(0, 0);
+
+        // プレイボタンはフィールド上に配置するから
+        fieldContainer.add(this.play);
         this.play.setInteractive();
 
         this.play.on("pointerover", () => this.play.setTint(0x44ff44));
@@ -214,6 +207,21 @@ export class Ui {
         this.pause.on("pointerup", () => {
             this.requestPauseGameFromUi();
         });
+    }
+
+    setupReadyGoTextWithBar(fieldContainer: Phaser.GameObjects.Container) {
+        this.readyGoText.setVisible(false);
+        fieldContainer.add(this.readyGoText);
+
+        this.progressBox.setVisible(false);
+        this.progressBox.fillStyle(0x222222, 0.8);
+        this.progressBox.fillRect(0, 0, this.barWidth, this.barHeight);
+        fieldContainer.add(this.progressBox);
+
+        this.progressBar.setVisible(false);
+        this.progressBar.fillStyle(0xffff00, 0.8);
+        this.progressBar.fillRect(0, 0, this.barWidth, this.barHeight);
+        fieldContainer.add(this.progressBar);
     }
 
     setupRetryLongButton() {
