@@ -4,13 +4,13 @@ import { GameSceneGeneralSupervision } from "./gameSceneGeneralSupervision";
 export class RetryLongButton {
     private readonly image: Phaser.GameObjects.Image;
     private readonly clock: Phaser.Time.Clock;
-    private timerEvent: Phaser.Time.TimerEvent;
 
-    private readonly scenePlugin: Phaser.Scenes.ScenePlugin;
+    private timerEvent: Phaser.Time.TimerEvent;
 
     private readonly progressBox: Phaser.GameObjects.Graphics;
     private readonly progressBar: Phaser.GameObjects.Graphics;
 
+    private readonly restartGame: () => void;
     private readonly hasGameStarted: () => boolean;
 
     // @ts-ignore リクエストを送る処理を必ずいれるので使う
@@ -30,9 +30,12 @@ export class RetryLongButton {
         },
     }
 
-    constructor(generalSupervision: GameSceneGeneralSupervision, uiLayer: Phaser.GameObjects.Layer, clock: Phaser.Time.Clock, scenePlugin: Phaser.Scenes.ScenePlugin, gameObjectCreator: Phaser.GameObjects.GameObjectCreator) {
+    constructor(generalSupervision: GameSceneGeneralSupervision,
+        uiLayer: Phaser.GameObjects.Layer,
+        clock: Phaser.Time.Clock,
+        gameObjectCreator: Phaser.GameObjects.GameObjectCreator) {
         this.clock = clock;
-        this.scenePlugin = scenePlugin;
+        this.restartGame = generalSupervision.restartGame;
         this.hasGameStarted = generalSupervision.hasGameStarted;
         this.requestRetryGameFromUi = generalSupervision.getInputCoordinator().requestRetryGameFromUi;
 
@@ -90,8 +93,8 @@ export class RetryLongButton {
             this.progressBar.fillRect(0, 0, this.barWidth * progress, this.barHeight);
 
             if (this.repeatCount >= GameConstants.FPS) {
-                // 押し続けてたのでシーンリセット実行
-                this.scenePlugin.restart();
+                // 押し続けてたのでゲームリスタート
+                this.restartGame();
             }
         } else {
             this.repeatCount = 0;

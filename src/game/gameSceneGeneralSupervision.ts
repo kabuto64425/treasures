@@ -15,6 +15,7 @@ export class GameSceneGeneralSupervision {
     private readonly gameObjectFactory: Phaser.GameObjects.GameObjectFactory;
 
     private readonly inputPlugin: Phaser.Input.InputPlugin;
+    private readonly scenePlugin: Phaser.Scenes.ScenePlugin;
 
     private readonly params: any;
 
@@ -47,6 +48,7 @@ export class GameSceneGeneralSupervision {
     constructor(scene: GameScene) {
         this.gameObjectFactory = scene.add;
         this.inputPlugin = scene.input;
+        this.scenePlugin = scene.scene;
         // これを使用してゲームの物体を生成してもシーンには自動的に加わらない。どこかのレイヤーなどに加えるときに使用
         const gameObjectCreator = scene.make;
         this.params = scene.getParams();
@@ -59,10 +61,10 @@ export class GameSceneGeneralSupervision {
 
         this.inputCoordinator = new InputCoordinator(this.inputPlugin);
 
-        this.ui = new Ui(this, this.gameObjectFactory, gameObjectCreator, scene.time, scene.scene, scene.getBestRecord());
-
-        // ゲームオーバー時に表示するオーバレイ
+        // ゲームオーバー等に表示するオーバレイ
         this.overlay = this.gameObjectFactory.graphics();
+
+        this.ui = new Ui(this, this.gameObjectFactory, gameObjectCreator, scene.time, scene.scene, scene.getBestRecord());
 
         // プレイヤー
         this.player = new Player(this.gameObjectFactory, GameConstants.parameterPlayer.row, GameConstants.parameterPlayer.column, this.params);
@@ -88,7 +90,7 @@ export class GameSceneGeneralSupervision {
 
         this.ui.setupPlayButton();
         this.ui.setupRetryLongButton();
-        this.ui.setupDeleteRecordButton();
+        this.ui.setupDeleteRecordButton(this.overlay);
 
         // フィールド描画
         const fieldGraphics = this.gameObjectFactory.graphics({
@@ -276,6 +278,10 @@ export class GameSceneGeneralSupervision {
         this.gameState = GameSceneGeneralSupervision.GAME_STATE.GAME_COMPLETE;
         this.updateBestRecord(this.isGameComplete(), this.recorder.getNumberOfCollectedTreasures(), this.recorder.getElapsedFrame());
         this.ui.updateBestRecordText();
+    }
+
+    readonly restartGame = () => {
+        this.scenePlugin.restart();
     }
 
     readonly queryCurrentRecord = () => {
