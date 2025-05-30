@@ -6,24 +6,24 @@ export class TreasuresRoundSupervision implements ISingleRoundSupervision {
 
     private readonly treasureList: Treasure[];
 
-    constructor(gameObjectFactory: Phaser.GameObjects.GameObjectFactory) {
+    constructor() {
         this.treasureList = Array.from({ length: GameConstants.numberOfTreasuresPerRound }, _ => {
-            return new Treasure(gameObjectFactory, 0xffff00, false);
+            return new Treasure(0xffff00, false);
         });
     }
 
-    setup(): void {
-        this.setupTreasurePositions();
+    setup(fieldContainer: Phaser.GameObjects.Container): void {
+        this.setupTreasures(fieldContainer);
     }
 
-    private setupTreasurePositions() {
+    private setupTreasures(fieldContainer: Phaser.GameObjects.Container) {
         for (const treasure of this.treasureList) {
             let treasurePos = { row: Math.floor(Math.random() * GameConstants.H), column: Math.floor(Math.random() * GameConstants.W) };
             // 壁が存在するところに宝を配置しないようにする
             while (GameConstants.FIELD[treasurePos.row][treasurePos.column] === 1) {
                 treasurePos = { row: Math.floor(Math.random() * GameConstants.H), column: Math.floor(Math.random() * GameConstants.W) };
             }
-            treasure.setPosition(treasurePos);
+            treasure.setup(fieldContainer, treasurePos);
         }
     }
 

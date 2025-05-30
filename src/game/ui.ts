@@ -7,6 +7,7 @@ import { Logger } from "./logger";
 import ConfirmDeleteModal from "../tsx/confirmDeleteModal";
 
 import { JSX as JSXDom } from "jsx-dom";
+import { SceneServices } from "./sceneServices";
 
 declare global {
     namespace JSX {
@@ -74,13 +75,9 @@ export class Ui {
     };
 
     constructor(generalSupervision: GameSceneGeneralSupervision,
-        gameObjectFactory: Phaser.GameObjects.GameObjectFactory,
-        gameObjectCreator: Phaser.GameObjects.GameObjectCreator,
-        clock: Phaser.Time.Clock,
-        scenePlugin: Phaser.Scenes.ScenePlugin,
         bestRecord: BestRecord) {
-        this.clock = clock;
-        this.scenePlugin = scenePlugin;
+        this.clock = SceneServices.time;
+        this.scenePlugin = SceneServices.scenePlugin;
 
         this.isStandby = generalSupervision.isStandby;
         this.setReady = generalSupervision.setReady;
@@ -99,10 +96,10 @@ export class Ui {
         this.requestPauseGameFromUi = generalSupervision.getInputCoordinator().requestPauseGameFromUi;
         this.getApprovedActionInfo = generalSupervision.getInputCoordinator().getApprovedActionInfo;
 
-        this.uiLayer = gameObjectFactory.container();
+        this.uiLayer = SceneServices.add.container();
         this.uiLayer.setDepth(98);
 
-        this.play = gameObjectCreator.image({ x: 214, y: 214, key: "play" }, false);
+        this.play = SceneServices.make.image({ x: 214, y: 214, key: "play" }, false);
         this.play.setOrigin(0, 0);
         this.uiLayer.add(this.play);
 
@@ -131,35 +128,35 @@ export class Ui {
             },
         });
 
-        this.readyGoText = gameObjectCreator.bitmapText({ x: 214, y: 214, font: "font", text: "READY" }, false);
+        this.readyGoText = SceneServices.make.bitmapText({ x: 214, y: 214, font: "font", text: "READY" }, false);
         this.readyGoText.setVisible(false);
         this.uiLayer.add(this.readyGoText);
 
-        this.progressBox = gameObjectCreator.graphics({ x: 214, y: 320 }, false);
+        this.progressBox = SceneServices.make.graphics({ x: 214, y: 320 }, false);
         this.progressBox.setVisible(false);
         this.progressBox.fillStyle(0x222222, 0.8);
         this.progressBox.fillRect(0, 0, this.barWidth, this.barHeight);
         this.uiLayer.add(this.progressBox);
 
-        this.progressBar = gameObjectCreator.graphics({ x: 214, y: 320 }, false);
+        this.progressBar = SceneServices.make.graphics({ x: 214, y: 320 }, false);
         this.progressBar.setVisible(false);
         this.progressBar.fillStyle(0xffff00, 0.8);
         this.progressBar.fillRect(0, 0, this.barWidth, this.barHeight);
         this.uiLayer.add(this.progressBar);
 
-        this.pause = gameObjectCreator.image({ x: 1000, y: 550, key: "pause" }, false);
+        this.pause = SceneServices.make.image({ x: 1000, y: 550, key: "pause" }, false);
         this.pause.setOrigin(0, 0);
         this.pause.setScale(0.5);
         this.uiLayer.add(this.pause);
 
-        this.restartButton = new RestartButton(generalSupervision, this.uiLayer, this.clock, gameObjectCreator);
+        this.restartButton = new RestartButton(generalSupervision, this.uiLayer, this.clock);
 
-        this.deleteRecord = gameObjectCreator.image({ x: 1195, y: 550, key: "delete" }, false);
+        this.deleteRecord = SceneServices.make.image({ x: 1195, y: 550, key: "delete" }, false);
         this.deleteRecord.setOrigin(0, 0);
         this.deleteRecord.setScale(0.5);
         this.uiLayer.add(this.deleteRecord);
 
-        this.deleteModal = gameObjectFactory.dom(200, 200, ConfirmDeleteModal({
+        this.deleteModal = SceneServices.add.dom(200, 200, ConfirmDeleteModal({
             onConfirm: () => {
                 bestRecord.deleteBestRecord();
                 // ゲームリスタートで閉じたと見せかける。
@@ -173,28 +170,28 @@ export class Ui {
         this.deleteModal.setOrigin(0, 0);
         this.deleteModal.setVisible(false);
 
-        this.timeText = gameObjectCreator.bitmapText({ x: 970, y: 10, font: "font", text: "0:00.000" }, false);
+        this.timeText = SceneServices.make.bitmapText({ x: 970, y: 10, font: "font", text: "0:00.000" }, false);
         this.timeText.setScale(0.4);
         this.uiLayer.add(this.timeText);
 
-        this.collectedTreasuresText = gameObjectCreator.bitmapText({ x: 970, y: 92, font: "font", text: `0/${Utils.calculateNumberOfTreasuresInALLRounds()}` }, false);
+        this.collectedTreasuresText = SceneServices.make.bitmapText({ x: 970, y: 92, font: "font", text: `0/${Utils.calculateNumberOfTreasuresInALLRounds()}` }, false);
         this.collectedTreasuresText.setScale(0.4);
         this.uiLayer.add(this.collectedTreasuresText);
 
-        this.gameOverText = gameObjectCreator.bitmapText({ x: 970, y: 174, font: "font", text: "GAME OVER!" }, false);
+        this.gameOverText = SceneServices.make.bitmapText({ x: 970, y: 174, font: "font", text: "GAME OVER!" }, false);
         this.gameOverText.setVisible(false);
         this.gameOverText.setScale(0.4);
         this.uiLayer.add(this.gameOverText);
 
-        this.congratulationsText = gameObjectCreator.bitmapText({ x: 970, y: 174, font: "font", text: "CONGRATULATIONS!" }, false);
+        this.congratulationsText = SceneServices.make.bitmapText({ x: 970, y: 174, font: "font", text: "CONGRATULATIONS!" }, false);
         this.congratulationsText.setVisible(false);
         this.congratulationsText.setScale(0.4);
         this.uiLayer.add(this.congratulationsText);
 
-        const bestText = gameObjectCreator.bitmapText({ x: 970, y: 256, font: "font", text: "BEST" }, false);
+        const bestText = SceneServices.make.bitmapText({ x: 970, y: 256, font: "font", text: "BEST" }, false);
         this.uiLayer.add(bestText);
         bestText.setScale(0.4);
-        this.bestRecordText = gameObjectCreator.bitmapText({ x: 970, y: 338, font: "font", text: this.createBestRecordStr() }, false);
+        this.bestRecordText = SceneServices.make.bitmapText({ x: 970, y: 338, font: "font", text: this.createBestRecordStr() }, false);
         this.bestRecordText.setScale(0.4);
         this.uiLayer.add(this.bestRecordText);
     }

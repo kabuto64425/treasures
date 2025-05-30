@@ -2,6 +2,7 @@ import * as Util from "./utils";
 import { DIRECTION } from "./drection";
 import * as GameConstants from "./gameConstants";
 import { IFieldActor } from "./iFieldActor";
+import { SceneServices } from "./sceneServices";
 
 enum EnemyState {
     SEARCHING = 0,
@@ -34,7 +35,7 @@ export class Enemy implements IFieldActor {
     private readonly onPlayerSpotted: (spottedRoomId: number) => void;
     private readonly getEnemyList: () => Enemy[];
 
-    constructor(gameObjectFactory: Phaser.GameObjects.GameObjectFactory, iniRow: number,
+    constructor(iniRow: number,
         iniColumn: number, params: any, priorityScanDirections: DIRECTION[],
         strategy: SearchingStrategy, onPlayerCaptured: () => void,
         getFirstFootprint: () => Util.Position, stepOnFirstFootprint: () => void,
@@ -42,7 +43,7 @@ export class Enemy implements IFieldActor {
         getPlayerRoomId: () => number, isFinalRound: () => boolean, onPlayerSpotted: (spottedRoomId: number) => void,
         getEnemyList: () => Enemy[]
     ) {
-        this.graphics = gameObjectFactory.graphics();
+        this.graphics = SceneServices.make.graphics({});
         this.graphics.depth = 10;
         this.state = EnemyState.SEARCHING;
         this.row = iniRow;
@@ -72,7 +73,8 @@ export class Enemy implements IFieldActor {
         this.chargeAmount++;
     }
 
-    setup() {
+    setup(fieldContainer: Phaser.GameObjects.Container) {
+        fieldContainer.add(this.graphics);
         this.draw();
         this.strategy.setup();
     }

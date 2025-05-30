@@ -25,7 +25,7 @@ export class EnemiesSupervision {
         "Flanking"
     ] as const;
 
-    constructor(gameObjectFactory: Phaser.GameObjects.GameObjectFactory, params: any,
+    constructor(params: any,
         onPlayerCaptured: () => void, footprint: Footprint,
         isShortestDirection: (from: Util.Position, to: Util.Position, direction: DIRECTION) => boolean,
         getPlayerRoomId: () => number, isFinalRound: () => boolean, extractCurrentAppearanceTreasures: () => IFieldActor[]
@@ -34,15 +34,14 @@ export class EnemiesSupervision {
         this.extractCurrentAppearanceTreasures = extractCurrentAppearanceTreasures;
         this.enemyList = Array.from({ length: GameConstants.numberOfEnemyies }, (_, i) => {
             return this.createEnemy(
-                i, gameObjectFactory, params,onPlayerCaptured,
+                i, params, onPlayerCaptured,
                 footprint, isShortestDirection, getPlayerRoomId, isFinalRound
             );
         });
     }
 
     private createEnemy(
-        index: number,
-        gameObjectFactory: Phaser.GameObjects.GameObjectFactory, params: any,
+        index: number, params: any,
         onPlayerCaptured: () => void, footprint: Footprint,
         isShortestDirection: (from: Util.Position, to: Util.Position, direction: DIRECTION) => boolean,
         getPlayerRoomId: () => number, isFinalRound: () => boolean
@@ -57,7 +56,7 @@ export class EnemiesSupervision {
         const strategy = this.createStrategy(this.enemyStrategyOrders[index], strategyInitArgs);
 
         return new Enemy(
-            gameObjectFactory, GameConstants.parametersOfEnemies[index].row, GameConstants.parametersOfEnemies[index].column,
+            GameConstants.parametersOfEnemies[index].row, GameConstants.parametersOfEnemies[index].column,
             params, GameConstants.parametersOfEnemies[index].priorityScanDirections, strategy,
             onPlayerCaptured, footprint.getFirstPrint, footprint.onSteppedOnByEnemy,
             isShortestDirection, getPlayerRoomId, isFinalRound, this.onPlayerSpotted, this.getEnemyList
@@ -79,9 +78,9 @@ export class EnemiesSupervision {
         }
     }
 
-    setup() {
+    setup(fieldContainer: Phaser.GameObjects.Container) {
         for (const enemy of this.enemyList) {
-            enemy.setup();
+            enemy.setup(fieldContainer);
         }
         DebugDataMediator.setEnemiesDebugValue(
             this.enemyList.map(e => { return e.getDebugValueData() })
@@ -125,7 +124,7 @@ export class EnemiesSupervision {
     readonly findRoomIdWithMostTreasures = () => {
         const roomIdCountsMap = new Map<number, number>();
 
-        for(const treasure of this.extractCurrentAppearanceTreasures()) {
+        for (const treasure of this.extractCurrentAppearanceTreasures()) {
             const roomId = Util.findRoomId(treasure.position());
             const count = roomIdCountsMap.get(roomId) ?? 0;
             roomIdCountsMap.set(roomId, count + 1);
@@ -133,10 +132,10 @@ export class EnemiesSupervision {
 
         const maxCount = Math.max(...roomIdCountsMap.values());
 
-        for(const [key, value] of roomIdCountsMap) {
+        for (const [key, value] of roomIdCountsMap) {
             // とりあえず最初に見つけた部屋。
             // 優先度含めた細かい調整を実装する必要あり
-            if(value === maxCount) {
+            if (value === maxCount) {
                 return key;
             }
         }
@@ -151,8 +150,8 @@ export class EnemiesSupervision {
 
         const roomIdSet = new Set(roomIdList);
 
-        for(let i = 0; i < GameConstants.ROOM_COUNT; i++) {
-            if(!roomIdSet.has(i)) {
+        for (let i = 0; i < GameConstants.ROOM_COUNT; i++) {
+            if (!roomIdSet.has(i)) {
                 // とりあえず最初に見つけた部屋。
                 // 優先度含めた細かい調整を実装する必要あり
                 return i;

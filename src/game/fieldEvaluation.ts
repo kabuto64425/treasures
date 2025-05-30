@@ -1,5 +1,6 @@
 import { DIRECTION } from "./drection";
 import * as GameConstants from "./gameConstants";
+import { SceneServices } from "./sceneServices";
 import { Position } from "./utils";
 
 export class FieldEvaluation {
@@ -8,16 +9,17 @@ export class FieldEvaluation {
     private readonly graphics: Phaser.GameObjects.Graphics;
     private readonly getFirstPrint: () => Position;
 
-    constructor(gameObjectFactory: Phaser.GameObjects.GameObjectFactory, isVisible: boolean, getFirstPrint: () => Position) {
+    constructor(getFirstPrint: () => Position) {
         this.evaluationMap = new Map<string, Map<string, boolean>[][]>();
 
-        this.graphics = gameObjectFactory.graphics();
-        this.graphics.depth = 99;
-        this.graphics.setVisible(isVisible);
+        this.graphics = SceneServices.make.graphics({});
         this.getFirstPrint = getFirstPrint;
     }
 
-    setup() {
+    setup(fieldContainer: Phaser.GameObjects.Container, isVisible: boolean) {
+        this.graphics.depth = 99;
+        this.graphics.setVisible(isVisible);
+        fieldContainer.add(this.graphics);
         this.draw();
     }
 

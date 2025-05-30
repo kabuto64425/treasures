@@ -5,16 +5,16 @@ import * as GameConstants from "./gameConstants";
 export class FinalRoundSupervision implements ISingleRoundSupervision {
     private readonly goal: Treasure;
 
-    constructor(gameObjectFactory: Phaser.GameObjects.GameObjectFactory) {
-        this.goal = new Treasure(gameObjectFactory, 0xffa500, true);
+    constructor() {
+        this.goal = new Treasure(0xffa500, true);
     }
 
-    setup(): void {
-        this.setupGoalPosition();
+    setup(fieldContainer: Phaser.GameObjects.Container): void {
+        this.setupGoalPosition(fieldContainer);
     }
 
-    private setupGoalPosition() {
-        this.goal.setPosition(GameConstants.goalPosition);
+    private setupGoalPosition(fieldContainer: Phaser.GameObjects.Container) {
+        this.goal.setup(fieldContainer, GameConstants.goalPosition);
     }
 
     startRound(): void {

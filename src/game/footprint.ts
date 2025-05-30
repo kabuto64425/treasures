@@ -1,6 +1,7 @@
 import { Position } from "./utils";
 import * as GameConstants from "./gameConstants";
 import { Logger } from "./logger";
+import { SceneServices } from "./sceneServices";
 
 export class Footprint {
     private readonly queue: { position: Position, frame: number }[];
@@ -9,11 +10,15 @@ export class Footprint {
     private readonly limit: number;
     private isFirstPrintStepped: boolean;
 
-    constructor(gameObjectFactory: Phaser.GameObjects.GameObjectFactory, isVisible: boolean, limit: number) {
-        this.graphics = gameObjectFactory.graphics();
+    constructor(limit: number) {
+        this.graphics = SceneServices.make.graphics({});
         this.queue = [];
         this.limit = limit;
         this.isFirstPrintStepped = false;
+    }
+
+    setup(fieldContainer: Phaser.GameObjects.Container, isVisible: boolean) {
+        fieldContainer.add(this.graphics);
         this.graphics.setVisible(isVisible);
     }
 

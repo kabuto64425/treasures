@@ -1,5 +1,6 @@
 import * as GameConstants from "./gameConstants";
 import { GameSceneGeneralSupervision } from "./gameSceneGeneralSupervision";
+import { SceneServices } from "./sceneServices";
 
 export class RestartButton {
     private readonly image: Phaser.GameObjects.Image;
@@ -31,25 +32,24 @@ export class RestartButton {
 
     constructor(generalSupervision: GameSceneGeneralSupervision,
         uiLayer: Phaser.GameObjects.Container,
-        clock: Phaser.Time.Clock,
-        gameObjectCreator: Phaser.GameObjects.GameObjectCreator) {
+        clock: Phaser.Time.Clock) {
         this.clock = clock;
         this.restartGame = generalSupervision.restartGame;
         this.hasGameStarted = generalSupervision.hasGameStarted;
         this.requestRetryGameFromUi = generalSupervision.getInputCoordinator().requestRetryGameFromUi;
 
-        this.image = gameObjectCreator.image({ x: 1100, y: 550, key: "retry" }, false);
+        this.image = SceneServices.make.image({ x: 1100, y: 550, key: "retry" }, false);
         this.image.setOrigin(0, 0);
         this.image.setScale(0.5);
 
         uiLayer.add(this.image);
 
-        this.progressBox = gameObjectCreator.graphics({ x: 1063, y: 490, key: "retry" }, false);
+        this.progressBox = SceneServices.make.graphics({ x: 1063, y: 490, key: "retry" }, false);
         this.progressBox.setVisible(false);
         this.progressBox.fillStyle(0x222222, 0.8);
         this.progressBox.fillRect(0, 0, this.barWidth, this.barHeight);
         uiLayer.add(this.progressBox);
-        this.progressBar = gameObjectCreator.graphics({ x: 1063, y: 490, key: "retry" }, false);
+        this.progressBar = SceneServices.make.graphics({ x: 1063, y: 490, key: "retry" }, false);
         this.progressBar.setVisible(false);
         this.progressBar.fillStyle(0xffff00, 0.8);
         this.progressBar.fillRect(0, 0, this.barWidth, this.barHeight);

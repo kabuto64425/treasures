@@ -1,6 +1,7 @@
 import Phaser from "phaser";
 import { Logger } from "./logger";
 import { DIRECTION } from "./drection";
+import { SceneServices } from "./sceneServices";
 
 const NO_PRESS_RANK = -1;
 
@@ -30,8 +31,8 @@ export class InputCoordinator {
         readonly playerDirection: DIRECTION | undefined
     };
 
-    constructor(inputPlugin: Phaser.Input.InputPlugin) {
-        this.inputPlugin = inputPlugin;
+    constructor() {
+        this.inputPlugin = SceneServices.inputPlugin;
         this.keyMap = {};
 
         // キー登録
