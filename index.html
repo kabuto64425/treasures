@@ -1,17 +1,29 @@
 <!DOCTYPE html>
 <html lang="ja">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Vite + TS + Phaser</title>
-    <style>
-      body {
-        margin: 0;
-      }
-    </style>
-  </head>
-  <body>
-    <div id="app"></div>
-    <script type="module" src="/src/main.ts"></script>
-  </body>
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/bulma@0.8.0/css/bulma.min.css">
+  <link rel="stylesheet" href="//cdn.materialdesignicons.com/7.4.47/css/materialdesignicons.min.css">
+  <title>Vite + TS + Phaser</title>
+  <style>
+    body {
+      margin: 0;
+    }
+
+    /* Bulmaの .number が邪魔な場合に上書き */
+    .lil-gui .number {
+      all: unset;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="app">
+    <div id="phaser"></div>
+  </div>
+  <script type="module" src="/src/main.ts"></script>
+</body>
+
 </html>

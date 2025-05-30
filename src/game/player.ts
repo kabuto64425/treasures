@@ -5,6 +5,7 @@ import * as GameConstants from "./gameConstants";
 import { IFieldActor } from "./iFieldActor";
 import { PlayerDirectionBuffer } from "./playerDirectionBuffer";
 import { DebugDataMediator } from "./debugData";
+import { SceneServices } from "./sceneServices";
 
 export class Player {
     private readonly graphics: Phaser.GameObjects.Graphics;
@@ -19,8 +20,8 @@ export class Player {
 
     private footPrint: Footprint;
 
-    constructor(gameObjectFactory: Phaser.GameObjects.GameObjectFactory, iniRow: number, iniColumn: number, params: any) {
-        this.graphics = gameObjectFactory.graphics();
+    constructor(iniRow: number, iniColumn: number, params: any) {
+        this.graphics = SceneServices.make.graphics({});
         this.row = iniRow;
         this.column = iniColumn;
         this.roomId = Util.findRoomId({ row: this.row, column: this.column });
@@ -29,7 +30,7 @@ export class Player {
         // 先行入力受付は、暫定チャージ中いつでもできるように第２引数を指定している。多分これで確定しそう。
         this.playerDirectionBuffer = new PlayerDirectionBuffer(params.playerMoveCost, params.playerMoveCost, this.getLastMoveDirection);
         this.lastMoveDirection = undefined;
-        this.footPrint = new Footprint(gameObjectFactory, params.visibleFootPrint, params.footPrintLimitFrame);
+        this.footPrint = new Footprint(params.footPrintLimitFrame);
     }
 
     position() {
@@ -47,9 +48,11 @@ export class Player {
         return false;
     }
 
-    setup(currentFrame: number) {
-        this.footPrint.push(this.position(), currentFrame);
+    setup(fieldContainer: Phaser.GameObjects.Container, currentFrame: number, isVisibleFootprint: boolean) {
+        fieldContainer.add(this.graphics);
         this.draw();
+        this.footPrint.setup(fieldContainer, isVisibleFootprint);
+        this.footPrint.push(this.position(), currentFrame);
         this.updateDebugData();
     }
 
@@ -80,7 +83,7 @@ export class Player {
 
         this.roomId = Util.findRoomId(this.position());
         this.draw();
-        
+
         this.footPrint.resolveFootprintPerFrame(currentFrame);
         this.updateDebugData();
     }

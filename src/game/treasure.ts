@@ -1,6 +1,7 @@
 import * as GameConstants from "./gameConstants";
 import { IFieldActor } from "./iFieldActor";
 import { RecorderMediator } from "./recoder";
+import { SceneServices } from "./sceneServices";
 import { Position } from "./utils";
 
 export class Treasure implements IFieldActor {
@@ -20,15 +21,20 @@ export class Treasure implements IFieldActor {
         COLLECTED: 2,
     };
 
-    constructor(gameObjectFactory: Phaser.GameObjects.GameObjectFactory, color: number, isGoal: boolean) {
-        this.graphics = gameObjectFactory.graphics();
+    constructor(color: number, isGoal: boolean) {
+        this.graphics = SceneServices.make.graphics({});
         this.color = color;
         this.state = Treasure.TREASURE_STATE.NON_APPEARANCE;
         this.isGoal = isGoal;
     }
 
+    setup(fieldContainer: Phaser.GameObjects.Container, position: Position) {
+        fieldContainer.add(this.graphics);
+        this.setPosition(position);
+    }
+
     // 位置情報が取得される前にかならずこのメソッドを呼び出す
-    setPosition(position: Position) {
+    private setPosition(position: Position) {
         this.row = position.row;
         this.column = position.column;
     }

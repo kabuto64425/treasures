@@ -9,13 +9,9 @@ import { InputCoordinator } from "./inputCoordinator";
 import * as Util from "./utils"
 import { Logger } from "./logger";
 import { EnemiesSupervision } from "./enemiesSupervision";
+import { SceneServices } from "./sceneServices";
 
 export class GameSceneGeneralSupervision {
-    // これを使用してゲームの物体を生成すると、シーンに自動的に加わる
-    private readonly gameObjectFactory: Phaser.GameObjects.GameObjectFactory;
-
-    private readonly inputPlugin: Phaser.Input.InputPlugin;
-
     private readonly params: any;
 
     private readonly inputCoordinator: InputCoordinator;
@@ -30,6 +26,7 @@ export class GameSceneGeneralSupervision {
 
     private readonly recorder: Recorder;
 
+    private fieldContainer: Phaser.GameObjects.Container;
     private overlay: Phaser.GameObjects.Graphics;
 
     private updateBestRecord: (isGameComplete: boolean, currentNumberOfCollectedTreasures: number, currentElapedFrame: number) => boolean;
@@ -45,10 +42,8 @@ export class GameSceneGeneralSupervision {
     };
 
     constructor(scene: GameScene) {
-        this.gameObjectFactory = scene.add;
-        this.inputPlugin = scene.input;
-        // これを使用してゲームの物体を生成してもシーンには自動的に加わらない。どこかのレイヤーなどに加えるときに使用
-        const gameObjectCreator = scene.make;
+        this.fieldContainer = SceneServices.add.container();
+
         this.params = scene.getParams();
 
         this.updateBestRecord = scene.getBestRecord().updateBestRecord;
@@ -57,25 +52,25 @@ export class GameSceneGeneralSupervision {
 
         this.gameState = GameSceneGeneralSupervision.GAME_STATE.INITIALIZED;
 
-        this.inputCoordinator = new InputCoordinator(this.inputPlugin);
+        this.inputCoordinator = new InputCoordinator();
 
-        this.ui = new Ui(this, this.gameObjectFactory, gameObjectCreator, scene.time, scene.scene, scene.getBestRecord());
+        // ゲームオーバー等に表示するオーバレイ
+        this.overlay = SceneServices.make.graphics({})
 
-        // ゲームオーバー時に表示するオーバレイ
-        this.overlay = this.gameObjectFactory.graphics();
+        this.ui = new Ui(this, scene.getBestRecord());
 
         // プレイヤー
-        this.player = new Player(this.gameObjectFactory, GameConstants.parameterPlayer.row, GameConstants.parameterPlayer.column, this.params);
+        this.player = new Player(GameConstants.parameterPlayer.row, GameConstants.parameterPlayer.column, this.params);
 
         //フィールド評価
-        this.fieldEvaluation = new FieldEvaluation(this.gameObjectFactory, this.params.visibleFieldEvaluation, this.player.getFootPrint().getFirstPrint);
+        this.fieldEvaluation = new FieldEvaluation(this.player.getFootPrint().getFirstPrint);
 
         // ラウンド進行監督
-        this.roundsSupervision = new RoundsSupervision(this.gameObjectFactory, this.onGameCompleted);
+        this.roundsSupervision = new RoundsSupervision(this.onGameCompleted);
 
         // 敵
         this.enemiesSupervision = new EnemiesSupervision(
-            this.gameObjectFactory, this.params, this.onPlayerCaptured,
+            this.params, this.onPlayerCaptured,
             this.player.getFootPrint(), this.fieldEvaluation.isShortestDirection,
             this.player.getRoomId, this.roundsSupervision.isFinalRound,
             this.roundsSupervision.extractCurrentAppearanceTreasures
@@ -84,14 +79,15 @@ export class GameSceneGeneralSupervision {
 
     setupSupervision() {
         this.gameState = GameSceneGeneralSupervision.GAME_STATE.STANDBY;
+        this.fieldContainer.setPosition(30, 8);
         RecorderMediator.setRecoder(this.recorder);
 
         this.ui.setupPlayButton();
         this.ui.setupRetryLongButton();
-        this.ui.setupDeleteRecordButton();
+        this.ui.setupDeleteRecordButton(this.overlay);
 
         // フィールド描画
-        const fieldGraphics = this.gameObjectFactory.graphics({
+        const fieldGraphics = SceneServices.make.graphics({
             lineStyle: { width: 1, color: 0x000000, alpha: 1 },
             fillStyle: { color: 0xffffff, alpha: 1 }
         });
@@ -100,9 +96,10 @@ export class GameSceneGeneralSupervision {
                 fieldGraphics.strokeRect(j * GameConstants.GRID_SIZE, i * GameConstants.GRID_SIZE, GameConstants.GRID_SIZE, GameConstants.GRID_SIZE);
             }
         }
+        this.fieldContainer.add(fieldGraphics);
 
         if (this.params.enableVisibleRoomRanges) {
-            const roomGraphics = this.gameObjectFactory.graphics({
+            const roomGraphics = SceneServices.make.graphics({
                 lineStyle: { width: 1, color: 0x000000, alpha: 1 },
                 fillStyle: { color: 0xffffff, alpha: 1 },
             });
@@ -129,41 +126,43 @@ export class GameSceneGeneralSupervision {
                     roomGraphics.fillRect(j * GameConstants.GRID_SIZE, i * GameConstants.GRID_SIZE, GameConstants.GRID_SIZE, GameConstants.GRID_SIZE);
                 }
             }
+            this.fieldContainer.add(roomGraphics);
         }
 
-        this.gameObjectFactory.text(3 * GameConstants.GRID_SIZE + 5, 0 * GameConstants.GRID_SIZE, "↑", { fontSize: "22px", color: "#000000" });
-        this.gameObjectFactory.text(4 * GameConstants.GRID_SIZE + 5, 0 * GameConstants.GRID_SIZE, "↑", { fontSize: "22px", color: "#000000" });
-        this.gameObjectFactory.text(37 * GameConstants.GRID_SIZE + 5, 0 * GameConstants.GRID_SIZE, "↑", { fontSize: "22px", color: "#000000" });
-        this.gameObjectFactory.text(38 * GameConstants.GRID_SIZE + 5, 0 * GameConstants.GRID_SIZE, "↑", { fontSize: "22px", color: "#000000" });
+        this.fieldContainer.add(SceneServices.make.text({ x: 3 * GameConstants.GRID_SIZE + 5, y: 0 * GameConstants.GRID_SIZE, text: "↑", style: { fontSize: "22px", color: "#000000" } }));
+        this.fieldContainer.add(SceneServices.make.text({ x: 4 * GameConstants.GRID_SIZE + 5, y: 0 * GameConstants.GRID_SIZE, text: "↑", style: { fontSize: "22px", color: "#000000" } }));
+        this.fieldContainer.add(SceneServices.make.text({ x: 37 * GameConstants.GRID_SIZE + 5, y: 0 * GameConstants.GRID_SIZE, text: "↑", style: { fontSize: "22px", color: "#000000" } }));
+        this.fieldContainer.add(SceneServices.make.text({ x: 38 * GameConstants.GRID_SIZE + 5, y: 0 * GameConstants.GRID_SIZE, text: "↑", style: { fontSize: "22px", color: "#000000" } }));
 
-        this.gameObjectFactory.text(3 * GameConstants.GRID_SIZE + 5, 31 * GameConstants.GRID_SIZE, "↓", { fontSize: "22px", color: "#000000" });
-        this.gameObjectFactory.text(4 * GameConstants.GRID_SIZE + 5, 31 * GameConstants.GRID_SIZE, "↓", { fontSize: "22px", color: "#000000" });
-        this.gameObjectFactory.text(37 * GameConstants.GRID_SIZE + 5, 31 * GameConstants.GRID_SIZE, "↓", { fontSize: "22px", color: "#000000" });
-        this.gameObjectFactory.text(38 * GameConstants.GRID_SIZE + 5, 31 * GameConstants.GRID_SIZE, "↓", { fontSize: "22px", color: "#000000" });
+        this.fieldContainer.add(SceneServices.make.text({ x: 3 * GameConstants.GRID_SIZE + 5, y: 31 * GameConstants.GRID_SIZE, text: "↓", style: { fontSize: "22px", color: "#000000" } }));
+        this.fieldContainer.add(SceneServices.make.text({ x: 4 * GameConstants.GRID_SIZE + 5, y: 31 * GameConstants.GRID_SIZE, text: "↓", style: { fontSize: "22px", color: "#000000" } }));
+        this.fieldContainer.add(SceneServices.make.text({ x: 37 * GameConstants.GRID_SIZE + 5, y: 31 * GameConstants.GRID_SIZE, text: "↓", style: { fontSize: "22px", color: "#000000" } }));
+        this.fieldContainer.add(SceneServices.make.text({ x: 38 * GameConstants.GRID_SIZE + 5, y: 31 * GameConstants.GRID_SIZE, text: "↓", style: { fontSize: "22px", color: "#000000" } }));
 
         // 壁描画
         for (let i = 0; i < GameConstants.H; i++) {
             for (let j = 0; j < GameConstants.W; j++) {
                 if (GameConstants.FIELD[i][j] === 1) {
-                    this.gameObjectFactory.graphics({
+                    const fillRect = SceneServices.make.graphics({
                         lineStyle: { width: 1, color: 0x000000, alpha: 1 },
                         fillStyle: { color: 0x000000, alpha: 1 }
                     }).fillRect(j * GameConstants.GRID_SIZE, i * GameConstants.GRID_SIZE, GameConstants.GRID_SIZE, GameConstants.GRID_SIZE);
+                    this.fieldContainer.add(fillRect);
                 }
             }
         }
 
         // プレイヤー
-        this.player.setup(this.recorder.getElapsedFrame());
+        this.player.setup(this.fieldContainer, this.recorder.getElapsedFrame(), this.params.visibleFootPrint);
 
         // フィールド評価
-        this.fieldEvaluation.setup();
+        this.fieldEvaluation.setup(this.fieldContainer, this.params.visibleFieldEvaluation);
 
         // ゲーム進行管理
-        this.roundsSupervision.setup();
+        this.roundsSupervision.setup(this.fieldContainer);
 
         // 敵
-        this.enemiesSupervision.setup();
+        this.enemiesSupervision.setup(this.fieldContainer);
     }
 
     startGame() {
@@ -276,6 +275,10 @@ export class GameSceneGeneralSupervision {
         this.gameState = GameSceneGeneralSupervision.GAME_STATE.GAME_COMPLETE;
         this.updateBestRecord(this.isGameComplete(), this.recorder.getNumberOfCollectedTreasures(), this.recorder.getElapsedFrame());
         this.ui.updateBestRecordText();
+    }
+
+    readonly restartGame = () => {
+        SceneServices.scenePlugin.restart();
     }
 
     readonly queryCurrentRecord = () => {

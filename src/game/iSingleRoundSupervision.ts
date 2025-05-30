@@ -2,7 +2,7 @@ import { IFieldActor } from "./iFieldActor";
 
 export interface ISingleRoundSupervision {
     // 宝の配置などに使う
-    setup(): void;
+    setup(fieldContainer: Phaser.GameObjects.Container): void;
 
     startRound(): void;
     isRoundCompleted(): boolean;

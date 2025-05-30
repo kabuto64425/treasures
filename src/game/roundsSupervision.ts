@@ -8,19 +8,19 @@ export class RoundsSupervision {
     private readonly singleRoundSupervisionList: ISingleRoundSupervision[];
     private readonly onGameCompleted: () => void;
 
-    constructor(gameObjectFactory: Phaser.GameObjects.GameObjectFactory, onGameCompleted: () => void) {
+    constructor(onGameCompleted: () => void) {
         this.currentRound = 0;
         this.onGameCompleted = onGameCompleted;
         // +1でファイナルラウンドに対応しているのは暫定
         const totalRounds = GameConstants.numberOfTreasuresRounds + 1;
         this.singleRoundSupervisionList = Array.from({ length: totalRounds }, (_, i) =>
-            (i === totalRounds - 1) ? new FinalRoundSupervision(gameObjectFactory) : new TreasuresRoundSupervision(gameObjectFactory)
+            (i === totalRounds - 1) ? new FinalRoundSupervision() : new TreasuresRoundSupervision()
         );
     }
 
-    setup() {
+    setup(fieldContainer: Phaser.GameObjects.Container) {
         for (const round of this.singleRoundSupervisionList) {
-            round.setup();
+            round.setup(fieldContainer);
         }
     }
 

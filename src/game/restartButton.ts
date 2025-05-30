@@ -1,19 +1,19 @@
 import * as GameConstants from "./gameConstants";
 import { GameSceneGeneralSupervision } from "./gameSceneGeneralSupervision";
+import { SceneServices } from "./sceneServices";
 
-export class RetryLongButton {
+export class RestartButton {
     private readonly image: Phaser.GameObjects.Image;
     private readonly clock: Phaser.Time.Clock;
-    private timerEvent: Phaser.Time.TimerEvent;
 
-    private readonly scenePlugin: Phaser.Scenes.ScenePlugin;
+    private timerEvent: Phaser.Time.TimerEvent;
 
     private readonly progressBox: Phaser.GameObjects.Graphics;
     private readonly progressBar: Phaser.GameObjects.Graphics;
 
+    private readonly restartGame: () => void;
     private readonly hasGameStarted: () => boolean;
 
-    // @ts-ignore リクエストを送る処理を必ずいれるので使う
     private readonly requestRetryGameFromUi: () => void;
 
     private readonly barWidth = 70;
@@ -25,28 +25,31 @@ export class RetryLongButton {
         delay: 0,
         loop: true,
         callbackScope: this,
-        callback: function (this: RetryLongButton) {
+        callback: function (this: RestartButton) {
             this.requestRetryGameFromUi();
         },
     }
 
-    constructor(generalSupervision: GameSceneGeneralSupervision, uiLayer: Phaser.GameObjects.Layer, clock: Phaser.Time.Clock, scenePlugin: Phaser.Scenes.ScenePlugin, gameObjectCreator: Phaser.GameObjects.GameObjectCreator) {
+    constructor(generalSupervision: GameSceneGeneralSupervision,
+        uiLayer: Phaser.GameObjects.Container,
+        clock: Phaser.Time.Clock) {
         this.clock = clock;
-        this.scenePlugin = scenePlugin;
+        this.restartGame = generalSupervision.restartGame;
         this.hasGameStarted = generalSupervision.hasGameStarted;
         this.requestRetryGameFromUi = generalSupervision.getInputCoordinator().requestRetryGameFromUi;
 
-        this.image = gameObjectCreator.image({ x: 1100, y: 550, key: "retry" }, false);
+        this.image = SceneServices.make.image({ x: 1100, y: 550, key: "retry" }, false);
+        this.image.setOrigin(0, 0);
         this.image.setScale(0.5);
 
         uiLayer.add(this.image);
 
-        this.progressBox = gameObjectCreator.graphics({ x: 1063, y: 490, key: "retry" }, false);
+        this.progressBox = SceneServices.make.graphics({ x: 1063, y: 490, key: "retry" }, false);
         this.progressBox.setVisible(false);
         this.progressBox.fillStyle(0x222222, 0.8);
         this.progressBox.fillRect(0, 0, this.barWidth, this.barHeight);
         uiLayer.add(this.progressBox);
-        this.progressBar = gameObjectCreator.graphics({ x: 1063, y: 490, key: "retry" }, false);
+        this.progressBar = SceneServices.make.graphics({ x: 1063, y: 490, key: "retry" }, false);
         this.progressBar.setVisible(false);
         this.progressBar.fillStyle(0xffff00, 0.8);
         this.progressBar.fillRect(0, 0, this.barWidth, this.barHeight);
@@ -55,7 +58,7 @@ export class RetryLongButton {
         this.timerEvent = new Phaser.Time.TimerEvent(this.timerEventConfig);
     }
 
-    setupButton() {
+    setup() {
         this.image.setInteractive();
 
         this.image.on("pointerdown", () => {
@@ -90,8 +93,8 @@ export class RetryLongButton {
             this.progressBar.fillRect(0, 0, this.barWidth * progress, this.barHeight);
 
             if (this.repeatCount >= GameConstants.FPS) {
-                // 押し続けてたのでシーンリセット実行
-                this.scenePlugin.restart();
+                // 押し続けてたのでゲームリスタート
+                this.restartGame();
             }
         } else {
             this.repeatCount = 0;
