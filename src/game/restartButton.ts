@@ -30,7 +30,7 @@ export class RestartButton {
     }
 
     constructor(generalSupervision: GameSceneGeneralSupervision,
-        uiLayer: Phaser.GameObjects.Layer,
+        uiLayer: Phaser.GameObjects.Container,
         clock: Phaser.Time.Clock,
         gameObjectCreator: Phaser.GameObjects.GameObjectCreator) {
         this.clock = clock;
@@ -39,6 +39,7 @@ export class RestartButton {
         this.requestRetryGameFromUi = generalSupervision.getInputCoordinator().requestRetryGameFromUi;
 
         this.image = gameObjectCreator.image({ x: 1100, y: 550, key: "retry" }, false);
+        this.image.setOrigin(0, 0);
         this.image.setScale(0.5);
 
         uiLayer.add(this.image);

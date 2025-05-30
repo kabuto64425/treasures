@@ -19,7 +19,7 @@ export class Ui {
     private readonly clock: Phaser.Time.Clock;
     private readonly scenePlugin: Phaser.Scenes.ScenePlugin;
 
-    private readonly uiLayer: Phaser.GameObjects.Layer;
+    private readonly uiLayer: Phaser.GameObjects.Container;
 
     private readonly readyGoText: Phaser.GameObjects.BitmapText;
 
@@ -99,10 +99,11 @@ export class Ui {
         this.requestPauseGameFromUi = generalSupervision.getInputCoordinator().requestPauseGameFromUi;
         this.getApprovedActionInfo = generalSupervision.getInputCoordinator().getApprovedActionInfo;
 
-        this.uiLayer = gameObjectFactory.layer();
+        this.uiLayer = gameObjectFactory.container();
         this.uiLayer.setDepth(98);
 
-        this.play = gameObjectCreator.image({ x: 214, y: 214, key: "play" }, false).setOrigin(0, 0);
+        this.play = gameObjectCreator.image({ x: 214, y: 214, key: "play" }, false);
+        this.play.setOrigin(0, 0);
         this.uiLayer.add(this.play);
 
         this.timerEvent = new Phaser.Time.TimerEvent({
@@ -130,8 +131,8 @@ export class Ui {
             },
         });
 
-        this.readyGoText = gameObjectCreator.bitmapText({ x: 214, y: 214, font: "font", text: "READY" }, false).setOrigin(0.5, 0.5);
-        this.readyGoText.setVisible(true);
+        this.readyGoText = gameObjectCreator.bitmapText({ x: 214, y: 214, font: "font", text: "READY" }, false);
+        this.readyGoText.setVisible(false);
         this.uiLayer.add(this.readyGoText);
 
         this.progressBox = gameObjectCreator.graphics({ x: 214, y: 320 }, false);
@@ -147,12 +148,14 @@ export class Ui {
         this.uiLayer.add(this.progressBar);
 
         this.pause = gameObjectCreator.image({ x: 1000, y: 550, key: "pause" }, false);
+        this.pause.setOrigin(0, 0);
         this.pause.setScale(0.5);
         this.uiLayer.add(this.pause);
 
         this.restartButton = new RestartButton(generalSupervision, this.uiLayer, this.clock, gameObjectCreator);
 
         this.deleteRecord = gameObjectCreator.image({ x: 1195, y: 550, key: "delete" }, false);
+        this.deleteRecord.setOrigin(0, 0);
         this.deleteRecord.setScale(0.5);
         this.uiLayer.add(this.deleteRecord);
 
