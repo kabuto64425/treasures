@@ -11,14 +11,19 @@
     body {
       margin: 0;
     }
+
+    /* Bulmaの .number が邪魔な場合に上書き */
+    .lil-gui .number {
+      all: unset;
+    }
   </style>
 </head>
 
 <body>
-    <div id="app">
+  <div id="app">
     <div id="phaser"></div>
-    </div>
-    <script type="module" src="/src/main.ts"></script>
+  </div>
+  <script type="module" src="/src/main.ts"></script>
 </body>
 
 </html>
