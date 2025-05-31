@@ -1,8 +1,10 @@
+import ConfirmDeleteModal from "../tsx/confirmDeleteModal";
+import { BestRecord } from "./bestRecord";
 import * as GameConstants from "./gameConstants";
 import { GameSceneGeneralSupervision } from "./gameSceneGeneralSupervision";
 import { SceneServices } from "./sceneServices";
 
-export class RestartButton {
+export class DeleteBestRecordButton {
     private buttonContainer: Phaser.GameObjects.Container;
 
     private readonly image: Phaser.GameObjects.Image;
@@ -13,10 +15,10 @@ export class RestartButton {
     private readonly progressBox: Phaser.GameObjects.Graphics;
     private readonly progressBar: Phaser.GameObjects.Graphics;
 
-    private readonly restartGame: () => void;
-    private readonly hasGameStarted: () => boolean;
+    private readonly deleteModal: Phaser.GameObjects.DOMElement;
 
-    private readonly requestRetryGameFromUi: () => void;
+    private readonly requestDeleteBestRecordFromUi: () => void;
+    private readonly getOverlay: () => Phaser.GameObjects.Graphics;
 
     private readonly barWidth = 70;
     private readonly barHeight = 17;
@@ -27,24 +29,23 @@ export class RestartButton {
         delay: 0,
         loop: true,
         callbackScope: this,
-        callback: function (this: RestartButton) {
-            this.requestRetryGameFromUi();
+        callback: function (this: DeleteBestRecordButton) {
+            this.requestDeleteBestRecordFromUi();
         },
     }
 
     // locationは、ボタンの左上の座標を表す。
     // プログレスバーはそのさらに上につくことに注意する
     // locationの宣言場所はコンストラクタで良いのか要検討
-    constructor(generalSupervision: GameSceneGeneralSupervision,
+    constructor(bestRecord: BestRecord, generalSupervision: GameSceneGeneralSupervision,
         location: { x: number, y: number }) {
         this.buttonContainer = SceneServices.make.container(location);
 
         this.clock = SceneServices.time;
-        this.restartGame = generalSupervision.restartGame;
-        this.hasGameStarted = generalSupervision.hasGameStarted;
-        this.requestRetryGameFromUi = generalSupervision.getInputCoordinator().requestRetryGameFromUi;
+        this.requestDeleteBestRecordFromUi = generalSupervision.getInputCoordinator().requestDeleteBestRecordFromUi;
+        this.getOverlay = generalSupervision.getOverlay;
 
-        this.image = SceneServices.make.image({ x: 0, y: 0, key: "retry" }, false);
+        this.image = SceneServices.make.image({ x: 0, y: 0, key: "delete" }, false);
         this.image.setOrigin(0, 0);
         this.image.setScale(0.5);
 
@@ -52,12 +53,27 @@ export class RestartButton {
         this.progressBox.setVisible(false);
         this.progressBox.fillStyle(0x222222, 0.8);
         this.progressBox.fillRect(0, 0, this.barWidth, this.barHeight);
+
         this.progressBar = SceneServices.make.graphics({ x: 0, y: -23, key: "retry" }, false);
         this.progressBar.setVisible(false);
         this.progressBar.fillStyle(0xffff00, 0.8);
         this.progressBar.fillRect(0, 0, this.barWidth, this.barHeight);
 
         this.timerEvent = new Phaser.Time.TimerEvent(this.timerEventConfig);
+
+        this.deleteModal = SceneServices.add.dom(200, 200, ConfirmDeleteModal({
+            onConfirm: () => {
+                bestRecord.deleteBestRecord();
+                // ゲームリスタートで閉じたと見せかける。
+                generalSupervision.restartGame();
+            },
+            onCancel: () => {
+                // ゲームリスタートで閉じたと見せかける。
+                generalSupervision.restartGame();
+            }
+        }));
+        this.deleteModal.setOrigin(0, 0);
+        this.deleteModal.setVisible(false);
     }
 
     setup(uiContainer: Phaser.GameObjects.Container) {
@@ -83,25 +99,31 @@ export class RestartButton {
         });
     }
 
+    hide() {
+        this.buttonContainer.setVisible(false);
+    }
+
     handleApprovedAction(approved: boolean) {
-        if (!this.hasGameStarted()) {
-            return;
-        }
         if (approved) {
+            const requiredHoldFrames = GameConstants.FPS * 10;
             this.repeatCount++;
             this.progressBox.setVisible(true);
             this.progressBar.setVisible(true);
 
-            const progress = (this.repeatCount / GameConstants.FPS);
+            const progress = (this.repeatCount / requiredHoldFrames);
 
             this.progressBar.clear();
             this.progressBar.fillStyle(0xffff00, 0.8);
 
             this.progressBar.fillRect(0, 0, this.barWidth * progress, this.barHeight);
 
-            if (this.repeatCount >= GameConstants.FPS) {
-                // 押し続けてたのでゲームリスタート
-                this.restartGame();
+            if (this.repeatCount >= requiredHoldFrames) {
+                // 押し続けてたので削除ウィンドウ表示
+                this.getOverlay().clear();
+                this.getOverlay().fillStyle(0xffffff, 0.5).fillRect(0, 0, GameConstants.D_WIDTH, GameConstants.D_WIDTH);
+                this.getOverlay().setDepth(99);
+                SceneServices.scenePlugin.pause();
+                this.deleteModal.setVisible(true);
             }
         } else {
             this.repeatCount = 0;

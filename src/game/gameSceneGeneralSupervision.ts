@@ -7,7 +7,6 @@ import { Ui } from "./ui";
 import { Recorder, RecorderMediator } from "./recoder";
 import { InputCoordinator } from "./inputCoordinator";
 import * as Util from "./utils"
-import { Logger } from "./logger";
 import { EnemiesSupervision } from "./enemiesSupervision";
 import { SceneServices } from "./sceneServices";
 
@@ -26,6 +25,7 @@ export class GameSceneGeneralSupervision {
 
     private readonly recorder: Recorder;
 
+    // コンテナ内でaddしたものの表示順は、depthに関係なく後からaddしたものが前に来るので注意
     private fieldContainer: Phaser.GameObjects.Container;
     private overlay: Phaser.GameObjects.Graphics;
 
@@ -116,8 +116,6 @@ export class GameSceneGeneralSupervision {
 
                     const color = (r << 16) | (g << 8) | b;
 
-                    Logger.debug(roomColumn + roomRow * GameConstants.ROOM_COLUMN_COUNT, color, roomRow, roomColumn);
-
                     roomGraphics.fillStyle(color, 0.5);
                     roomGraphics.fillRect(j * GameConstants.GRID_SIZE, i * GameConstants.GRID_SIZE, GameConstants.GRID_SIZE, GameConstants.GRID_SIZE);
                 }
@@ -151,7 +149,7 @@ export class GameSceneGeneralSupervision {
         this.ui.setupPlayButton(this.fieldContainer);
         this.ui.setupReadyGoTextWithBar(this.fieldContainer);
         this.ui.setupRetryLongButton();
-        this.ui.setupDeleteRecordButton(this.overlay);
+        this.ui.setupDeleteBestRecordButton();
 
         // プレイヤー
         this.player.setup(this.fieldContainer, this.recorder.getElapsedFrame(), this.params.visibleFootPrint);
@@ -287,6 +285,10 @@ export class GameSceneGeneralSupervision {
             elapsedFrame: this.recorder.getElapsedFrame(),
             numberOfCollectedTreasures: this.recorder.getNumberOfCollectedTreasures()
         }
+    }
+
+    readonly getOverlay = () => {
+        return this.overlay;
     }
 
     readonly isStandby = () => {

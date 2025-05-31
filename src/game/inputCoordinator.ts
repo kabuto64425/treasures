@@ -21,6 +21,7 @@ export class InputCoordinator {
     private isStartGameRequestedFromUi = false;
     private isRetryGameRequestedFromUi = false;
     private isPauseGameRequestedFromUi = false;
+    private isDeleteBestRecordRequestedFromUi = false;
 
     private readonly cursorKeysPressOrderRankMap: Map<string, number>;
 
@@ -28,6 +29,7 @@ export class InputCoordinator {
         readonly startGame: boolean,
         readonly pauseGame: boolean,
         readonly retryGame: boolean,
+        readonly deleteBestRecord: boolean,
         readonly playerDirection: DIRECTION | undefined
     };
 
@@ -45,6 +47,7 @@ export class InputCoordinator {
             startGame: false,
             pauseGame: false,
             retryGame: false,
+            deleteBestRecord: false,
             playerDirection: undefined
         }
 
@@ -134,19 +137,27 @@ export class InputCoordinator {
         this.isPauseGameRequestedFromUi = true;
     }
 
+    readonly requestDeleteBestRecordFromUi = () => {
+        Logger.debug("requestDeleteBestRecord");
+        this.isDeleteBestRecordRequestedFromUi = true;
+    }
+
     // 審査
     approveRequestedAction() {
         // ゲームメニューに関する審査
         let startGame = false;
         let pauseGame = false;
         let retryGame = false;
+        let deleteBestRecord = false;
 
-        if(this.isPauseGameRequestedFromUi) {
+        if (this.isPauseGameRequestedFromUi) {
             pauseGame = true;
-        }else if (this.isRetryGameRequestedFromUi) {
+        } else if (this.isRetryGameRequestedFromUi) {
             retryGame = true;
         } else if (this.isStartGameRequestedFromUi) {
             startGame = true;
+        } else if (this.isDeleteBestRecordRequestedFromUi) {
+            deleteBestRecord = true;
         } else if (this.isPauseGameRequestedFromKey) {
             pauseGame = true;
         } else if (this.isRetryGameRequestedFromKey) {
@@ -160,6 +171,7 @@ export class InputCoordinator {
             startGame: startGame,
             pauseGame: pauseGame,
             retryGame: retryGame,
+            deleteBestRecord: deleteBestRecord,
             playerDirection: this.pickDirectionMaxOrderRank()
         }
 
@@ -171,6 +183,7 @@ export class InputCoordinator {
         this.isStartGameRequestedFromUi = false;
         this.isRetryGameRequestedFromUi = false;
         this.isPauseGameRequestedFromUi = false;
+        this.isDeleteBestRecordRequestedFromUi = false;
     }
 
     // 審査結果は渡せるようにしておく

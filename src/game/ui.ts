@@ -1,13 +1,13 @@
-import * as Utils from "./utils"
+import * as Util from "./utils"
 import * as GameConstants from "./gameConstants";
 import { BestRecord } from "./bestRecord";
 import { GameSceneGeneralSupervision } from "./gameSceneGeneralSupervision";
 import { RestartButton } from "./restartButton";
 import { Logger } from "./logger";
-import ConfirmDeleteModal from "../tsx/confirmDeleteModal";
 
 import { JSX as JSXDom } from "jsx-dom";
 import { SceneServices } from "./sceneServices";
+import { DeleteBestRecordButton } from "./deleteBestRecordButton";
 
 declare global {
     namespace JSX {
@@ -18,8 +18,8 @@ declare global {
 
 export class Ui {
     private readonly clock: Phaser.Time.Clock;
-    private readonly scenePlugin: Phaser.Scenes.ScenePlugin;
 
+    // コンテナ内でaddしたものの表示順は、depthに関係なく後からaddしたものが前に来るので注意
     private readonly uiContainer: Phaser.GameObjects.Container;
 
     private readonly readyGoText: Phaser.GameObjects.BitmapText;
@@ -40,9 +40,7 @@ export class Ui {
     private readonly pause: Phaser.GameObjects.Image;
 
     private readonly restartButton: RestartButton;
-
-    private readonly deleteRecord: Phaser.GameObjects.Image;
-    private readonly deleteModal: Phaser.GameObjects.DOMElement;
+    private readonly deleteBestRecordButton: DeleteBestRecordButton;
 
     private readonly bestRecordText: Phaser.GameObjects.BitmapText;
 
@@ -72,12 +70,12 @@ export class Ui {
         startGame: boolean,
         pauseGame: boolean,
         retryGame: boolean,
+        deleteBestRecord: boolean
     };
 
     constructor(generalSupervision: GameSceneGeneralSupervision,
         bestRecord: BestRecord) {
         this.clock = SceneServices.time;
-        this.scenePlugin = SceneServices.scenePlugin;
 
         this.isStandby = generalSupervision.isStandby;
         this.setReady = generalSupervision.setReady;
@@ -138,32 +136,15 @@ export class Ui {
         this.pause.setScale(0.5);
         this.uiContainer.add(this.pause);
 
-        this.restartButton = new RestartButton(generalSupervision, this.uiContainer, this.clock);
+        this.restartButton = new RestartButton(generalSupervision, { x: 146, y: 550 });
 
-        this.deleteRecord = SceneServices.make.image({ x: 241, y: 550, key: "delete" }, false);
-        this.deleteRecord.setOrigin(0, 0);
-        this.deleteRecord.setScale(0.5);
-        this.uiContainer.add(this.deleteRecord);
-
-        this.deleteModal = SceneServices.add.dom(200, 200, ConfirmDeleteModal({
-            onConfirm: () => {
-                bestRecord.deleteBestRecord();
-                // ゲームリスタートで閉じたと見せかける。
-                generalSupervision.restartGame();
-            },
-            onCancel: () => {
-                // ゲームリスタートで閉じたと見せかける。
-                generalSupervision.restartGame();
-            }
-        }));
-        this.deleteModal.setOrigin(0, 0);
-        this.deleteModal.setVisible(false);
+        this.deleteBestRecordButton = new DeleteBestRecordButton(bestRecord, generalSupervision, { x: 241, y: 550 });
 
         this.timeText = SceneServices.make.bitmapText({ x: 16, y: 10, font: "font", text: "0:00.000" }, false);
         this.timeText.setScale(0.4);
         this.uiContainer.add(this.timeText);
 
-        this.collectedTreasuresText = SceneServices.make.bitmapText({ x: 16, y: 92, font: "font", text: `0/${Utils.calculateNumberOfTreasuresInALLRounds()}` }, false);
+        this.collectedTreasuresText = SceneServices.make.bitmapText({ x: 16, y: 92, font: "font", text: `0/${Util.calculateNumberOfTreasuresInALLRounds()}` }, false);
         this.collectedTreasuresText.setScale(0.4);
         this.uiContainer.add(this.collectedTreasuresText);
 
@@ -225,22 +206,11 @@ export class Ui {
     }
 
     setupRetryLongButton() {
-        this.restartButton.setup();
+        this.restartButton.setup(this.uiContainer);
     }
 
-    setupDeleteRecordButton(overlay: Phaser.GameObjects.Graphics) {
-        this.deleteRecord.setInteractive();
-
-        this.deleteRecord.on("pointerover", () => this.deleteRecord.setTint(0x44ff44));
-        this.deleteRecord.on("pointerout", () => this.deleteRecord.clearTint());
-
-        this.deleteRecord.on("pointerup", () => {
-            overlay.clear();
-            overlay.fillStyle(0xffffff, 0.5).fillRect(0, 0, GameConstants.D_WIDTH, GameConstants.D_WIDTH);
-            overlay.setDepth(99);
-            this.scenePlugin.pause();
-            this.deleteModal.setVisible(true);
-        });
+    setupDeleteBestRecordButton() {
+        this.deleteBestRecordButton.setup(this.uiContainer);
     }
 
     handleApprovedAction() {
@@ -263,6 +233,7 @@ export class Ui {
         }
 
         this.restartButton.handleApprovedAction(approvedActionInfo.retryGame);
+        this.deleteBestRecordButton.handleApprovedAction(approvedActionInfo.deleteBestRecord);
     }
 
     private executeStartGameAction() {
@@ -271,17 +242,19 @@ export class Ui {
         this.readyGoText.setVisible(true);
         this.progressBox.setVisible(true);
         this.progressBar.setVisible(true);
+        // ゲームスタートが承認された時点で削除ボタンを押せないようにしたいから
+        this.deleteBestRecordButton.hide();
 
         this.clock.addEvent(this.timerEvent);
     }
 
     updateTimeText() {
-        this.timeText.setText(`${Utils.createFormattedTimeFromFrame(this.queryCurrentRecord().elapsedFrame)}`);
+        this.timeText.setText(`${Util.createFormattedTimeFromFrame(this.queryCurrentRecord().elapsedFrame)}`);
     }
 
     updateCollectedTreasuresText() {
         const numberOfCollectedTreasures = this.queryCurrentRecord().numberOfCollectedTreasures;
-        this.collectedTreasuresText.setText(`${numberOfCollectedTreasures}/${Utils.calculateNumberOfTreasuresInALLRounds()}`);
+        this.collectedTreasuresText.setText(`${numberOfCollectedTreasures}/${Util.calculateNumberOfTreasuresInALLRounds()}`);
     }
 
     updateBestRecordText() {
