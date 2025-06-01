@@ -5,7 +5,6 @@ import * as Util from "./game/utils"
 
 import { JSX as JSXDom } from "jsx-dom";
 import './style/fonts.css';
-import { TestScene } from "./game/testscene";
 
 // Add global JSX namespace for jsx-dom
 declare global {
@@ -20,18 +19,12 @@ const configFile = `/treasures//config/${(Util.isDebugEnv()) ? "dev.json" : "pro
 fetch(configFile)
     .then(res => res.json())
     .then(data => {
+        // フォントの読み込みは非同期関数のため、読み込み完了後にゲームをinitさせる。
         return document.fonts.load('1em BestTen-CRT').then(() => {return data});
     })
     .then((data) => {
         initGame(data);
     });
-
-/*fetch(configFile)
-    .then(res => res.json())
-    .then((data) => {
-        setTimeout(() => {document.fonts.load('1em BestTen-CRT')}, 10000);
-        initGame(data);
-    });*/
 
 // Phaser3オブジェクトを作る
 function initGame(params: any) {
