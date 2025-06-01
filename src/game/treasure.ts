@@ -1,7 +1,7 @@
 import * as GameConstants from "./gameConstants";
 import { IFieldActor } from "./iFieldActor";
 import { RecorderMediator } from "./recoder";
-import { SceneServices } from "./sceneServices";
+import { SceneContext } from "./sceneContext";
 import { Position } from "./utils";
 
 export class Treasure implements IFieldActor {
@@ -22,7 +22,7 @@ export class Treasure implements IFieldActor {
     };
 
     constructor(color: number, isGoal: boolean) {
-        this.graphics = SceneServices.make.graphics({});
+        this.graphics = SceneContext.make.graphics({});
         this.color = color;
         this.state = Treasure.TREASURE_STATE.NON_APPEARANCE;
         this.isGoal = isGoal;

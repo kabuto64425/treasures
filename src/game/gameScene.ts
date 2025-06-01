@@ -4,7 +4,7 @@ import { BestRecord } from "./bestRecord";
 import { DebugView } from "./debugView";
 import { DebugData, DebugDataMediator } from "./debugData";
 import * as Util from "./utils";
-import { SceneServices } from "./sceneServices";
+import { SceneContext } from "./sceneContext";
 
 export class GameScene extends Phaser.Scene {
 
@@ -50,7 +50,7 @@ export class GameScene extends Phaser.Scene {
         Phaser.GameObjects.BitmapText.ParseFromAtlas(this, "font", "fontatlas", "azo-fire", "azoXML");
 
         DebugDataMediator.setDebugData(this.debugData);
-        SceneServices.setScene(this);
+        SceneContext.setup(this);
 
         this.gameSceneGeneralSupervision = new GameSceneGeneralSupervision(this);
         this.gameSceneGeneralSupervision.setupSupervision();

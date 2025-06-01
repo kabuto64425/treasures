@@ -2,7 +2,7 @@ import * as Util from "./utils";
 import { DIRECTION } from "./drection";
 import * as GameConstants from "./gameConstants";
 import { IFieldActor } from "./iFieldActor";
-import { SceneServices } from "./sceneServices";
+import { SceneContext } from "./sceneContext";
 
 enum EnemyState {
     SEARCHING = 0,
@@ -43,7 +43,7 @@ export class Enemy implements IFieldActor {
         getPlayerRoomId: () => number, isFinalRound: () => boolean, onPlayerSpotted: (spottedRoomId: number) => void,
         getEnemyList: () => Enemy[]
     ) {
-        this.graphics = SceneServices.make.graphics({});
+        this.graphics = SceneContext.make.graphics({});
         this.graphics.depth = 10;
         this.state = EnemyState.SEARCHING;
         this.row = iniRow;

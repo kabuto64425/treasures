@@ -5,7 +5,7 @@ import * as GameConstants from "./gameConstants";
 import { IFieldActor } from "./iFieldActor";
 import { PlayerDirectionBuffer } from "./playerDirectionBuffer";
 import { DebugDataMediator } from "./debugData";
-import { SceneServices } from "./sceneServices";
+import { SceneContext } from "./sceneContext";
 
 export class Player {
     private readonly graphics: Phaser.GameObjects.Graphics;
@@ -21,7 +21,7 @@ export class Player {
     private footPrint: Footprint;
 
     constructor(iniRow: number, iniColumn: number, params: any) {
-        this.graphics = SceneServices.make.graphics({});
+        this.graphics = SceneContext.make.graphics({});
         this.row = iniRow;
         this.column = iniColumn;
         this.roomId = Util.findRoomId({ row: this.row, column: this.column });

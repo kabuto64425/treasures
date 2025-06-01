@@ -1,4 +1,4 @@
-import { SceneServices } from "./sceneServices";
+import { SceneContext } from "./sceneContext";
 
 export class TestScene extends Phaser.Scene {
     constructor() {
@@ -24,20 +24,20 @@ export class TestScene extends Phaser.Scene {
     }
 
     create() {
-        SceneServices.setScene(this);
-        const container = SceneServices.make.container({x:109, y:513}, true);
-        const image = SceneServices.make.image({ x: 0, y: 0, key: "retry" }, false);
+        SceneContext.setup(this);
+        const container = SceneContext.make.container({x:109, y:513}, true);
+        const image = SceneContext.make.image({ x: 0, y: 0, key: "retry" }, false);
         image.setOrigin(0, 0);
         image.setScale(0.5);
         container.add(image);
 
-        const progressBox = SceneServices.make.graphics({ x: 0, y: -23, key: "retry" }, false);
+        const progressBox = SceneContext.make.graphics({ x: 0, y: -23, key: "retry" }, false);
         progressBox.setVisible(true);
         progressBox.fillStyle(0x222222, 0.8);
         progressBox.fillRect(0, 0, 70, 17);
         container.add(progressBox);
         
-        const progressBar = SceneServices.make.graphics({ x: 0, y: -23, key: "retry" }, false);
+        const progressBar = SceneContext.make.graphics({ x: 0, y: -23, key: "retry" }, false);
         progressBar.setVisible(true);
         progressBar.fillStyle(0xffff00, 0.8);
         progressBar.fillRect(0, 0, 70, 17);

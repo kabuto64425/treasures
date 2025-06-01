@@ -1,6 +1,6 @@
 import { DIRECTION } from "./drection";
 import * as GameConstants from "./gameConstants";
-import { SceneServices } from "./sceneServices";
+import { SceneContext } from "./sceneContext";
 import { Position } from "./utils";
 
 export class FieldEvaluation {
@@ -12,7 +12,7 @@ export class FieldEvaluation {
     constructor(getFirstPrint: () => Position) {
         this.evaluationMap = new Map<string, Map<string, boolean>[][]>();
 
-        this.graphics = SceneServices.make.graphics({});
+        this.graphics = SceneContext.make.graphics({});
         this.getFirstPrint = getFirstPrint;
     }
 

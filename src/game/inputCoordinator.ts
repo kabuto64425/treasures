@@ -1,7 +1,7 @@
 import Phaser from "phaser";
 import { Logger } from "./logger";
 import { DIRECTION } from "./drection";
-import { SceneServices } from "./sceneServices";
+import { SceneContext } from "./sceneContext";
 
 const NO_PRESS_RANK = -1;
 
@@ -34,7 +34,7 @@ export class InputCoordinator {
     };
 
     constructor() {
-        this.inputPlugin = SceneServices.inputPlugin;
+        this.inputPlugin = SceneContext.inputPlugin;
         this.keyMap = {};
 
         // キー登録

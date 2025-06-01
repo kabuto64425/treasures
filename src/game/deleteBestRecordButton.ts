@@ -2,7 +2,7 @@ import ConfirmDeleteModal from "../tsx/confirmDeleteModal";
 import { BestRecord } from "./bestRecord";
 import * as GameConstants from "./gameConstants";
 import { GameSceneGeneralSupervision } from "./gameSceneGeneralSupervision";
-import { SceneServices } from "./sceneServices";
+import { SceneContext } from "./sceneContext";
 
 export class DeleteBestRecordButton {
     private buttonContainer: Phaser.GameObjects.Container;
@@ -39,29 +39,29 @@ export class DeleteBestRecordButton {
     // locationの宣言場所はコンストラクタで良いのか要検討
     constructor(bestRecord: BestRecord, generalSupervision: GameSceneGeneralSupervision,
         location: { x: number, y: number }) {
-        this.buttonContainer = SceneServices.make.container(location);
+        this.buttonContainer = SceneContext.make.container(location);
 
-        this.clock = SceneServices.time;
+        this.clock = SceneContext.time;
         this.requestDeleteBestRecordFromUi = generalSupervision.getInputCoordinator().requestDeleteBestRecordFromUi;
         this.getOverlay = generalSupervision.getOverlay;
 
-        this.image = SceneServices.make.image({ x: 0, y: 0, key: "delete" }, false);
+        this.image = SceneContext.make.image({ x: 0, y: 0, key: "delete" }, false);
         this.image.setOrigin(0, 0);
         this.image.setScale(0.5);
 
-        this.progressBox = SceneServices.make.graphics({ x: 0, y: -23, key: "retry" }, false);
+        this.progressBox = SceneContext.make.graphics({ x: 0, y: -23, key: "retry" }, false);
         this.progressBox.setVisible(false);
         this.progressBox.fillStyle(0x222222, 0.8);
         this.progressBox.fillRect(0, 0, this.barWidth, this.barHeight);
 
-        this.progressBar = SceneServices.make.graphics({ x: 0, y: -23, key: "retry" }, false);
+        this.progressBar = SceneContext.make.graphics({ x: 0, y: -23, key: "retry" }, false);
         this.progressBar.setVisible(false);
         this.progressBar.fillStyle(0xffff00, 0.8);
         this.progressBar.fillRect(0, 0, this.barWidth, this.barHeight);
 
         this.timerEvent = new Phaser.Time.TimerEvent(this.timerEventConfig);
 
-        this.deleteModal = SceneServices.add.dom(200, 200, ConfirmDeleteModal({
+        this.deleteModal = SceneContext.add.dom(200, 200, ConfirmDeleteModal({
             onConfirm: () => {
                 bestRecord.deleteBestRecord();
                 // ゲームリスタートで閉じたと見せかける。
@@ -122,7 +122,7 @@ export class DeleteBestRecordButton {
                 this.getOverlay().clear();
                 this.getOverlay().fillStyle(0xffffff, 0.5).fillRect(0, 0, GameConstants.D_WIDTH, GameConstants.D_WIDTH);
                 this.getOverlay().setDepth(99);
-                SceneServices.scenePlugin.pause();
+                SceneContext.scenePlugin.pause();
                 this.deleteModal.setVisible(true);
             }
         } else {

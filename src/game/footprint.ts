@@ -1,7 +1,7 @@
 import { Position } from "./utils";
 import * as GameConstants from "./gameConstants";
 import { Logger } from "./logger";
-import { SceneServices } from "./sceneServices";
+import { SceneContext } from "./sceneContext";
 
 export class Footprint {
     private readonly queue: { position: Position, frame: number }[];
@@ -11,7 +11,7 @@ export class Footprint {
     private isFirstPrintStepped: boolean;
 
     constructor(limit: number) {
-        this.graphics = SceneServices.make.graphics({});
+        this.graphics = SceneContext.make.graphics({});
         this.queue = [];
         this.limit = limit;
         this.isFirstPrintStepped = false;

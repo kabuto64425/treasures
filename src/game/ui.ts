@@ -6,7 +6,7 @@ import { RestartButton } from "./restartButton";
 import { Logger } from "./logger";
 
 import { JSX as JSXDom } from "jsx-dom";
-import { SceneServices } from "./sceneServices";
+import { SceneContext } from "./sceneContext";
 import { DeleteBestRecordButton } from "./deleteBestRecordButton";
 
 declare global {
@@ -75,7 +75,7 @@ export class Ui {
 
     constructor(generalSupervision: GameSceneGeneralSupervision,
         bestRecord: BestRecord) {
-        this.clock = SceneServices.time;
+        this.clock = SceneContext.time;
 
         this.isStandby = generalSupervision.isStandby;
         this.setReady = generalSupervision.setReady;
@@ -94,11 +94,11 @@ export class Ui {
         this.requestPauseGameFromUi = generalSupervision.getInputCoordinator().requestPauseGameFromUi;
         this.getApprovedActionInfo = generalSupervision.getInputCoordinator().getApprovedActionInfo;
 
-        this.uiContainer = SceneServices.add.container();
+        this.uiContainer = SceneContext.add.container();
         this.uiContainer.setPosition(954, 0);
         this.uiContainer.setDepth(98);
 
-        this.play = SceneServices.make.image({ x: 214, y: 214, key: "play" }, false);
+        this.play = SceneContext.make.image({ x: 214, y: 214, key: "play" }, false);
 
         this.timerEvent = new Phaser.Time.TimerEvent({
             delay: 0,
@@ -125,13 +125,13 @@ export class Ui {
             },
         });
 
-        this.readyGoText = SceneServices.make.bitmapText({ x: 214, y: 214, font: "font", text: "READY" }, false);
+        this.readyGoText = SceneContext.make.bitmapText({ x: 214, y: 214, font: "font", text: "READY" }, false);
 
-        this.progressBox = SceneServices.make.graphics({ x: 214, y: 320 }, false);
+        this.progressBox = SceneContext.make.graphics({ x: 214, y: 320 }, false);
 
-        this.progressBar = SceneServices.make.graphics({ x: 214, y: 320 }, false);
+        this.progressBar = SceneContext.make.graphics({ x: 214, y: 320 }, false);
 
-        this.pause = SceneServices.make.image({ x: 46, y: 550, key: "pause" }, false);
+        this.pause = SceneContext.make.image({ x: 46, y: 550, key: "pause" }, false);
         this.pause.setOrigin(0, 0);
         this.pause.setScale(0.5);
         this.uiContainer.add(this.pause);
@@ -140,28 +140,28 @@ export class Ui {
 
         this.deleteBestRecordButton = new DeleteBestRecordButton(bestRecord, generalSupervision, { x: 241, y: 550 });
 
-        this.timeText = SceneServices.make.bitmapText({ x: 16, y: 10, font: "font", text: "0:00.000" }, false);
+        this.timeText = SceneContext.make.bitmapText({ x: 16, y: 10, font: "font", text: "0:00.000" }, false);
         this.timeText.setScale(0.4);
         this.uiContainer.add(this.timeText);
 
-        this.collectedTreasuresText = SceneServices.make.bitmapText({ x: 16, y: 92, font: "font", text: `0/${Util.calculateNumberOfTreasuresInALLRounds()}` }, false);
+        this.collectedTreasuresText = SceneContext.make.bitmapText({ x: 16, y: 92, font: "font", text: `0/${Util.calculateNumberOfTreasuresInALLRounds()}` }, false);
         this.collectedTreasuresText.setScale(0.4);
         this.uiContainer.add(this.collectedTreasuresText);
 
-        this.gameOverText = SceneServices.make.bitmapText({ x: 16, y: 174, font: "font", text: "GAME OVER!" }, false);
+        this.gameOverText = SceneContext.make.bitmapText({ x: 16, y: 174, font: "font", text: "GAME OVER!" }, false);
         this.gameOverText.setVisible(false);
         this.gameOverText.setScale(0.4);
         this.uiContainer.add(this.gameOverText);
 
-        this.congratulationsText = SceneServices.make.bitmapText({ x: 16, y: 174, font: "font", text: "CONGRATULATIONS!" }, false);
+        this.congratulationsText = SceneContext.make.bitmapText({ x: 16, y: 174, font: "font", text: "CONGRATULATIONS!" }, false);
         this.congratulationsText.setVisible(false);
         this.congratulationsText.setScale(0.4);
         this.uiContainer.add(this.congratulationsText);
 
-        const bestText = SceneServices.make.bitmapText({ x: 16, y: 256, font: "font", text: "BEST" }, false);
+        const bestText = SceneContext.make.bitmapText({ x: 16, y: 256, font: "font", text: "BEST" }, false);
         this.uiContainer.add(bestText);
         bestText.setScale(0.4);
-        this.bestRecordText = SceneServices.make.bitmapText({ x: 16, y: 338, font: "font", text: this.createBestRecordStr() }, false);
+        this.bestRecordText = SceneContext.make.bitmapText({ x: 16, y: 338, font: "font", text: this.createBestRecordStr() }, false);
         this.bestRecordText.setScale(0.4);
         this.uiContainer.add(this.bestRecordText);
     }

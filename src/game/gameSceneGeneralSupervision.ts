@@ -8,7 +8,7 @@ import { Recorder, RecorderMediator } from "./recoder";
 import { InputCoordinator } from "./inputCoordinator";
 import * as Util from "./utils"
 import { EnemiesSupervision } from "./enemiesSupervision";
-import { SceneServices } from "./sceneServices";
+import { SceneContext } from "./sceneContext";
 
 export class GameSceneGeneralSupervision {
     private readonly params: any;
@@ -42,7 +42,7 @@ export class GameSceneGeneralSupervision {
     };
 
     constructor(scene: GameScene) {
-        this.fieldContainer = SceneServices.add.container();
+        this.fieldContainer = SceneContext.add.container();
 
         this.params = scene.getParams();
 
@@ -55,7 +55,7 @@ export class GameSceneGeneralSupervision {
         this.inputCoordinator = new InputCoordinator();
 
         // ゲームオーバー等に表示するオーバレイ
-        this.overlay = SceneServices.add.graphics();
+        this.overlay = SceneContext.add.graphics();
 
         this.ui = new Ui(this, scene.getBestRecord());
 
@@ -83,7 +83,7 @@ export class GameSceneGeneralSupervision {
         RecorderMediator.setRecoder(this.recorder);
 
         // フィールド描画
-        const fieldGraphics = SceneServices.make.graphics({
+        const fieldGraphics = SceneContext.make.graphics({
             lineStyle: { width: 1, color: 0x000000, alpha: 1 },
             fillStyle: { color: 0xffffff, alpha: 1 }
         });
@@ -95,7 +95,7 @@ export class GameSceneGeneralSupervision {
         this.fieldContainer.add(fieldGraphics);
 
         if (this.params.enableVisibleRoomRanges) {
-            const roomGraphics = SceneServices.make.graphics({
+            const roomGraphics = SceneContext.make.graphics({
                 lineStyle: { width: 1, color: 0x000000, alpha: 1 },
                 fillStyle: { color: 0xffffff, alpha: 1 },
             });
@@ -123,21 +123,21 @@ export class GameSceneGeneralSupervision {
             this.fieldContainer.add(roomGraphics);
         }
 
-        this.fieldContainer.add(SceneServices.make.text({ x: 3 * GameConstants.GRID_SIZE + 5, y: 0 * GameConstants.GRID_SIZE, text: "↑", style: { fontSize: "22px", color: "#000000" } }));
-        this.fieldContainer.add(SceneServices.make.text({ x: 4 * GameConstants.GRID_SIZE + 5, y: 0 * GameConstants.GRID_SIZE, text: "↑", style: { fontSize: "22px", color: "#000000" } }));
-        this.fieldContainer.add(SceneServices.make.text({ x: 37 * GameConstants.GRID_SIZE + 5, y: 0 * GameConstants.GRID_SIZE, text: "↑", style: { fontSize: "22px", color: "#000000" } }));
-        this.fieldContainer.add(SceneServices.make.text({ x: 38 * GameConstants.GRID_SIZE + 5, y: 0 * GameConstants.GRID_SIZE, text: "↑", style: { fontSize: "22px", color: "#000000" } }));
+        this.fieldContainer.add(SceneContext.make.text({ x: 3 * GameConstants.GRID_SIZE + 5, y: 0 * GameConstants.GRID_SIZE, text: "↑", style: { fontSize: "22px", color: "#000000" } }));
+        this.fieldContainer.add(SceneContext.make.text({ x: 4 * GameConstants.GRID_SIZE + 5, y: 0 * GameConstants.GRID_SIZE, text: "↑", style: { fontSize: "22px", color: "#000000" } }));
+        this.fieldContainer.add(SceneContext.make.text({ x: 37 * GameConstants.GRID_SIZE + 5, y: 0 * GameConstants.GRID_SIZE, text: "↑", style: { fontSize: "22px", color: "#000000" } }));
+        this.fieldContainer.add(SceneContext.make.text({ x: 38 * GameConstants.GRID_SIZE + 5, y: 0 * GameConstants.GRID_SIZE, text: "↑", style: { fontSize: "22px", color: "#000000" } }));
 
-        this.fieldContainer.add(SceneServices.make.text({ x: 3 * GameConstants.GRID_SIZE + 5, y: 31 * GameConstants.GRID_SIZE, text: "↓", style: { fontSize: "22px", color: "#000000" } }));
-        this.fieldContainer.add(SceneServices.make.text({ x: 4 * GameConstants.GRID_SIZE + 5, y: 31 * GameConstants.GRID_SIZE, text: "↓", style: { fontSize: "22px", color: "#000000" } }));
-        this.fieldContainer.add(SceneServices.make.text({ x: 37 * GameConstants.GRID_SIZE + 5, y: 31 * GameConstants.GRID_SIZE, text: "↓", style: { fontSize: "22px", color: "#000000" } }));
-        this.fieldContainer.add(SceneServices.make.text({ x: 38 * GameConstants.GRID_SIZE + 5, y: 31 * GameConstants.GRID_SIZE, text: "↓", style: { fontSize: "22px", color: "#000000" } }));
+        this.fieldContainer.add(SceneContext.make.text({ x: 3 * GameConstants.GRID_SIZE + 5, y: 31 * GameConstants.GRID_SIZE, text: "↓", style: { fontSize: "22px", color: "#000000" } }));
+        this.fieldContainer.add(SceneContext.make.text({ x: 4 * GameConstants.GRID_SIZE + 5, y: 31 * GameConstants.GRID_SIZE, text: "↓", style: { fontSize: "22px", color: "#000000" } }));
+        this.fieldContainer.add(SceneContext.make.text({ x: 37 * GameConstants.GRID_SIZE + 5, y: 31 * GameConstants.GRID_SIZE, text: "↓", style: { fontSize: "22px", color: "#000000" } }));
+        this.fieldContainer.add(SceneContext.make.text({ x: 38 * GameConstants.GRID_SIZE + 5, y: 31 * GameConstants.GRID_SIZE, text: "↓", style: { fontSize: "22px", color: "#000000" } }));
 
         // 壁描画
         for (let i = 0; i < GameConstants.H; i++) {
             for (let j = 0; j < GameConstants.W; j++) {
                 if (GameConstants.FIELD[i][j] === 1) {
-                    const fillRect = SceneServices.make.graphics({
+                    const fillRect = SceneContext.make.graphics({
                         lineStyle: { width: 1, color: 0x000000, alpha: 1 },
                         fillStyle: { color: 0x000000, alpha: 1 }
                     }).fillRect(j * GameConstants.GRID_SIZE, i * GameConstants.GRID_SIZE, GameConstants.GRID_SIZE, GameConstants.GRID_SIZE);
@@ -277,7 +277,7 @@ export class GameSceneGeneralSupervision {
     }
 
     readonly restartGame = () => {
-        SceneServices.scenePlugin.restart();
+        SceneContext.scenePlugin.restart();
     }
 
     readonly queryCurrentRecord = () => {
