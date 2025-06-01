@@ -1,6 +1,6 @@
 export class SceneContext {
 
-    private static hoge: {
+    private static components: {
         add: Phaser.GameObjects.GameObjectFactory,
         make: Phaser.GameObjects.GameObjectCreator,
         scenePlugin: Phaser.Scenes.ScenePlugin,
@@ -9,7 +9,7 @@ export class SceneContext {
     };
 
     static setup(scene: Phaser.Scene) {
-        this.hoge = {
+        this.components = {
             add: scene.add,
             make: scene.make,
             scenePlugin: scene.scene,
@@ -20,23 +20,23 @@ export class SceneContext {
 
     // これを使用してゲームの物体を生成すると、シーンに自動的に加わる
     static get add(): Phaser.GameObjects.GameObjectFactory {
-        return this.hoge.add;
+        return this.components.add;
     }
 
     // これを使用してゲームの物体を生成してもシーンには自動的に加わらない。どこかのレイヤーなどに加えるときに使用
     static get make(): Phaser.GameObjects.GameObjectCreator {
-        return this.hoge.make;
+        return this.components.make;
     }
 
     static get scenePlugin(): Phaser.Scenes.ScenePlugin {
-        return this.hoge.scenePlugin;
+        return this.components.scenePlugin;
     }
 
     static get inputPlugin(): Phaser.Input.InputPlugin {
-        return this.hoge.inputPlugin;
+        return this.components.inputPlugin;
     }
 
     static get time(): Phaser.Time.Clock {
-        return this.hoge.time;
+        return this.components.time;
     }
 }
