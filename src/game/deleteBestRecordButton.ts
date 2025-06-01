@@ -75,7 +75,7 @@ export class DeleteBestRecordButton {
         }));
         this.deleteModal.setOrigin(0, 0);
         Logger.debug(this.deleteModal.width);
-        this.deleteModal.setVisible(true);
+        this.deleteModal.setVisible(false);
     }
 
     setup(uiContainer: Phaser.GameObjects.Container) {

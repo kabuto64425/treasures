@@ -1,5 +1,4 @@
 import { SceneContext } from "./sceneContext";
-import '../style/fonts.css';
 
 export class TestScene extends Phaser.Scene {
     constructor() {

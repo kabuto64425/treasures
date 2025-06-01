@@ -8,7 +8,6 @@ import { Logger } from "./logger";
 import { JSX as JSXDom } from "jsx-dom";
 import { SceneContext } from "./sceneContext";
 import { DeleteBestRecordButton } from "./deleteBestRecordButton";
-import '../style/fonts.css';
 
 declare global {
     namespace JSX {

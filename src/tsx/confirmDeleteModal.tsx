@@ -7,7 +7,7 @@ type ConfirmDeleteModalProps = {
 
 function ConfirmDeleteModal({ onConfirm, onCancel }: ConfirmDeleteModalProps) {
     const root = (
-        <div class="box has-text-centered" style="background-color: #ffd6d6;" font-family="BestTen-CRT">
+        <div class="box has-text-centered BestTen-CRT" style="background-color: #ffd6d6;">
             <div class="field">
                 <label class="label">
                     Are you sure you want to delete your best record?
@@ -20,7 +20,7 @@ function ConfirmDeleteModal({ onConfirm, onCancel }: ConfirmDeleteModalProps) {
                         <span class="icon">
                             <i class="mdi mdi-delete-forever-outline is-size-4 fa-fw"></i>
                         </span>
-                        <span>Yes</span>
+                        <span class="BestTen-CRT">Yes</span>
                     </button>
                 </div>
                 <div class="column">
@@ -28,7 +28,7 @@ function ConfirmDeleteModal({ onConfirm, onCancel }: ConfirmDeleteModalProps) {
                         <span class="icon">
                             <i class="mdi mdi-arrow-u-left-top is-size-4 fa-fw"></i>
                         </span>
-                        <span>No</span>
+                        <span class="BestTen-CRT">No</span>
                     </button>
                 </div>
             </div>
