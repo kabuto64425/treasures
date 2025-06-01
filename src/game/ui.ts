@@ -8,6 +8,7 @@ import { Logger } from "./logger";
 import { JSX as JSXDom } from "jsx-dom";
 import { SceneContext } from "./sceneContext";
 import { DeleteBestRecordButton } from "./deleteBestRecordButton";
+import '../style/fonts.css';
 
 declare global {
     namespace JSX {
@@ -16,19 +17,25 @@ declare global {
     }
 }
 
+const textStyle = {
+    fontFamily: 'BestTen-CRT',
+    fontSize: '32px',
+    color: '#000000'
+};
+
 export class Ui {
     private readonly clock: Phaser.Time.Clock;
 
     // コンテナ内でaddしたものの表示順は、depthに関係なく後からaddしたものが前に来るので注意
     private readonly uiContainer: Phaser.GameObjects.Container;
 
-    private readonly readyGoText: Phaser.GameObjects.BitmapText;
+    private readonly readyGoText: Phaser.GameObjects.Text;
 
-    private readonly timeText: Phaser.GameObjects.BitmapText;
-    private readonly collectedTreasuresText: Phaser.GameObjects.BitmapText;
+    private readonly timeText: Phaser.GameObjects.Text;
+    private readonly collectedTreasuresText: Phaser.GameObjects.Text;
 
-    private readonly gameOverText: Phaser.GameObjects.BitmapText;
-    private readonly congratulationsText: Phaser.GameObjects.BitmapText;
+    private readonly gameOverText: Phaser.GameObjects.Text;
+    private readonly congratulationsText: Phaser.GameObjects.Text;
 
     private readonly progressBox: Phaser.GameObjects.Graphics;
     private readonly progressBar: Phaser.GameObjects.Graphics;
@@ -42,9 +49,9 @@ export class Ui {
     private readonly restartButton: RestartButton;
     private readonly deleteBestRecordButton: DeleteBestRecordButton;
 
-    private readonly bestRecordText: Phaser.GameObjects.BitmapText;
+    private readonly bestRecordText: Phaser.GameObjects.Text;
 
-    private readonly barWidth = 250;
+    private readonly barWidth = 415;
     private readonly barHeight = 20;
 
     private readonly isStandby: () => boolean;
@@ -98,7 +105,7 @@ export class Ui {
         this.uiContainer.setPosition(954, 0);
         this.uiContainer.setDepth(98);
 
-        this.play = SceneContext.make.image({ x: 214, y: 214, key: "play" }, false);
+        this.play = SceneContext.make.image({ x: 405, y: 277, key: "play" }, false);
 
         this.timerEvent = new Phaser.Time.TimerEvent({
             delay: 0,
@@ -114,6 +121,7 @@ export class Ui {
 
                 if (remainingCount <= 0) {
                     this.readyGoText.setText("GO");
+                    this.readyGoText.setX(360);
                     this.progressBar.destroy();
                     this.progressBox.destroy();
 
@@ -125,11 +133,18 @@ export class Ui {
             },
         });
 
-        this.readyGoText = SceneContext.make.bitmapText({ x: 214, y: 214, font: "font", text: "READY" }, false);
+        this.readyGoText = SceneContext.make.text({
+            x: 255, y: 250, text: "READY", style: {
+                fontFamily: 'BestTen-CRT',
+                fontSize: '128px',
+                color: '#000000',
+                strokeThickness: 27
+            }
+        }, false);
 
-        this.progressBox = SceneContext.make.graphics({ x: 214, y: 320 }, false);
+        this.progressBox = SceneContext.make.graphics({ x: 255, y: 403 }, false);
 
-        this.progressBar = SceneContext.make.graphics({ x: 214, y: 320 }, false);
+        this.progressBar = SceneContext.make.graphics({ x: 255, y: 403 }, false);
 
         this.pause = SceneContext.make.image({ x: 46, y: 550, key: "pause" }, false);
         this.pause.setOrigin(0, 0);
@@ -140,29 +155,23 @@ export class Ui {
 
         this.deleteBestRecordButton = new DeleteBestRecordButton(bestRecord, generalSupervision, { x: 241, y: 550 });
 
-        this.timeText = SceneContext.make.bitmapText({ x: 16, y: 10, font: "font", text: "0:00.000" }, false);
-        this.timeText.setScale(0.4);
+        this.timeText = SceneContext.make.text({ x: 16, y: 10, text: "0:00.000", style: textStyle }, false);
         this.uiContainer.add(this.timeText);
 
-        this.collectedTreasuresText = SceneContext.make.bitmapText({ x: 16, y: 92, font: "font", text: `0/${Util.calculateNumberOfTreasuresInALLRounds()}` }, false);
-        this.collectedTreasuresText.setScale(0.4);
+        this.collectedTreasuresText = SceneContext.make.text({ x: 16, y: 92, text: `0/${Util.calculateNumberOfTreasuresInALLRounds()}`, style: textStyle }, false);
         this.uiContainer.add(this.collectedTreasuresText);
 
-        this.gameOverText = SceneContext.make.bitmapText({ x: 16, y: 174, font: "font", text: "GAME OVER!" }, false);
+        this.gameOverText = SceneContext.make.text({ x: 16, y: 174, text: "GAME OVER!", style: textStyle }, false);
         this.gameOverText.setVisible(false);
-        this.gameOverText.setScale(0.4);
         this.uiContainer.add(this.gameOverText);
 
-        this.congratulationsText = SceneContext.make.bitmapText({ x: 16, y: 174, font: "font", text: "CONGRATULATIONS!" }, false);
+        this.congratulationsText = SceneContext.make.text({ x: 16, y: 174, text: "CONGRATULATIONS!", style: textStyle }, false);
         this.congratulationsText.setVisible(false);
-        this.congratulationsText.setScale(0.4);
         this.uiContainer.add(this.congratulationsText);
 
-        const bestText = SceneContext.make.bitmapText({ x: 16, y: 256, font: "font", text: "BEST" }, false);
+        const bestText = SceneContext.make.text({ x: 16, y: 256, text: "BEST", style: textStyle }, false);
         this.uiContainer.add(bestText);
-        bestText.setScale(0.4);
-        this.bestRecordText = SceneContext.make.bitmapText({ x: 16, y: 338, font: "font", text: this.createBestRecordStr() }, false);
-        this.bestRecordText.setScale(0.4);
+        this.bestRecordText = SceneContext.make.text({ x: 16, y: 338, text: this.createBestRecordStr(), style: textStyle }, false);
         this.uiContainer.add(this.bestRecordText);
     }
 

@@ -44,6 +44,9 @@ export class GameScene extends Phaser.Scene {
         this.load.image("pause", "/treasures/pause.svg");
         this.load.image("retry", "/treasures/retry.svg");
         this.load.image("delete", "/treasures/delete.svg");
+
+        // フォント(htmlに記述だが、素材URLは1箇所にまとめたいので個々に記載)
+        //https://booth.pm/ja/items/2747965
     }
 
     create() {

@@ -2,6 +2,7 @@ import ConfirmDeleteModal from "../tsx/confirmDeleteModal";
 import { BestRecord } from "./bestRecord";
 import * as GameConstants from "./gameConstants";
 import { GameSceneGeneralSupervision } from "./gameSceneGeneralSupervision";
+import { Logger } from "./logger";
 import { SceneContext } from "./sceneContext";
 
 export class DeleteBestRecordButton {
@@ -61,7 +62,7 @@ export class DeleteBestRecordButton {
 
         this.timerEvent = new Phaser.Time.TimerEvent(this.timerEventConfig);
 
-        this.deleteModal = SceneContext.add.dom(200, 200, ConfirmDeleteModal({
+        this.deleteModal = SceneContext.add.dom(277, 290, ConfirmDeleteModal({
             onConfirm: () => {
                 bestRecord.deleteBestRecord();
                 // ゲームリスタートで閉じたと見せかける。
@@ -73,7 +74,8 @@ export class DeleteBestRecordButton {
             }
         }));
         this.deleteModal.setOrigin(0, 0);
-        this.deleteModal.setVisible(false);
+        Logger.debug(this.deleteModal.width);
+        this.deleteModal.setVisible(true);
     }
 
     setup(uiContainer: Phaser.GameObjects.Container) {

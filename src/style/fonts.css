@@ -1,0 +1,8 @@
+@font-face {
+  font-family: 'BestTen-CRT';
+  src: url('/treasures/Best10-FONT/Best10-FONT/BestTen-CRT.otf') format('opentype');
+}
+
+.BestTen-CRT {
+  font-family: 'BestTen-CRT', sans-serif;
+}

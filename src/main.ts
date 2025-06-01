@@ -4,6 +4,7 @@ import { Logger } from "./game/logger";
 import * as Util from "./game/utils"
 
 import { JSX as JSXDom } from "jsx-dom";
+import { TestScene } from "./game/testscene";
 
 // Add global JSX namespace for jsx-dom
 declare global {
@@ -32,7 +33,8 @@ function initGame(params: any) {
         height: Game.D_HEIGHT,// ゲーム画面の高さ
         backgroundColor: "#FFFFFF", // 背景色を設定
         antialias: false,
-        scene: new Game.GameScene(params, bestRecord),
+        //scene: new Game.GameScene(params, bestRecord),
+        scene: new TestScene(),
         fps: {
             target: Game.FPS,// フレームレート
             forceSetTimeOut: false
