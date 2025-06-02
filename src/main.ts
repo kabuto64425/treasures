@@ -16,16 +16,6 @@ declare global {
 
 const configFile = `/treasures//config/${(Util.isDebugEnv()) ? "dev.json" : "prod.json"}`
 
-fetch(configFile)
-    .then(res => res.json())
-    .then(data => {
-        // フォントの読み込みは非同期関数のため、読み込み完了後にゲームをinitさせる。
-        return document.fonts.load('1em BestTen-CRT').then(() => {return data});
-    })
-    .then((data) => {
-        initGame(data);
-    });
-
 // Phaser3オブジェクトを作る
 function initGame(params: any) {
     Logger.setLogLevel(params.logLevel);
@@ -56,3 +46,14 @@ function initGame(params: any) {
     }
     new Phaser.Game(config);
 }
+
+// エントリポイント
+fetch(configFile)
+    .then(res => res.json())
+    .then(data => {
+        // フォントの読み込みは非同期関数のため、読み込み完了後にゲームをinitさせる。
+        return document.fonts.load('1em BestTen-CRT').then(() => {return Promise.resolve(data)});
+    })
+    .then((data) => {
+        return Promise.resolve(initGame(data));
+    });
