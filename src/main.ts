@@ -48,12 +48,11 @@ function initGame(params: any) {
 }
 
 // エントリポイント
-fetch(configFile)
-    .then(res => res.json())
-    .then(data => {
-        // フォントの読み込みは非同期関数のため、読み込み完了後にゲームをinitさせる。
-        return document.fonts.load('1em BestTen-CRT').then(() => {return Promise.resolve(data)});
-    })
-    .then((data) => {
-        return Promise.resolve(initGame(data));
-    });
+async function main() {
+    const res = await fetch(configFile);
+    const data = await res.json();
+    await document.fonts.load("1em BestTen-CRT");
+    await Promise.resolve(initGame(data));
+}
+
+main();
