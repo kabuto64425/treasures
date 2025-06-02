@@ -5,7 +5,8 @@ export class SceneContext {
         make: Phaser.GameObjects.GameObjectCreator,
         scenePlugin: Phaser.Scenes.ScenePlugin,
         inputPlugin: Phaser.Input.InputPlugin,
-        time: Phaser.Time.Clock
+        time: Phaser.Time.Clock,
+        anims: Phaser.Animations.AnimationManager
     };
 
     static setup(scene: Phaser.Scene) {
@@ -15,6 +16,7 @@ export class SceneContext {
             scenePlugin: scene.scene,
             inputPlugin: scene.input,
             time: scene.time,
+            anims: scene.anims
         };
     }
 
@@ -38,5 +40,9 @@ export class SceneContext {
 
     static get time(): Phaser.Time.Clock {
         return this.components.time;
+    }
+
+    static get anims(): Phaser.Animations.AnimationManager {
+        return this.components.anims;
     }
 }

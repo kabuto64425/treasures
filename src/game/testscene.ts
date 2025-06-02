@@ -21,6 +21,12 @@ export class TestScene extends Phaser.Scene {
         this.load.image("pause", "/treasures/pause.svg");
         this.load.image("retry", "/treasures/retry.svg");
         this.load.image("delete", "/treasures/delete.svg");
+
+        // https://pipoya.net/sozai/assets/icon/icon-image/
+        this.load.spritesheet('emotion', '/treasures/pipo-emotion.png', {
+            frameWidth: 32,  // 1アイコンの幅
+            frameHeight: 32, // 1アイコンの高さ
+        });
     }
 
     create() {
@@ -30,5 +36,14 @@ export class TestScene extends Phaser.Scene {
             fontSize: '32px',
             color: '#000000'
         });
+        this.anims.create({
+            key: 'iconAnim',
+            frames: this.anims.generateFrameNumbers('emotion', { start: 204, end: 205 }),
+            frameRate: 2,
+            repeat: -1 // 無限ループ
+        });
+
+        const icon = this.add.sprite(200, 200, 'emotion');
+        icon.play('iconAnim');
     }
 }

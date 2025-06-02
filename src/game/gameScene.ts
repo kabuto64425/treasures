@@ -45,6 +45,12 @@ export class GameScene extends Phaser.Scene {
         this.load.image("retry", "/treasures/retry.svg");
         this.load.image("delete", "/treasures/delete.svg");
 
+        // https://pipoya.net/sozai/assets/icon/icon-image/
+        this.load.spritesheet('emotion', '/treasures/pipo-emotion.png', {
+            frameWidth: 32,  // 1アイコンの幅
+            frameHeight: 32, // 1アイコンの高さ
+        });
+
         // フォント(htmlに記述だが、素材URLは1箇所にまとめたいので個々に記載)
         //https://booth.pm/ja/items/2747965
     }

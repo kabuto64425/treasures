@@ -42,6 +42,12 @@ function initGame(params: any) {
                 debug: true,// スプライトに緑の枠を表示します
                 gravity: { y: 300 }// 重力の方向とその強さ
             }
+        },
+        pixelArt: true, // ← ドット絵用に重要！
+        render: {
+            antialias: false,           // キャンバスのアンチエイリアスをオフ
+            pixelArt: true,             // 内部的にもピクセル補完を無効に
+            antialiasGL: false,         // WebGLレンダラ用のアンチエイリアスもオフ
         }
     }
     new Phaser.Game(config);

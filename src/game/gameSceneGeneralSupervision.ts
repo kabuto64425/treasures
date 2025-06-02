@@ -123,15 +123,30 @@ export class GameSceneGeneralSupervision {
             this.fieldContainer.add(roomGraphics);
         }
 
-        this.fieldContainer.add(SceneContext.make.text({ x: 3 * GameConstants.GRID_SIZE + 5, y: 0 * GameConstants.GRID_SIZE, text: "↑", style: { fontSize: "22px", color: "#000000" } }));
-        this.fieldContainer.add(SceneContext.make.text({ x: 4 * GameConstants.GRID_SIZE + 5, y: 0 * GameConstants.GRID_SIZE, text: "↑", style: { fontSize: "22px", color: "#000000" } }));
-        this.fieldContainer.add(SceneContext.make.text({ x: 37 * GameConstants.GRID_SIZE + 5, y: 0 * GameConstants.GRID_SIZE, text: "↑", style: { fontSize: "22px", color: "#000000" } }));
-        this.fieldContainer.add(SceneContext.make.text({ x: 38 * GameConstants.GRID_SIZE + 5, y: 0 * GameConstants.GRID_SIZE, text: "↑", style: { fontSize: "22px", color: "#000000" } }));
+        SceneContext.anims.create({
+            key: 'iconAnim',
+            frames: SceneContext.anims.generateFrameNumbers('emotion', { start: 204, end: 205 }),
+            frameRate: 2,
+            repeat: -1 // 無限ループ
+        });
 
-        this.fieldContainer.add(SceneContext.make.text({ x: 3 * GameConstants.GRID_SIZE + 5, y: 31 * GameConstants.GRID_SIZE, text: "↓", style: { fontSize: "22px", color: "#000000" } }));
-        this.fieldContainer.add(SceneContext.make.text({ x: 4 * GameConstants.GRID_SIZE + 5, y: 31 * GameConstants.GRID_SIZE, text: "↓", style: { fontSize: "22px", color: "#000000" } }));
-        this.fieldContainer.add(SceneContext.make.text({ x: 37 * GameConstants.GRID_SIZE + 5, y: 31 * GameConstants.GRID_SIZE, text: "↓", style: { fontSize: "22px", color: "#000000" } }));
-        this.fieldContainer.add(SceneContext.make.text({ x: 38 * GameConstants.GRID_SIZE + 5, y: 31 * GameConstants.GRID_SIZE, text: "↓", style: { fontSize: "22px", color: "#000000" } }));
+        // 左上に画像を配置する Container を作る
+        const container = SceneContext.make.container({ x: 100, y: 100 });
+        container.add(SceneContext.make.sprite({ x: 0, y: 0, key: "emotion", frame: 204 }, false).setAngle(0).setOrigin(0, 0));
+        container.add(SceneContext.make.sprite({ x: 0, y: 0, key: "emotion", frame: 204 }, false).setAngle(90).setOrigin(0, 0));
+        container.add(SceneContext.make.sprite({ x: 0, y: 0, key: "emotion", frame: 204 }, false).setAngle(180).setOrigin(0, 0));
+        container.add(SceneContext.make.sprite({ x: 0, y: 0, key: "emotion", frame: 204 }, false).setAngle(270).setOrigin(0, 0));
+        this.fieldContainer.add(container);
+
+
+        this.fieldContainer.add(SceneContext.make.sprite({ x: 4 * GameConstants.GRID_SIZE - 1, y: 0 * GameConstants.GRID_SIZE, key: "emotion", frame: 204 }, false).setAngle(0).play("iconAnim"));
+        this.fieldContainer.add(SceneContext.make.text({ x: 37 * GameConstants.GRID_SIZE + 5, y: 0 * GameConstants.GRID_SIZE, text: "↑", style: { fontFamily: 'BestTen-CRT', fontSize: "22px", color: "#000000" } }));
+        this.fieldContainer.add(SceneContext.make.text({ x: 38 * GameConstants.GRID_SIZE + 5, y: 0 * GameConstants.GRID_SIZE, text: "↑", style: { fontFamily: 'BestTen-CRT', fontSize: "22px", color: "#000000" } }));
+
+        this.fieldContainer.add(SceneContext.make.text({ x: 3 * GameConstants.GRID_SIZE + 5, y: 31 * GameConstants.GRID_SIZE, text: "↓", style: { fontFamily: 'BestTen-CRT', fontSize: "22px", color: "#000000" } }));
+        this.fieldContainer.add(SceneContext.make.text({ x: 4 * GameConstants.GRID_SIZE + 5, y: 31 * GameConstants.GRID_SIZE, text: "↓", style: { fontFamily: 'BestTen-CRT', fontSize: "22px", color: "#000000" } }));
+        this.fieldContainer.add(SceneContext.make.text({ x: 37 * GameConstants.GRID_SIZE + 5, y: 31 * GameConstants.GRID_SIZE, text: "↓", style: { fontFamily: 'BestTen-CRT', fontSize: "22px", color: "#000000" } }));
+        this.fieldContainer.add(SceneContext.make.text({ x: 38 * GameConstants.GRID_SIZE + 5, y: 31 * GameConstants.GRID_SIZE, text: "↓", style: { fontFamily: 'BestTen-CRT', fontSize: "22px", color: "#000000" } }));
 
         // 壁描画
         for (let i = 0; i < GameConstants.H; i++) {
