@@ -5,6 +5,7 @@ import { DebugView } from "./debugView";
 import { DebugData, DebugDataMediator } from "./debugData";
 import * as Util from "./utils";
 import { SceneContext } from "./sceneContext";
+import { WrapArrowFactory } from "./wrapArrowFactory";
 
 export class GameScene extends Phaser.Scene {
 
@@ -60,6 +61,8 @@ export class GameScene extends Phaser.Scene {
 
         DebugDataMediator.setDebugData(this.debugData);
         SceneContext.setup(this);
+        // 必ずSceneContext.setup(this)よりも後にセットアップすること
+        WrapArrowFactory.setup();
 
         this.gameSceneGeneralSupervision = new GameSceneGeneralSupervision(this);
         this.gameSceneGeneralSupervision.setupSupervision();
