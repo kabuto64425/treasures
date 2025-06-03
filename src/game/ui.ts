@@ -8,6 +8,7 @@ import { Logger } from "./logger";
 import { JSX as JSXDom } from "jsx-dom";
 import { SceneContext } from "./sceneContext";
 import { DeleteBestRecordButton } from "./deleteBestRecordButton";
+import { GameSceneContainerContext } from "./gameSceneContainerContext";
 
 declare global {
     namespace JSX {
@@ -174,11 +175,11 @@ export class Ui {
         this.uiContainer.add(this.bestRecordText);
     }
 
-    setupPlayButton(fieldContainer: Phaser.GameObjects.Container) {
+    setupPlayButton() {
         this.play.setOrigin(0, 0);
 
         // プレイボタンはフィールド上に配置するから
-        fieldContainer.add(this.play);
+        GameSceneContainerContext.fieldContainer.add(this.play);
         this.play.setInteractive();
 
         this.play.on("pointerover", () => this.play.setTint(0x44ff44));
@@ -198,7 +199,8 @@ export class Ui {
         });
     }
 
-    setupReadyGoTextWithBar(fieldContainer: Phaser.GameObjects.Container) {
+    setupReadyGoTextWithBar() {
+        const fieldContainer = GameSceneContainerContext.fieldContainer;
         this.readyGoText.setVisible(false);
         fieldContainer.add(this.readyGoText);
 

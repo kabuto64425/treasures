@@ -78,9 +78,9 @@ export class EnemiesSupervision {
         }
     }
 
-    setup(fieldContainer: Phaser.GameObjects.Container) {
+    setup() {
         for (const enemy of this.enemyList) {
-            enemy.setup(fieldContainer);
+            enemy.setup();
         }
         DebugDataMediator.setEnemiesDebugValue(
             this.enemyList.map(e => { return e.getDebugValueData() })

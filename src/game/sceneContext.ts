@@ -19,7 +19,7 @@ export class SceneContext {
             time: scene.time,
             anims: scene.anims,
             textures: scene.textures
-        };
+        } as const;
     }
 
     // これを使用してゲームの物体を生成すると、シーンに自動的に加わる

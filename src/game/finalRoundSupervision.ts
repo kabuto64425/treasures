@@ -9,12 +9,12 @@ export class FinalRoundSupervision implements ISingleRoundSupervision {
         this.goal = new Treasure(0xffa500, true);
     }
 
-    setup(fieldContainer: Phaser.GameObjects.Container): void {
-        this.setupGoalPosition(fieldContainer);
+    setup(): void {
+        this.setupGoalPosition();
     }
 
-    private setupGoalPosition(fieldContainer: Phaser.GameObjects.Container) {
-        this.goal.setup(fieldContainer, GameConstants.goalPosition);
+    private setupGoalPosition() {
+        this.goal.setup(GameConstants.goalPosition);
     }
 
     startRound(): void {

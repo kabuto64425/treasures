@@ -3,6 +3,7 @@ import { DIRECTION } from "./drection";
 import * as GameConstants from "./gameConstants";
 import { IFieldActor } from "./iFieldActor";
 import { SceneContext } from "./sceneContext";
+import { GameSceneContainerContext } from "./gameSceneContainerContext";
 
 enum EnemyState {
     SEARCHING = 0,
@@ -73,8 +74,8 @@ export class Enemy implements IFieldActor {
         this.chargeAmount++;
     }
 
-    setup(fieldContainer: Phaser.GameObjects.Container) {
-        fieldContainer.add(this.graphics);
+    setup() {
+        GameSceneContainerContext.fieldContainer.add(this.graphics);
         this.draw();
         this.strategy.setup();
     }

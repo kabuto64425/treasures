@@ -2,6 +2,7 @@ import { Position } from "./utils";
 import * as GameConstants from "./gameConstants";
 import { Logger } from "./logger";
 import { SceneContext } from "./sceneContext";
+import { GameSceneContainerContext } from "./gameSceneContainerContext";
 
 export class Footprint {
     private readonly queue: { position: Position, frame: number }[];
@@ -17,8 +18,8 @@ export class Footprint {
         this.isFirstPrintStepped = false;
     }
 
-    setup(fieldContainer: Phaser.GameObjects.Container, isVisible: boolean) {
-        fieldContainer.add(this.graphics);
+    setup(isVisible: boolean) {
+        GameSceneContainerContext.fieldContainer.add(this.graphics);
         this.graphics.setVisible(isVisible);
     }
 

@@ -6,6 +6,7 @@ import { IFieldActor } from "./iFieldActor";
 import { PlayerDirectionBuffer } from "./playerDirectionBuffer";
 import { DebugDataMediator } from "./debugData";
 import { SceneContext } from "./sceneContext";
+import { GameSceneContainerContext } from "./gameSceneContainerContext";
 
 export class Player {
     private readonly graphics: Phaser.GameObjects.Graphics;
@@ -48,10 +49,10 @@ export class Player {
         return false;
     }
 
-    setup(fieldContainer: Phaser.GameObjects.Container, currentFrame: number, isVisibleFootprint: boolean) {
-        fieldContainer.add(this.graphics);
+    setup(currentFrame: number, isVisibleFootprint: boolean) {
+        GameSceneContainerContext.fieldContainer.add(this.graphics);
         this.draw();
-        this.footPrint.setup(fieldContainer, isVisibleFootprint);
+        this.footPrint.setup(isVisibleFootprint);
         this.footPrint.push(this.position(), currentFrame);
         this.updateDebugData();
     }

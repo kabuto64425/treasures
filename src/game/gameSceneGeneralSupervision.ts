@@ -11,6 +11,7 @@ import { EnemiesSupervision } from "./enemiesSupervision";
 import { SceneContext } from "./sceneContext";
 import { WrapArrowFactory } from "./wrapArrowFactory";
 import { GameSceneOverlay } from "./gameSceneOverlay";
+import { GameSceneContainerContext } from "./gameSceneContainerContext";
 
 export class GameSceneGeneralSupervision {
     private readonly params: any;
@@ -27,9 +28,6 @@ export class GameSceneGeneralSupervision {
 
     private readonly recorder: Recorder;
 
-    // コンテナ内でaddしたものの表示順は、depthに関係なく後からaddしたものが前に来るので注意
-    private fieldContainer: Phaser.GameObjects.Container;
-
     private updateBestRecord: (isGameComplete: boolean, currentNumberOfCollectedTreasures: number, currentElapedFrame: number) => boolean;
 
     private static readonly GAME_STATE = {
@@ -43,8 +41,6 @@ export class GameSceneGeneralSupervision {
     };
 
     constructor(scene: GameScene) {
-        this.fieldContainer = SceneContext.add.container();
-
         this.params = scene.getParams();
 
         this.updateBestRecord = scene.getBestRecord().updateBestRecord;
@@ -78,9 +74,10 @@ export class GameSceneGeneralSupervision {
 
     setupSupervision() {
         this.gameState = GameSceneGeneralSupervision.GAME_STATE.STANDBY;
-        this.fieldContainer.setPosition(30, 8);
         RecorderMediator.setRecoder(this.recorder);
         GameSceneOverlay.setup();
+
+        const fieldContainer = GameSceneContainerContext.fieldContainer;
 
         // フィールド描画
         const fieldGraphics = SceneContext.make.graphics({
@@ -92,7 +89,7 @@ export class GameSceneGeneralSupervision {
                 fieldGraphics.strokeRect(j * GameConstants.GRID_SIZE, i * GameConstants.GRID_SIZE, GameConstants.GRID_SIZE, GameConstants.GRID_SIZE);
             }
         }
-        this.fieldContainer.add(fieldGraphics);
+        fieldContainer.add(fieldGraphics);
 
         if (this.params.enableVisibleRoomRanges) {
             const roomGraphics = SceneContext.make.graphics({
@@ -120,13 +117,13 @@ export class GameSceneGeneralSupervision {
                     roomGraphics.fillRect(j * GameConstants.GRID_SIZE, i * GameConstants.GRID_SIZE, GameConstants.GRID_SIZE, GameConstants.GRID_SIZE);
                 }
             }
-            this.fieldContainer.add(roomGraphics);
+            fieldContainer.add(roomGraphics);
         }
 
-        this.fieldContainer.add(WrapArrowFactory.makeWrapAroundArrow({ x: 4 * GameConstants.GRID_SIZE - 17, y: 0 * GameConstants.GRID_SIZE - 16 }, 180));
-        this.fieldContainer.add(WrapArrowFactory.makeWrapAroundArrow({ x: 38 * GameConstants.GRID_SIZE - 17, y: 0 * GameConstants.GRID_SIZE - 16 }, 180));
-        this.fieldContainer.add(WrapArrowFactory.makeWrapAroundArrow({ x: 4 * GameConstants.GRID_SIZE - 17, y: 31 * GameConstants.GRID_SIZE }, 0));
-        this.fieldContainer.add(WrapArrowFactory.makeWrapAroundArrow({ x: 38 * GameConstants.GRID_SIZE - 17, y: 31 * GameConstants.GRID_SIZE }, 0));
+        fieldContainer.add(WrapArrowFactory.makeWrapAroundArrow({ x: 4 * GameConstants.GRID_SIZE - 17, y: 0 * GameConstants.GRID_SIZE - 16 }, 180));
+        fieldContainer.add(WrapArrowFactory.makeWrapAroundArrow({ x: 38 * GameConstants.GRID_SIZE - 17, y: 0 * GameConstants.GRID_SIZE - 16 }, 180));
+        fieldContainer.add(WrapArrowFactory.makeWrapAroundArrow({ x: 4 * GameConstants.GRID_SIZE - 17, y: 31 * GameConstants.GRID_SIZE }, 0));
+        fieldContainer.add(WrapArrowFactory.makeWrapAroundArrow({ x: 38 * GameConstants.GRID_SIZE - 17, y: 31 * GameConstants.GRID_SIZE }, 0));
         //-----------------------
 
         // 壁描画
@@ -137,27 +134,27 @@ export class GameSceneGeneralSupervision {
                         lineStyle: { width: 1, color: 0x000000, alpha: 1 },
                         fillStyle: { color: 0x000000, alpha: 1 }
                     }).fillRect(j * GameConstants.GRID_SIZE, i * GameConstants.GRID_SIZE, GameConstants.GRID_SIZE, GameConstants.GRID_SIZE);
-                    this.fieldContainer.add(fillRect);
+                    fieldContainer.add(fillRect);
                 }
             }
         }
 
-        this.ui.setupPlayButton(this.fieldContainer);
-        this.ui.setupReadyGoTextWithBar(this.fieldContainer);
+        this.ui.setupPlayButton();
+        this.ui.setupReadyGoTextWithBar();
         this.ui.setupRetryLongButton();
         this.ui.setupDeleteBestRecordButton();
 
         // プレイヤー
-        this.player.setup(this.fieldContainer, this.recorder.getElapsedFrame(), this.params.visibleFootPrint);
+        this.player.setup(this.recorder.getElapsedFrame(), this.params.visibleFootPrint);
 
         // フィールド評価
-        this.fieldEvaluation.setup(this.fieldContainer, this.params.visibleFieldEvaluation);
+        this.fieldEvaluation.setup(this.params.visibleFieldEvaluation);
 
         // ゲーム進行管理
-        this.roundsSupervision.setup(this.fieldContainer);
+        this.roundsSupervision.setup();
 
         // 敵
-        this.enemiesSupervision.setup(this.fieldContainer);
+        this.enemiesSupervision.setup();
     }
 
     startGame() {
