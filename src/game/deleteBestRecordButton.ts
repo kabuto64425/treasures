@@ -2,6 +2,7 @@ import ConfirmDeleteModal from "../tsx/confirmDeleteModal";
 import { BestRecord } from "./bestRecord";
 import * as GameConstants from "./gameConstants";
 import { GameSceneGeneralSupervision } from "./gameSceneGeneralSupervision";
+import { GameSceneOverlay } from "./gameSceneOverlay";
 import { Logger } from "./logger";
 import { SceneContext } from "./sceneContext";
 
@@ -19,7 +20,6 @@ export class DeleteBestRecordButton {
     private readonly deleteModal: Phaser.GameObjects.DOMElement;
 
     private readonly requestDeleteBestRecordFromUi: () => void;
-    private readonly getOverlay: () => Phaser.GameObjects.Graphics;
 
     private readonly barWidth = 70;
     private readonly barHeight = 17;
@@ -44,7 +44,6 @@ export class DeleteBestRecordButton {
 
         this.clock = SceneContext.time;
         this.requestDeleteBestRecordFromUi = generalSupervision.getInputCoordinator().requestDeleteBestRecordFromUi;
-        this.getOverlay = generalSupervision.getOverlay;
 
         this.image = SceneContext.make.image({ x: 0, y: 0, key: "delete" }, false);
         this.image.setOrigin(0, 0);
@@ -121,9 +120,7 @@ export class DeleteBestRecordButton {
 
             if (this.repeatCount >= requiredHoldFrames) {
                 // 押し続けてたので削除ウィンドウ表示
-                this.getOverlay().clear();
-                this.getOverlay().fillStyle(0xffffff, 0.5).fillRect(0, 0, GameConstants.D_WIDTH, GameConstants.D_WIDTH);
-                this.getOverlay().setDepth(99);
+                GameSceneOverlay.onShowDeleteBestRecordModal();
                 SceneContext.scenePlugin.pause();
                 this.deleteModal.setVisible(true);
             }

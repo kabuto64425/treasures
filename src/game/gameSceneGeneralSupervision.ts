@@ -1,6 +1,6 @@
-import { GameScene } from "./gameScene"
-import { Player } from "./player"
-import * as GameConstants from "./gameConstants"
+import { GameScene } from "./gameScene";
+import { Player } from "./player";
+import * as GameConstants from "./gameConstants";
 import { FieldEvaluation } from "./fieldEvaluation";
 import { RoundsSupervision } from "./roundsSupervision";
 import { Ui } from "./ui";
@@ -10,6 +10,7 @@ import * as Util from "./utils"
 import { EnemiesSupervision } from "./enemiesSupervision";
 import { SceneContext } from "./sceneContext";
 import { WrapArrowFactory } from "./wrapArrowFactory";
+import { GameSceneOverlay } from "./gameSceneOverlay";
 
 export class GameSceneGeneralSupervision {
     private readonly params: any;
@@ -28,7 +29,6 @@ export class GameSceneGeneralSupervision {
 
     // コンテナ内でaddしたものの表示順は、depthに関係なく後からaddしたものが前に来るので注意
     private fieldContainer: Phaser.GameObjects.Container;
-    private overlay: Phaser.GameObjects.Graphics;
 
     private updateBestRecord: (isGameComplete: boolean, currentNumberOfCollectedTreasures: number, currentElapedFrame: number) => boolean;
 
@@ -55,9 +55,6 @@ export class GameSceneGeneralSupervision {
 
         this.inputCoordinator = new InputCoordinator();
 
-        // ゲームオーバー等に表示するオーバレイ
-        this.overlay = SceneContext.add.graphics();
-
         this.ui = new Ui(this, scene.getBestRecord());
 
         // プレイヤー
@@ -83,6 +80,7 @@ export class GameSceneGeneralSupervision {
         this.gameState = GameSceneGeneralSupervision.GAME_STATE.STANDBY;
         this.fieldContainer.setPosition(30, 8);
         RecorderMediator.setRecoder(this.recorder);
+        GameSceneOverlay.setup();
 
         // フィールド描画
         const fieldGraphics = SceneContext.make.graphics({
@@ -232,9 +230,7 @@ export class GameSceneGeneralSupervision {
     }
 
     readonly pauseGame = () => {
-        this.overlay.clear();
-        this.overlay.fillStyle(0xffffff, 0.5).fillRect(30, 8, GameConstants.FIELD_WIDTH, GameConstants.FIELD_HEIGHT);
-        this.overlay.setDepth(99);
+        GameSceneOverlay.onPauseGame();
         this.gameState = GameSceneGeneralSupervision.GAME_STATE.PAUSE;
 
         this.enemiesSupervision.handlePause();
@@ -242,7 +238,7 @@ export class GameSceneGeneralSupervision {
     }
 
     readonly resumeGame = () => {
-        this.overlay.clear();
+        GameSceneOverlay.onResumeGame();
         this.gameState = GameSceneGeneralSupervision.GAME_STATE.PLAYING;
 
         this.enemiesSupervision.handleResume();
@@ -256,9 +252,7 @@ export class GameSceneGeneralSupervision {
     // onPlayerCapturedは、「プレーヤーが捕まる」という認識でいいらしい by chatgpt
     readonly onPlayerCaptured = () => {
         if (!this.params.noGameOverMode) {
-            this.overlay.clear();
-            this.overlay.fillStyle(0xd20a13, 0.5).fillRect(30, 8, GameConstants.FIELD_WIDTH, GameConstants.FIELD_HEIGHT);
-            this.overlay.setDepth(99);
+            GameSceneOverlay.onPlayerCaptured();
             this.ui.showGameOverText();
             this.gameState = GameSceneGeneralSupervision.GAME_STATE.GAME_OVER;
             this.updateBestRecord(this.isGameComplete(), this.recorder.getNumberOfCollectedTreasures(), this.recorder.getElapsedFrame());
@@ -283,10 +277,6 @@ export class GameSceneGeneralSupervision {
             elapsedFrame: this.recorder.getElapsedFrame(),
             numberOfCollectedTreasures: this.recorder.getNumberOfCollectedTreasures()
         }
-    }
-
-    readonly getOverlay = () => {
-        return this.overlay;
     }
 
     readonly isStandby = () => {
