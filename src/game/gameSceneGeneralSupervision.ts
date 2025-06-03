@@ -29,6 +29,10 @@ export class GameSceneGeneralSupervision {
     private fieldContainer: Phaser.GameObjects.Container;
     private overlay: Phaser.GameObjects.Graphics;
 
+    private readonly textureFrame: Phaser.Textures.Frame;
+    private readonly halfWidth: number;
+    private readonly halfHeight: number;
+
     private updateBestRecord: (isGameComplete: boolean, currentNumberOfCollectedTreasures: number, currentElapedFrame: number) => boolean;
 
     private static readonly GAME_STATE = {
@@ -75,6 +79,10 @@ export class GameSceneGeneralSupervision {
             this.player.getRoomId, this.roundsSupervision.isFinalRound,
             this.roundsSupervision.extractCurrentAppearanceTreasures
         );
+
+        this.textureFrame = SceneContext.textures.get('emotion').get(204);
+        this.halfWidth = this.textureFrame.width / 2;
+        this.halfHeight = this.textureFrame.height / 2;
     }
 
     setupSupervision() {
@@ -123,29 +131,18 @@ export class GameSceneGeneralSupervision {
             this.fieldContainer.add(roomGraphics);
         }
 
-        // 要コード整理・矢印実装
-        const textureFrame = SceneContext.textures.get('emotion').get(204);
-        const halfWidth = textureFrame.width / 2;
-        const halfHeight = textureFrame.height / 2;
-
+        // ループ矢印アニメのセットアップ
         SceneContext.anims.create({
             key: 'iconAnim',
             frames: SceneContext.anims.generateFrameNumbers('emotion', { start: 204, end: 205 }),
             frameRate: 2,
             repeat: -1 // 無限ループ
         });
-        // 左上に画像を配置する Container を作る
-        const container = SceneContext.make.container({ x: 4 * GameConstants.GRID_SIZE - 17, y: 0 * GameConstants.GRID_SIZE - 16 });
-        container.add(SceneContext.make.sprite({ x: halfWidth, y: halfHeight, key: "emotion", frame: 204 }, false).setAngle(180).play("iconAnim"));
-        this.fieldContainer.add(container);
 
-        this.fieldContainer.add(SceneContext.make.text({ x: 37 * GameConstants.GRID_SIZE + 5, y: 0 * GameConstants.GRID_SIZE, text: "↑", style: { fontFamily: 'BestTen-CRT', fontSize: "22px", color: "#000000" } }));
-        this.fieldContainer.add(SceneContext.make.text({ x: 38 * GameConstants.GRID_SIZE + 5, y: 0 * GameConstants.GRID_SIZE, text: "↑", style: { fontFamily: 'BestTen-CRT', fontSize: "22px", color: "#000000" } }));
-
-        this.fieldContainer.add(SceneContext.make.text({ x: 3 * GameConstants.GRID_SIZE + 5, y: 31 * GameConstants.GRID_SIZE, text: "↓", style: { fontFamily: 'BestTen-CRT', fontSize: "22px", color: "#000000" } }));
-        this.fieldContainer.add(SceneContext.make.text({ x: 4 * GameConstants.GRID_SIZE + 5, y: 31 * GameConstants.GRID_SIZE, text: "↓", style: { fontFamily: 'BestTen-CRT', fontSize: "22px", color: "#000000" } }));
-        this.fieldContainer.add(SceneContext.make.text({ x: 37 * GameConstants.GRID_SIZE + 5, y: 31 * GameConstants.GRID_SIZE, text: "↓", style: { fontFamily: 'BestTen-CRT', fontSize: "22px", color: "#000000" } }));
-        this.fieldContainer.add(SceneContext.make.text({ x: 38 * GameConstants.GRID_SIZE + 5, y: 31 * GameConstants.GRID_SIZE, text: "↓", style: { fontFamily: 'BestTen-CRT', fontSize: "22px", color: "#000000" } }));
+        this.fieldContainer.add(this.makeWrapAroundArrow({ x: 4 * GameConstants.GRID_SIZE - 17, y: 0 * GameConstants.GRID_SIZE - 16 }, 180));
+        this.fieldContainer.add(this.makeWrapAroundArrow({ x: 38 * GameConstants.GRID_SIZE - 17, y: 0 * GameConstants.GRID_SIZE - 16 }, 180));
+        this.fieldContainer.add(this.makeWrapAroundArrow({ x: 4 * GameConstants.GRID_SIZE - 17, y: 31 * GameConstants.GRID_SIZE }, 0));
+        this.fieldContainer.add(this.makeWrapAroundArrow({ x: 38 * GameConstants.GRID_SIZE - 17, y: 31 * GameConstants.GRID_SIZE }, 0));
         //-----------------------
 
         // 壁描画
@@ -293,6 +290,15 @@ export class GameSceneGeneralSupervision {
 
     readonly restartGame = () => {
         SceneContext.scenePlugin.restart();
+    }
+
+    // 矢印の真ん中を中心に下向きから時計回りにangle度だけ回転後、画像の左上を基準に配置する
+    private makeWrapAroundArrow(location: { x: number, y: number }, angle: number) {
+        // 左上に画像を配置する Container を作る
+        const container = SceneContext.make.container({ x: location.x, y: location.y }, false);
+        container.add(SceneContext.make.sprite({ x: this.halfWidth, y: this.halfHeight, key: "emotion", frame: 204 }, false).setAngle(angle).play("iconAnim"));
+        this.fieldContainer.add(container);
+        return container;
     }
 
     readonly queryCurrentRecord = () => {
