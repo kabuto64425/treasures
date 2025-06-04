@@ -1,15 +1,15 @@
-import { GameScene } from "./gameScene"
-import { Player } from "./player"
-import * as GameConstants from "./gameConstants"
+import { GameScene } from "./gameScene";
+import { Player } from "./player";
+import * as GameConstants from "./gameConstants";
 import { FieldEvaluation } from "./fieldEvaluation";
 import { RoundsSupervision } from "./roundsSupervision";
 import { Ui } from "./ui";
 import { Recorder, RecorderMediator } from "./recoder";
 import { InputCoordinator } from "./inputCoordinator";
-import * as Util from "./utils"
 import { EnemiesSupervision } from "./enemiesSupervision";
 import { SceneContext } from "./sceneContext";
-import { WrapArrowFactory } from "./wrapArrowFactory";
+import { GameSceneOverlay } from "./gameSceneOverlay";
+import { FieldSupervision } from "./fieldSupervision";
 
 export class GameSceneGeneralSupervision {
     private readonly params: any;
@@ -18,6 +18,7 @@ export class GameSceneGeneralSupervision {
 
     private readonly ui: Ui;
 
+    private readonly fieldSupervision: FieldSupervision;
     private readonly player: Player;
     private readonly fieldEvaluation: FieldEvaluation;
     private readonly enemiesSupervision: EnemiesSupervision
@@ -25,10 +26,6 @@ export class GameSceneGeneralSupervision {
     private gameState: number;
 
     private readonly recorder: Recorder;
-
-    // コンテナ内でaddしたものの表示順は、depthに関係なく後からaddしたものが前に来るので注意
-    private fieldContainer: Phaser.GameObjects.Container;
-    private overlay: Phaser.GameObjects.Graphics;
 
     private updateBestRecord: (isGameComplete: boolean, currentNumberOfCollectedTreasures: number, currentElapedFrame: number) => boolean;
 
@@ -43,8 +40,6 @@ export class GameSceneGeneralSupervision {
     };
 
     constructor(scene: GameScene) {
-        this.fieldContainer = SceneContext.add.container();
-
         this.params = scene.getParams();
 
         this.updateBestRecord = scene.getBestRecord().updateBestRecord;
@@ -54,14 +49,13 @@ export class GameSceneGeneralSupervision {
         this.gameState = GameSceneGeneralSupervision.GAME_STATE.INITIALIZED;
 
         this.inputCoordinator = new InputCoordinator();
-
-        // ゲームオーバー等に表示するオーバレイ
-        this.overlay = SceneContext.add.graphics();
-
+        
         this.ui = new Ui(this, scene.getBestRecord());
 
         // プレイヤー
         this.player = new Player(GameConstants.parameterPlayer.row, GameConstants.parameterPlayer.column, this.params);
+
+        this.fieldSupervision = new FieldSupervision(this.params, this.player.position);
 
         //フィールド評価
         this.fieldEvaluation = new FieldEvaluation(this.player.getFootPrint().getFirstPrint);
@@ -81,85 +75,28 @@ export class GameSceneGeneralSupervision {
 
     setupSupervision() {
         this.gameState = GameSceneGeneralSupervision.GAME_STATE.STANDBY;
-        this.fieldContainer.setPosition(30, 8);
         RecorderMediator.setRecoder(this.recorder);
+        GameSceneOverlay.setup();
 
         // フィールド描画
-        const fieldGraphics = SceneContext.make.graphics({
-            lineStyle: { width: 1, color: 0x000000, alpha: 1 },
-            fillStyle: { color: 0xffffff, alpha: 1 }
-        });
-        for (let i = 0; i < GameConstants.H; i++) {
-            for (let j = 0; j < GameConstants.W; j++) {
-                fieldGraphics.strokeRect(j * GameConstants.GRID_SIZE, i * GameConstants.GRID_SIZE, GameConstants.GRID_SIZE, GameConstants.GRID_SIZE);
-            }
-        }
-        this.fieldContainer.add(fieldGraphics);
+        this.fieldSupervision.setup();
 
-        if (this.params.enableVisibleRoomRanges) {
-            const roomGraphics = SceneContext.make.graphics({
-                lineStyle: { width: 1, color: 0x000000, alpha: 1 },
-                fillStyle: { color: 0xffffff, alpha: 1 },
-            });
-            roomGraphics.setDepth(-1);
-            for (let i = 0; i < GameConstants.H; i++) {
-                for (let j = 0; j < GameConstants.W; j++) {
-                    const roomRow = Util.findRoomRowIndex(i);
-                    const roomColumn = Util.findRoomColumnIndex(j);
-
-                    // 2次元グラデーション
-                    const ratioY = roomRow / (GameConstants.ROOM_ROW_COUNT); // 縦方向の割合
-                    const ratioX = roomColumn / (GameConstants.ROOM_COLUMN_COUNT); // 横方向の割合
-
-                    // 左上(赤)→右下(青)のグラデーション
-                    const r = Math.round(255 * (1 - ratioX) * (1 - ratioY));
-                    const g = Math.round(255 * ratioX * (1 - ratioY));
-                    const b = Math.round(255 * ratioY);
-
-                    const color = (r << 16) | (g << 8) | b;
-
-                    roomGraphics.fillStyle(color, 0.5);
-                    roomGraphics.fillRect(j * GameConstants.GRID_SIZE, i * GameConstants.GRID_SIZE, GameConstants.GRID_SIZE, GameConstants.GRID_SIZE);
-                }
-            }
-            this.fieldContainer.add(roomGraphics);
-        }
-
-        this.fieldContainer.add(WrapArrowFactory.makeWrapAroundArrow({ x: 4 * GameConstants.GRID_SIZE - 17, y: 0 * GameConstants.GRID_SIZE - 16 }, 180));
-        this.fieldContainer.add(WrapArrowFactory.makeWrapAroundArrow({ x: 38 * GameConstants.GRID_SIZE - 17, y: 0 * GameConstants.GRID_SIZE - 16 }, 180));
-        this.fieldContainer.add(WrapArrowFactory.makeWrapAroundArrow({ x: 4 * GameConstants.GRID_SIZE - 17, y: 31 * GameConstants.GRID_SIZE }, 0));
-        this.fieldContainer.add(WrapArrowFactory.makeWrapAroundArrow({ x: 38 * GameConstants.GRID_SIZE - 17, y: 31 * GameConstants.GRID_SIZE }, 0));
-        //-----------------------
-
-        // 壁描画
-        for (let i = 0; i < GameConstants.H; i++) {
-            for (let j = 0; j < GameConstants.W; j++) {
-                if (GameConstants.FIELD[i][j] === 1) {
-                    const fillRect = SceneContext.make.graphics({
-                        lineStyle: { width: 1, color: 0x000000, alpha: 1 },
-                        fillStyle: { color: 0x000000, alpha: 1 }
-                    }).fillRect(j * GameConstants.GRID_SIZE, i * GameConstants.GRID_SIZE, GameConstants.GRID_SIZE, GameConstants.GRID_SIZE);
-                    this.fieldContainer.add(fillRect);
-                }
-            }
-        }
-
-        this.ui.setupPlayButton(this.fieldContainer);
-        this.ui.setupReadyGoTextWithBar(this.fieldContainer);
+        this.ui.setupPlayButton();
+        this.ui.setupReadyGoTextWithBar();
         this.ui.setupRetryLongButton();
         this.ui.setupDeleteBestRecordButton();
 
         // プレイヤー
-        this.player.setup(this.fieldContainer, this.recorder.getElapsedFrame(), this.params.visibleFootPrint);
+        this.player.setup(this.recorder.getElapsedFrame(), this.params.visibleFootPrint);
 
         // フィールド評価
-        this.fieldEvaluation.setup(this.fieldContainer, this.params.visibleFieldEvaluation);
+        this.fieldEvaluation.setup(this.params.visibleFieldEvaluation);
 
         // ゲーム進行管理
-        this.roundsSupervision.setup(this.fieldContainer);
+        this.roundsSupervision.setup();
 
         // 敵
-        this.enemiesSupervision.setup(this.fieldContainer);
+        this.enemiesSupervision.setup();
     }
 
     startGame() {
@@ -183,6 +120,8 @@ export class GameSceneGeneralSupervision {
         let playerDirection = this.inputCoordinator.getApprovedActionInfo().playerDirection;
         // プレイヤーのターン
         this.player.resolvePlayerFrame(playerDirection, this.recorder.getElapsedFrame());
+
+        this.fieldSupervision.updatePerFrame();
 
         // 敵との接触判定・ゲームオーバー更新
         for (const enemy of this.enemiesSupervision.getEnemyList()) {
@@ -232,19 +171,19 @@ export class GameSceneGeneralSupervision {
     }
 
     readonly pauseGame = () => {
-        this.overlay.clear();
-        this.overlay.fillStyle(0xffffff, 0.5).fillRect(30, 8, GameConstants.FIELD_WIDTH, GameConstants.FIELD_HEIGHT);
-        this.overlay.setDepth(99);
+        GameSceneOverlay.onPauseGame();
         this.gameState = GameSceneGeneralSupervision.GAME_STATE.PAUSE;
 
+        this.fieldSupervision.handlePause();
         this.enemiesSupervision.handlePause();
         this.roundsSupervision.getCurrentRoundSupervision().handlePause();
     }
 
     readonly resumeGame = () => {
-        this.overlay.clear();
+        GameSceneOverlay.onResumeGame();
         this.gameState = GameSceneGeneralSupervision.GAME_STATE.PLAYING;
 
+        this.fieldSupervision.handleResume();
         this.enemiesSupervision.handleResume();
         this.roundsSupervision.getCurrentRoundSupervision().handleResume();
     }
@@ -256,9 +195,7 @@ export class GameSceneGeneralSupervision {
     // onPlayerCapturedは、「プレーヤーが捕まる」という認識でいいらしい by chatgpt
     readonly onPlayerCaptured = () => {
         if (!this.params.noGameOverMode) {
-            this.overlay.clear();
-            this.overlay.fillStyle(0xd20a13, 0.5).fillRect(30, 8, GameConstants.FIELD_WIDTH, GameConstants.FIELD_HEIGHT);
-            this.overlay.setDepth(99);
+            GameSceneOverlay.onPlayerCaptured();
             this.ui.showGameOverText();
             this.gameState = GameSceneGeneralSupervision.GAME_STATE.GAME_OVER;
             this.updateBestRecord(this.isGameComplete(), this.recorder.getNumberOfCollectedTreasures(), this.recorder.getElapsedFrame());
@@ -283,10 +220,6 @@ export class GameSceneGeneralSupervision {
             elapsedFrame: this.recorder.getElapsedFrame(),
             numberOfCollectedTreasures: this.recorder.getNumberOfCollectedTreasures()
         }
-    }
-
-    readonly getOverlay = () => {
-        return this.overlay;
     }
 
     readonly isStandby = () => {

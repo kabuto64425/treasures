@@ -1,5 +1,6 @@
 import { DIRECTION } from "./drection";
 import * as GameConstants from "./gameConstants";
+import { GameSceneContainerContext } from "./gameSceneContainerContext";
 import { SceneContext } from "./sceneContext";
 import { Position } from "./utils";
 
@@ -16,10 +17,10 @@ export class FieldEvaluation {
         this.getFirstPrint = getFirstPrint;
     }
 
-    setup(fieldContainer: Phaser.GameObjects.Container, isVisible: boolean) {
+    setup(isVisible: boolean) {
         this.graphics.depth = 99;
         this.graphics.setVisible(isVisible);
-        fieldContainer.add(this.graphics);
+        GameSceneContainerContext.fieldContainer.add(this.graphics);
         this.draw();
     }
 

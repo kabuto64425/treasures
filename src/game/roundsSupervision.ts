@@ -18,9 +18,9 @@ export class RoundsSupervision {
         );
     }
 
-    setup(fieldContainer: Phaser.GameObjects.Container) {
+    setup() {
         for (const round of this.singleRoundSupervisionList) {
-            round.setup(fieldContainer);
+            round.setup();
         }
     }
 

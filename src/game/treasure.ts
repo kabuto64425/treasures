@@ -1,4 +1,5 @@
 import * as GameConstants from "./gameConstants";
+import { GameSceneContainerContext } from "./gameSceneContainerContext";
 import { IFieldActor } from "./iFieldActor";
 import { RecorderMediator } from "./recoder";
 import { SceneContext } from "./sceneContext";
@@ -28,8 +29,8 @@ export class Treasure implements IFieldActor {
         this.isGoal = isGoal;
     }
 
-    setup(fieldContainer: Phaser.GameObjects.Container, position: Position) {
-        fieldContainer.add(this.graphics);
+    setup(position: Position) {
+        GameSceneContainerContext.fieldContainer.add(this.graphics);
         this.setPosition(position);
     }
 
