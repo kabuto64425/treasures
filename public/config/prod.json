@@ -7,6 +7,7 @@
     "enemyMoveCostChasing": 10,
     "visibleFootPrint": false,
     "footPrintLimitFrame": 30,
-    "enableVisibleRoomRanges": false,
+    "visibleRoomRanges": false,
+    "visibleWrapArrowFrameGraphic": false,
     "logLevel": "DEBUG"
 }

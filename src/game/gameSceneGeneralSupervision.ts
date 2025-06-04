@@ -6,12 +6,10 @@ import { RoundsSupervision } from "./roundsSupervision";
 import { Ui } from "./ui";
 import { Recorder, RecorderMediator } from "./recoder";
 import { InputCoordinator } from "./inputCoordinator";
-import * as Util from "./utils"
 import { EnemiesSupervision } from "./enemiesSupervision";
 import { SceneContext } from "./sceneContext";
-import { WrapArrowFactory } from "./wrapArrowFactory";
 import { GameSceneOverlay } from "./gameSceneOverlay";
-import { GameSceneContainerContext } from "./gameSceneContainerContext";
+import { FieldSupervision } from "./fieldSupervision";
 
 export class GameSceneGeneralSupervision {
     private readonly params: any;
@@ -20,6 +18,7 @@ export class GameSceneGeneralSupervision {
 
     private readonly ui: Ui;
 
+    private readonly fieldSupervision: FieldSupervision;
     private readonly player: Player;
     private readonly fieldEvaluation: FieldEvaluation;
     private readonly enemiesSupervision: EnemiesSupervision
@@ -50,11 +49,13 @@ export class GameSceneGeneralSupervision {
         this.gameState = GameSceneGeneralSupervision.GAME_STATE.INITIALIZED;
 
         this.inputCoordinator = new InputCoordinator();
-
+        
         this.ui = new Ui(this, scene.getBestRecord());
 
         // プレイヤー
         this.player = new Player(GameConstants.parameterPlayer.row, GameConstants.parameterPlayer.column, this.params);
+
+        this.fieldSupervision = new FieldSupervision(this.params, this.player.position);
 
         //フィールド評価
         this.fieldEvaluation = new FieldEvaluation(this.player.getFootPrint().getFirstPrint);
@@ -77,67 +78,8 @@ export class GameSceneGeneralSupervision {
         RecorderMediator.setRecoder(this.recorder);
         GameSceneOverlay.setup();
 
-        const fieldContainer = GameSceneContainerContext.fieldContainer;
-
         // フィールド描画
-        const fieldGraphics = SceneContext.make.graphics({
-            lineStyle: { width: 1, color: 0x000000, alpha: 1 },
-            fillStyle: { color: 0xffffff, alpha: 1 }
-        });
-        for (let i = 0; i < GameConstants.H; i++) {
-            for (let j = 0; j < GameConstants.W; j++) {
-                fieldGraphics.strokeRect(j * GameConstants.GRID_SIZE, i * GameConstants.GRID_SIZE, GameConstants.GRID_SIZE, GameConstants.GRID_SIZE);
-            }
-        }
-        fieldContainer.add(fieldGraphics);
-
-        if (this.params.enableVisibleRoomRanges) {
-            const roomGraphics = SceneContext.make.graphics({
-                lineStyle: { width: 1, color: 0x000000, alpha: 1 },
-                fillStyle: { color: 0xffffff, alpha: 1 },
-            });
-            roomGraphics.setDepth(-1);
-            for (let i = 0; i < GameConstants.H; i++) {
-                for (let j = 0; j < GameConstants.W; j++) {
-                    const roomRow = Util.findRoomRowIndex(i);
-                    const roomColumn = Util.findRoomColumnIndex(j);
-
-                    // 2次元グラデーション
-                    const ratioY = roomRow / (GameConstants.ROOM_ROW_COUNT); // 縦方向の割合
-                    const ratioX = roomColumn / (GameConstants.ROOM_COLUMN_COUNT); // 横方向の割合
-
-                    // 左上(赤)→右下(青)のグラデーション
-                    const r = Math.round(255 * (1 - ratioX) * (1 - ratioY));
-                    const g = Math.round(255 * ratioX * (1 - ratioY));
-                    const b = Math.round(255 * ratioY);
-
-                    const color = (r << 16) | (g << 8) | b;
-
-                    roomGraphics.fillStyle(color, 0.5);
-                    roomGraphics.fillRect(j * GameConstants.GRID_SIZE, i * GameConstants.GRID_SIZE, GameConstants.GRID_SIZE, GameConstants.GRID_SIZE);
-                }
-            }
-            fieldContainer.add(roomGraphics);
-        }
-
-        fieldContainer.add(WrapArrowFactory.makeWrapAroundArrow({ x: 4 * GameConstants.GRID_SIZE - 17, y: 0 * GameConstants.GRID_SIZE - 16 }, 180));
-        fieldContainer.add(WrapArrowFactory.makeWrapAroundArrow({ x: 38 * GameConstants.GRID_SIZE - 17, y: 0 * GameConstants.GRID_SIZE - 16 }, 180));
-        fieldContainer.add(WrapArrowFactory.makeWrapAroundArrow({ x: 4 * GameConstants.GRID_SIZE - 17, y: 31 * GameConstants.GRID_SIZE }, 0));
-        fieldContainer.add(WrapArrowFactory.makeWrapAroundArrow({ x: 38 * GameConstants.GRID_SIZE - 17, y: 31 * GameConstants.GRID_SIZE }, 0));
-        //-----------------------
-
-        // 壁描画
-        for (let i = 0; i < GameConstants.H; i++) {
-            for (let j = 0; j < GameConstants.W; j++) {
-                if (GameConstants.FIELD[i][j] === 1) {
-                    const fillRect = SceneContext.make.graphics({
-                        lineStyle: { width: 1, color: 0x000000, alpha: 1 },
-                        fillStyle: { color: 0x000000, alpha: 1 }
-                    }).fillRect(j * GameConstants.GRID_SIZE, i * GameConstants.GRID_SIZE, GameConstants.GRID_SIZE, GameConstants.GRID_SIZE);
-                    fieldContainer.add(fillRect);
-                }
-            }
-        }
+        this.fieldSupervision.setup();
 
         this.ui.setupPlayButton();
         this.ui.setupReadyGoTextWithBar();
@@ -178,6 +120,8 @@ export class GameSceneGeneralSupervision {
         let playerDirection = this.inputCoordinator.getApprovedActionInfo().playerDirection;
         // プレイヤーのターン
         this.player.resolvePlayerFrame(playerDirection, this.recorder.getElapsedFrame());
+
+        this.fieldSupervision.updatePerFrame();
 
         // 敵との接触判定・ゲームオーバー更新
         for (const enemy of this.enemiesSupervision.getEnemyList()) {
@@ -230,6 +174,7 @@ export class GameSceneGeneralSupervision {
         GameSceneOverlay.onPauseGame();
         this.gameState = GameSceneGeneralSupervision.GAME_STATE.PAUSE;
 
+        this.fieldSupervision.handlePause();
         this.enemiesSupervision.handlePause();
         this.roundsSupervision.getCurrentRoundSupervision().handlePause();
     }
@@ -238,6 +183,7 @@ export class GameSceneGeneralSupervision {
         GameSceneOverlay.onResumeGame();
         this.gameState = GameSceneGeneralSupervision.GAME_STATE.PLAYING;
 
+        this.fieldSupervision.handleResume();
         this.enemiesSupervision.handleResume();
         this.roundsSupervision.getCurrentRoundSupervision().handleResume();
     }

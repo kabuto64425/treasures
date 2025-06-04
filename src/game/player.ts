@@ -34,7 +34,7 @@ export class Player {
         this.footPrint = new Footprint(params.footPrintLimitFrame);
     }
 
-    position() {
+    position = () => {
         return { row: this.row, column: this.column };
     }
 
