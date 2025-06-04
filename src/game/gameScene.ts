@@ -53,7 +53,7 @@ export class GameScene extends Phaser.Scene {
             frameHeight: 32, // 1アイコンの高さ
         });
 
-        // フォント(htmlに記述だが、素材URLは1箇所にまとめたいので個々に記載)
+        // フォント(htmlに記述だが、素材URLは1箇所にまとめたいのでここに記載)
         //https://booth.pm/ja/items/2747965
     }
 
