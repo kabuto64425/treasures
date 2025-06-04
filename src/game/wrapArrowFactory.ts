@@ -29,6 +29,10 @@ export class WrapArrow {
         this.hide();
     }
 
+    bringToTop() {
+        GameSceneContainerContext.fieldContainer.bringToTop(this.container);
+    }
+
     show() {
         this.container.setVisible(true);
     }

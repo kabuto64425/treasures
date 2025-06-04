@@ -101,9 +101,7 @@ export class Ui {
         this.requestPauseGameFromUi = generalSupervision.getInputCoordinator().requestPauseGameFromUi;
         this.getApprovedActionInfo = generalSupervision.getInputCoordinator().getApprovedActionInfo;
 
-        this.uiContainer = SceneContext.add.container();
-        this.uiContainer.setPosition(954, 0);
-        this.uiContainer.setDepth(98);
+        this.uiContainer = GameSceneContainerContext.uiContainer;
 
         this.play = SceneContext.make.image({ x: 405, y: 277, key: "play" }, false);
 

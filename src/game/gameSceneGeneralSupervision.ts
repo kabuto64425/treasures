@@ -55,6 +55,7 @@ export class GameSceneGeneralSupervision {
         // プレイヤー
         this.player = new Player(GameConstants.parameterPlayer.row, GameConstants.parameterPlayer.column, this.params);
 
+        // フィールド監督
         this.fieldSupervision = new FieldSupervision(this.params, this.player.position);
 
         //フィールド評価
@@ -78,7 +79,6 @@ export class GameSceneGeneralSupervision {
         RecorderMediator.setRecoder(this.recorder);
         GameSceneOverlay.setup();
 
-        // フィールド描画
         this.fieldSupervision.setup();
 
         this.ui.setupPlayButton();
@@ -97,6 +97,10 @@ export class GameSceneGeneralSupervision {
 
         // 敵
         this.enemiesSupervision.setup();
+
+        // 矢印よりもプレイヤーなどを後にコンテナにaddしているが、
+        // 矢印を手前に持ってきたいから、ここで矢印を手前に持ってくる処理を入れる
+        this.fieldSupervision.bringAllWrapAroundArrowsToTop();
     }
 
     startGame() {
@@ -121,6 +125,7 @@ export class GameSceneGeneralSupervision {
         // プレイヤーのターン
         this.player.resolvePlayerFrame(playerDirection, this.recorder.getElapsedFrame());
 
+        // フィールドの更新
         this.fieldSupervision.updatePerFrame();
 
         // 敵との接触判定・ゲームオーバー更新

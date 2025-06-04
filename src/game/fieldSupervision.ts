@@ -98,6 +98,7 @@ export class FieldSupervision {
             fieldContainer.add(roomGraphics);
         }
 
+        // ループ案内の矢印
         for (const wrapAroundArrowResistry of this.wrapAroundArrowRegistryList) {
             for (const wrapAroundArrow of wrapAroundArrowResistry.wrapAroundArrowList) {
                 wrapAroundArrow.setup();
@@ -114,6 +115,14 @@ export class FieldSupervision {
                     }).fillRect(j * GameConstants.GRID_SIZE, i * GameConstants.GRID_SIZE, GameConstants.GRID_SIZE, GameConstants.GRID_SIZE);
                     fieldContainer.add(fillRect);
                 }
+            }
+        }
+    }
+
+    bringAllWrapAroundArrowsToTop() {
+        for (const wrapAroundArrowResistry of this.wrapAroundArrowRegistryList) {
+            for (const wrapAroundArrow of wrapAroundArrowResistry.wrapAroundArrowList) {
+                wrapAroundArrow.bringToTop();
             }
         }
     }
