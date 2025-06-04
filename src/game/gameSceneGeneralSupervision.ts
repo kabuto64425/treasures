@@ -99,7 +99,7 @@ export class GameSceneGeneralSupervision {
         this.enemiesSupervision.setup();
 
         // 矢印よりもプレイヤーなどを後にコンテナにaddしているが、
-        // 矢印を手前に持ってきたいから、ここで矢印を手前に持ってくる処理を入れる
+        // 矢印を手前に持ってきたい。だからここで矢印を手前に持ってくる処理を入れる
         this.fieldSupervision.bringAllWrapAroundArrowsToTop();
     }
 
