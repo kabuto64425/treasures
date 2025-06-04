@@ -9,6 +9,7 @@ import { SceneContext } from "./sceneContext";
 import { GameSceneContainerContext } from "./gameSceneContainerContext";
 
 export class Player {
+    private readonly image: Phaser.GameObjects.Image;
     private readonly graphics: Phaser.GameObjects.Graphics;
     private row: number;
     private column: number;
@@ -22,7 +23,8 @@ export class Player {
     private footPrint: Footprint;
 
     constructor(iniRow: number, iniColumn: number, params: any) {
-        this.graphics = SceneContext.make.graphics({});
+        this.image = SceneContext.make.image({ key: "player" }, false);
+        this.graphics = SceneContext.make.graphics({}, false);
         this.row = iniRow;
         this.column = iniColumn;
         this.roomId = Util.findRoomId({ row: this.row, column: this.column });
@@ -50,7 +52,18 @@ export class Player {
     }
 
     setup(currentFrame: number, isVisibleFootprint: boolean) {
+        GameSceneContainerContext.fieldContainer.add(this.image);
         GameSceneContainerContext.fieldContainer.add(this.graphics);
+
+        this.image.setPosition(this.column * GameConstants.GRID_SIZE, this.row * GameConstants.GRID_SIZE).setScale(1 / 20).setOrigin(0.05, 0.1);
+        //this.image.setPosition(this.column * GameConstants.GRID_SIZE, this.row * GameConstants.GRID_SIZE).setScale(0.78125).setOrigin(0.05, 0.1);
+        GameSceneContainerContext.fieldContainer.add(this.image);
+
+        //const frame = SceneContext.make.graphics({}, false);
+        //frame.lineStyle(1, 0xff0000);
+        //frame.strokeRect(this.column * GameConstants.GRID_SIZE, this.row * GameConstants.GRID_SIZE, sprite.width, sprite.height);
+        //GameSceneContainerContext.fieldContainer.add(frame);
+
         this.draw();
         this.footPrint.setup(isVisibleFootprint);
         this.footPrint.push(this.position(), currentFrame);
@@ -124,10 +137,11 @@ export class Player {
     }
 
     private draw() {
-        this.graphics.clear();
-        this.graphics.lineStyle(0, 0x0000ff);
-        this.graphics.fillStyle(0x0000ff);
-        this.graphics.fillRect(this.column * GameConstants.GRID_SIZE, this.row * GameConstants.GRID_SIZE, GameConstants.GRID_SIZE, GameConstants.GRID_SIZE);
+        this.image.setPosition(this.column * GameConstants.GRID_SIZE, this.row * GameConstants.GRID_SIZE);
+        //this.graphics.clear();
+        //this.graphics.lineStyle(0, 0x0000ff);
+        //this.graphics.fillStyle(0x0000ff);
+        //this.graphics.fillRect(this.column * GameConstants.GRID_SIZE, this.row * GameConstants.GRID_SIZE, GameConstants.GRID_SIZE, GameConstants.GRID_SIZE);
     }
 
     readonly getLastMoveDirection = () => {

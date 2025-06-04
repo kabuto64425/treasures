@@ -6,6 +6,7 @@ import { SceneContext } from "./sceneContext";
 import { Position } from "./utils";
 
 export class Treasure implements IFieldActor {
+    private readonly image: Phaser.GameObjects.Image;
     private readonly graphics: Phaser.GameObjects.Graphics;
     private readonly color: number;
     // undefinedのまま呼び出すとエラー・バグになるので注意!!
@@ -23,15 +24,18 @@ export class Treasure implements IFieldActor {
     };
 
     constructor(color: number, isGoal: boolean) {
-        this.graphics = SceneContext.make.graphics({});
+        this.image = SceneContext.make.image({key: "dummy"}, false);
+        this.graphics = SceneContext.make.graphics({}, false);
         this.color = color;
         this.state = Treasure.TREASURE_STATE.NON_APPEARANCE;
         this.isGoal = isGoal;
     }
 
     setup(position: Position) {
-        GameSceneContainerContext.fieldContainer.add(this.graphics);
         this.setPosition(position);
+        this.image.setScale(1 / 20).setOrigin(-0.08, -0.05);
+        //GameSceneContainerContext.fieldContainer.add(this.graphics);
+        GameSceneContainerContext.fieldContainer.add(this.image);
     }
 
     // 位置情報が取得される前にかならずこのメソッドを呼び出す
@@ -61,6 +65,8 @@ export class Treasure implements IFieldActor {
     }
 
     draw() {
+        this.image.setTexture("treasure");
+        this.image.setPosition(this.column * GameConstants.GRID_SIZE, this.row * GameConstants.GRID_SIZE);
         this.graphics.clear();
         this.graphics.lineStyle(0, this.color);
         this.graphics.fillStyle(this.color);
@@ -76,6 +82,7 @@ export class Treasure implements IFieldActor {
     }
 
     private clearDisplay() {
+        this.image.destroy();
         this.graphics.clear();
     }
 

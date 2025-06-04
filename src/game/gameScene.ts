@@ -53,6 +53,20 @@ export class GameScene extends Phaser.Scene {
             frameHeight: 32, // 1アイコンの高さ
         });
 
+        //https://pipoya.net/sozai/assets/charachip/character-chip-1/
+        /*this.load.spritesheet('player', '/treasures/charachip/pipo-charachip018a.png', {
+            frameWidth: 32,  // 1アイコンの幅
+            frameHeight: 32, // 1アイコンの高さ
+        });*/
+
+        // https://dot-illust.net/category/character/page/8/
+        this.load.image('player', '/treasures/character_hero_blue_man.svg');
+        this.load.image('enemy', '/treasures/character_teki_recreate.svg');
+        this.load.image('treasure', '/treasures/jewelry_emerald_yellow.svg');
+
+        //ダミー
+        this.load.image('dummy', '/treasures/dummy.png');
+
         // フォント(htmlに記述だが、素材URLは1箇所にまとめたいのでここに記載)
         //https://booth.pm/ja/items/2747965
     }

@@ -11,6 +11,7 @@ enum EnemyState {
 }
 
 export class Enemy implements IFieldActor {
+    private readonly image: Phaser.GameObjects.Image;
     private readonly graphics: Phaser.GameObjects.Graphics;
     private state: EnemyState;
     behaviorMap = {
@@ -44,7 +45,8 @@ export class Enemy implements IFieldActor {
         getPlayerRoomId: () => number, isFinalRound: () => boolean, onPlayerSpotted: (spottedRoomId: number) => void,
         getEnemyList: () => Enemy[]
     ) {
-        this.graphics = SceneContext.make.graphics({});
+        this.image = SceneContext.make.image({ key: "enemy" }, false);
+        this.graphics = SceneContext.make.graphics({}, false);
         this.graphics.depth = 10;
         this.state = EnemyState.SEARCHING;
         this.row = iniRow;
@@ -75,7 +77,9 @@ export class Enemy implements IFieldActor {
     }
 
     setup() {
+        GameSceneContainerContext.fieldContainer.add(this.image);
         GameSceneContainerContext.fieldContainer.add(this.graphics);
+        this.image.setPosition(this.column * GameConstants.GRID_SIZE, this.row * GameConstants.GRID_SIZE).setScale(1 / 20).setOrigin(0.05, 0.1);
         this.draw();
         this.strategy.setup();
     }
@@ -171,10 +175,11 @@ export class Enemy implements IFieldActor {
     }
 
     private draw() {
-        this.graphics.clear();
-        this.graphics.lineStyle(0, 0xff0000);
-        this.graphics.fillStyle(0xff0000);
-        this.graphics.fillRect(this.column * GameConstants.GRID_SIZE, this.row * GameConstants.GRID_SIZE, GameConstants.GRID_SIZE, GameConstants.GRID_SIZE);
+        this.image.setPosition(this.column * GameConstants.GRID_SIZE, this.row * GameConstants.GRID_SIZE);
+        //this.graphics.clear();
+        //this.graphics.lineStyle(0, 0xff0000);
+        //this.graphics.fillStyle(0xff0000);
+        //this.graphics.fillRect(this.column * GameConstants.GRID_SIZE, this.row * GameConstants.GRID_SIZE, GameConstants.GRID_SIZE, GameConstants.GRID_SIZE);
     }
 
     show() {
