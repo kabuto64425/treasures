@@ -24,7 +24,7 @@ export class Treasure implements IFieldActor {
     };
 
     constructor(color: number, isGoal: boolean) {
-        this.image = SceneContext.make.image({key: "dummy"}, false);
+        this.image = SceneContext.make.image({ key: "dummy" }, false);
         this.graphics = SceneContext.make.graphics({}, false);
         this.color = color;
         this.state = Treasure.TREASURE_STATE.NON_APPEARANCE;
@@ -33,7 +33,6 @@ export class Treasure implements IFieldActor {
 
     setup(position: Position) {
         this.setPosition(position);
-        this.image.setScale(1 / 20).setOrigin(-0.08, -0.05);
         //GameSceneContainerContext.fieldContainer.add(this.graphics);
         GameSceneContainerContext.fieldContainer.add(this.image);
     }
@@ -65,7 +64,13 @@ export class Treasure implements IFieldActor {
     }
 
     draw() {
-        this.image.setTexture("treasure");
+        if (this.isGoal) {
+            this.image.setTexture("goal");
+            this.image.setScale(1 / 26).setOrigin(-0.05, 0.2);
+        } else {
+            this.image.setTexture("treasure");
+            this.image.setScale(1 / 20).setOrigin(-0.08, -0.05);
+        }
         this.image.setPosition(this.column * GameConstants.GRID_SIZE, this.row * GameConstants.GRID_SIZE);
         this.graphics.clear();
         this.graphics.lineStyle(0, this.color);

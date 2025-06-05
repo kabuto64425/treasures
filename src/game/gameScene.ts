@@ -7,6 +7,7 @@ import * as Util from "./utils";
 import { SceneContext } from "./sceneContext";
 import { WrapArrowFactory } from "./wrapArrowFactory";
 import { GameSceneContainerContext } from "./gameSceneContainerContext";
+import { Logger } from "./logger";
 
 export class GameScene extends Phaser.Scene {
 
@@ -64,6 +65,9 @@ export class GameScene extends Phaser.Scene {
         this.load.image('enemy', '/treasures/character_teki_recreate.svg');
         this.load.image('treasure', '/treasures/jewelry_emerald_yellow.svg');
         this.load.image('renga_gray', '/treasures/block_renga_gray.svg');
+        this.load.image('goal', '/treasures/door_shitsunai_03_gold.svg');
+        this.load.image('floor', '/treasures/block_silver_resize.png');
+        this.load.tilemapTiledJSON('map', '/treasures/map.json');
 
         //ダミー
         this.load.image('dummy', '/treasures/dummy.png');
@@ -75,16 +79,23 @@ export class GameScene extends Phaser.Scene {
     create() {
         Phaser.GameObjects.BitmapText.ParseFromAtlas(this, "font", "fontatlas", "azo-fire", "azoXML");
 
-        const rt = this.make.renderTexture({x: 0, y: 0, width: 200, height:100}, false);
-        rt.draw('renga_gray', 0, 0);
-        rt.saveTexture('floor');
-
         DebugDataMediator.setDebugData(this.debugData);
         SceneContext.setup(this);
         // GameSceneContainerContext, WrapArrowFactoryは
         // 必ずSceneContext.setup(this)よりも後にセットアップすること
         GameSceneContainerContext.setup();
         WrapArrowFactory.setup();
+
+        const map = SceneContext.make.tilemap({ key: 'map' });
+        const tileset = map.addTilesetImage('tileset', 'floor');
+
+        const layer = map.createLayer('Tile Layer 1', tileset, GameSceneContainerContext.fieldContainer.x, GameSceneContainerContext.fieldContainer.y);
+
+        // コンテナを作って、レイヤーを入れる
+        GameSceneContainerContext.fieldContainer.add(SceneContext.add.rectangle(0, 0, map.widthInPixels, map.heightInPixels, 0x000000)
+    .setOrigin(0));
+        GameSceneContainerContext.fieldContainer.add(layer);
+        Logger.debug(GameSceneContainerContext.fieldContainer.list);
 
         this.gameSceneGeneralSupervision = new GameSceneGeneralSupervision(this);
         this.gameSceneGeneralSupervision.setupSupervision();
