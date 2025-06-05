@@ -63,6 +63,7 @@ export class GameScene extends Phaser.Scene {
         this.load.image('player', '/treasures/character_hero_blue_man.svg');
         this.load.image('enemy', '/treasures/character_teki_recreate.svg');
         this.load.image('treasure', '/treasures/jewelry_emerald_yellow.svg');
+        this.load.image('renga_gray', '/treasures/block_renga_gray.svg');
 
         //ダミー
         this.load.image('dummy', '/treasures/dummy.png');
@@ -73,6 +74,10 @@ export class GameScene extends Phaser.Scene {
 
     create() {
         Phaser.GameObjects.BitmapText.ParseFromAtlas(this, "font", "fontatlas", "azo-fire", "azoXML");
+
+        const rt = this.make.renderTexture({x: 0, y: 0, width: 200, height:100}, false);
+        rt.draw('renga_gray', 0, 0);
+        rt.saveTexture('floor');
 
         DebugDataMediator.setDebugData(this.debugData);
         SceneContext.setup(this);

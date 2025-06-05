@@ -5,6 +5,7 @@ import * as Util from "./utils"
 import { WrapArrow, WrapArrowFactory } from "./wrapArrowFactory";
 
 export class FieldSupervision {
+    private readonly floorImage: Phaser.GameObjects.Image;
     private readonly fieldGraphics: Phaser.GameObjects.Graphics;
     private readonly visibleRoomRanges: boolean;
     private readonly playerPosition: () => Util.Position;
@@ -15,6 +16,9 @@ export class FieldSupervision {
     }[];
 
     constructor(params: any, playerPosition: () => Util.Position) {
+        this.floorImage = SceneContext.make.image({x:100, y: 100, key: "floor"});
+        GameSceneContainerContext.fieldContainer.add(this.floorImage);
+        
         this.fieldGraphics = SceneContext.make.graphics({
             lineStyle: { width: 1, color: 0x000000, alpha: 1 },
             fillStyle: { color: 0xffffff, alpha: 1 }
