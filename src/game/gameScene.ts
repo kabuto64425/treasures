@@ -61,16 +61,16 @@ export class GameScene extends Phaser.Scene {
         });*/
 
         // https://dot-illust.net/category/character/page/8/
-        this.load.image('player', '/treasures/character_hero_blue_man.svg');
-        this.load.image('enemy', '/treasures/character_teki_recreate.svg');
         this.load.image('treasure', '/treasures/jewelry_emerald_yellow.svg');
         this.load.image('renga_gray', '/treasures/block_renga_gray.svg');
         this.load.image('goal', '/treasures/door_shitsunai_03_gold.svg');
         this.load.image('floor', '/treasures/block_silver_resize.png');
         this.load.tilemapTiledJSON('map', '/treasures/map.json');
 
-        //ダミー
+        //オリジナル素材とダミー素材
+        this.load.image('player', '/treasures/player_2.png');
         this.load.image('dummy', '/treasures/dummy.png');
+        this.load.image('enemy', '/treasures/enemy.png');
 
         // フォント(htmlに記述だが、素材URLは1箇所にまとめたいのでここに記載)
         //https://booth.pm/ja/items/2747965

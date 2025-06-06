@@ -55,7 +55,8 @@ export class Player {
         GameSceneContainerContext.fieldContainer.add(this.image);
         GameSceneContainerContext.fieldContainer.add(this.graphics);
 
-        this.image.setPosition(this.column * GameConstants.GRID_SIZE, this.row * GameConstants.GRID_SIZE).setScale(1 / 20).setOrigin(0.05, 0.1);
+        //this.image.setPosition(this.column * GameConstants.GRID_SIZE, this.row * GameConstants.GRID_SIZE).setScale(1 / 20).setOrigin(0.05, 0.1);
+        this.image.setPosition(this.column * GameConstants.GRID_SIZE, this.row * GameConstants.GRID_SIZE).setOrigin(0.05, 0.1);
         //this.image.setPosition(this.column * GameConstants.GRID_SIZE, this.row * GameConstants.GRID_SIZE).setScale(0.78125).setOrigin(0.05, 0.1);
         GameSceneContainerContext.fieldContainer.add(this.image);
 
