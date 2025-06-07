@@ -79,7 +79,9 @@ export class Enemy implements IFieldActor {
     setup() {
         GameSceneContainerContext.fieldContainer.add(this.image);
         GameSceneContainerContext.fieldContainer.add(this.graphics);
-        this.image.setPosition(this.column * GameConstants.GRID_SIZE, this.row * GameConstants.GRID_SIZE).setOrigin(0.05, 0.1);
+        this.image.setPosition(this.column * GameConstants.GRID_SIZE, this.row * GameConstants.GRID_SIZE);
+        // 1ピクセル左にずらすとうまく収まるから。不都合があればまた調整
+        this.image.setDisplayOrigin(1, 0);
         this.draw();
         this.strategy.setup();
     }
@@ -176,10 +178,6 @@ export class Enemy implements IFieldActor {
 
     private draw() {
         this.image.setPosition(this.column * GameConstants.GRID_SIZE, this.row * GameConstants.GRID_SIZE);
-        //this.graphics.clear();
-        //this.graphics.lineStyle(0, 0xff0000);
-        //this.graphics.fillStyle(0xff0000);
-        //this.graphics.fillRect(this.column * GameConstants.GRID_SIZE, this.row * GameConstants.GRID_SIZE, GameConstants.GRID_SIZE, GameConstants.GRID_SIZE);
     }
 
     show() {

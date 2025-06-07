@@ -55,15 +55,10 @@ export class Player {
         GameSceneContainerContext.fieldContainer.add(this.image);
         GameSceneContainerContext.fieldContainer.add(this.graphics);
 
-        //this.image.setPosition(this.column * GameConstants.GRID_SIZE, this.row * GameConstants.GRID_SIZE).setScale(1 / 20).setOrigin(0.05, 0.1);
-        this.image.setPosition(this.column * GameConstants.GRID_SIZE, this.row * GameConstants.GRID_SIZE).setOrigin(0.05, 0.1);
-        //this.image.setPosition(this.column * GameConstants.GRID_SIZE, this.row * GameConstants.GRID_SIZE).setScale(0.78125).setOrigin(0.05, 0.1);
+        this.image.setPosition(this.column * GameConstants.GRID_SIZE, this.row * GameConstants.GRID_SIZE).setDisplayOrigin(1, 0);
+        // 1ピクセル左にずらすとうまく収まるから。不都合があればまた調整
+        this.image.setDisplayOrigin(1, 0);
         GameSceneContainerContext.fieldContainer.add(this.image);
-
-        //const frame = SceneContext.make.graphics({}, false);
-        //frame.lineStyle(1, 0xff0000);
-        //frame.strokeRect(this.column * GameConstants.GRID_SIZE, this.row * GameConstants.GRID_SIZE, sprite.width, sprite.height);
-        //GameSceneContainerContext.fieldContainer.add(frame);
 
         this.draw();
         this.footPrint.setup(isVisibleFootprint);
@@ -139,10 +134,6 @@ export class Player {
 
     private draw() {
         this.image.setPosition(this.column * GameConstants.GRID_SIZE, this.row * GameConstants.GRID_SIZE);
-        //this.graphics.clear();
-        //this.graphics.lineStyle(0, 0x0000ff);
-        //this.graphics.fillStyle(0x0000ff);
-        //this.graphics.fillRect(this.column * GameConstants.GRID_SIZE, this.row * GameConstants.GRID_SIZE, GameConstants.GRID_SIZE, GameConstants.GRID_SIZE);
     }
 
     readonly getLastMoveDirection = () => {

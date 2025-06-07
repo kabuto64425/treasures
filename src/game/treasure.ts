@@ -66,11 +66,11 @@ export class Treasure implements IFieldActor {
     draw() {
         if (this.isGoal) {
             this.image.setTexture("goal");
-            this.image.setOrigin(-0.05, 0.2);
         } else {
             this.image.setTexture("treasure");
-            this.image.setOrigin(-0.08, -0.05);
         }
+        // 1ピクセル左にずらすとうまく収まるから。不都合があればまた調整
+        this.image.setDisplayOrigin(1, 0);
         this.image.setPosition(this.column * GameConstants.GRID_SIZE, this.row * GameConstants.GRID_SIZE);
         this.graphics.clear();
         this.graphics.lineStyle(0, this.color);

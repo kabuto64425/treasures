@@ -15,7 +15,7 @@ export class FieldSupervision {
         wrapAroundArrowList: WrapArrow[]
     }[];
 
-    constructor(params: any, playerPosition: () => Util.Position) {        
+    constructor(params: any, playerPosition: () => Util.Position) {
         this.fieldGraphics = SceneContext.make.graphics({
             lineStyle: { width: 1, color: 0x000000, alpha: 1 },
             fillStyle: { color: 0xffffff, alpha: 1 }
@@ -64,6 +64,31 @@ export class FieldSupervision {
         const fieldContainer = GameSceneContainerContext.fieldContainer;
         fieldContainer.add(this.fieldGraphics);
 
+        this.fieldGraphics.lineStyle(1, 0xBDBDBD);
+        this.fieldGraphics.fillStyle(0xBDBDBD);
+        // 1ピクセル削るとうまく収まるから。不都合があればまた調整
+        this.fieldGraphics.strokeRect(0, 0, GameConstants.FIELD_WIDTH - 1, GameConstants.FIELD_HEIGHT - 1);
+        this.fieldGraphics.fillRect(0, 0, GameConstants.FIELD_WIDTH - 1, GameConstants.FIELD_HEIGHT - 1);
+
+        this.fieldGraphics.lineStyle(1, 0xFFFFFF, 1);
+
+        // 横線
+        for (let i = 0; i <= GameConstants.H - 1; i++) {
+            const top = i * GameConstants.GRID_SIZE;
+            const bottom = (i + 1) * GameConstants.GRID_SIZE - 1;
+            // 1ピクセル削るとうまく収まるから。不都合があればまた調整
+            this.fieldGraphics.strokeLineShape(new Phaser.Geom.Line(0, top, GameConstants.FIELD_WIDTH - 1, top));
+            this.fieldGraphics.strokeLineShape(new Phaser.Geom.Line(0, bottom, GameConstants.FIELD_WIDTH - 1, bottom));
+        }
+
+        // 縦線
+        for (let i = 0; i <= GameConstants.W - 1; i++) {
+            const left = i * GameConstants.GRID_SIZE;
+            const right = (i + 1) * GameConstants.GRID_SIZE - 1;
+            this.fieldGraphics.strokeLineShape(new Phaser.Geom.Line(left, 0, left, GameConstants.FIELD_HEIGHT));
+            this.fieldGraphics.strokeLineShape(new Phaser.Geom.Line(right, 0, right, GameConstants.FIELD_HEIGHT));
+        }
+
         if (this.visibleRoomRanges) {
             const roomGraphics = SceneContext.make.graphics({
                 lineStyle: { width: 1, color: 0x000000, alpha: 1 },
@@ -107,7 +132,8 @@ export class FieldSupervision {
                     const fillRect = SceneContext.make.graphics({
                         lineStyle: { width: 1, color: 0x000000, alpha: 1 },
                         fillStyle: { color: 0x000000, alpha: 1 }
-                    }).fillRect(j * GameConstants.GRID_SIZE, i * GameConstants.GRID_SIZE, GameConstants.GRID_SIZE, GameConstants.GRID_SIZE);
+                    }).strokeRect(j * GameConstants.GRID_SIZE, i * GameConstants.GRID_SIZE, GameConstants.GRID_SIZE - 1, GameConstants.GRID_SIZE - 1)
+                        .fillRect(j * GameConstants.GRID_SIZE, i * GameConstants.GRID_SIZE, GameConstants.GRID_SIZE - 1, GameConstants.GRID_SIZE - 1);
                     fieldContainer.add(fillRect);
                 }
             }
