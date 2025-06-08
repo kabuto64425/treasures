@@ -36,6 +36,7 @@ export class Enemy implements IFieldActor {
     private readonly isFinalRound: () => boolean;
     private readonly onPlayerSpotted: (spottedRoomId: number) => void;
     private readonly getEnemyList: () => Enemy[];
+    private readonly isFloor: (position: Util.Position) => boolean;
 
     constructor(iniRow: number,
         iniColumn: number, params: any, priorityScanDirections: DIRECTION[],
@@ -43,7 +44,7 @@ export class Enemy implements IFieldActor {
         getFirstFootprint: () => Util.Position, stepOnFirstFootprint: () => void,
         isShortestDirection: (from: Util.Position, to: Util.Position, direction: DIRECTION) => boolean,
         getPlayerRoomId: () => number, isFinalRound: () => boolean, onPlayerSpotted: (spottedRoomId: number) => void,
-        getEnemyList: () => Enemy[]
+        getEnemyList: () => Enemy[], isFloor: (position: Util.Position) => boolean
     ) {
         this.image = SceneContext.make.image({ key: "enemy" }, false);
         this.graphics = SceneContext.make.graphics({}, false);
@@ -66,6 +67,7 @@ export class Enemy implements IFieldActor {
         this.isFinalRound = isFinalRound;
         this.onPlayerSpotted = onPlayerSpotted;
         this.getEnemyList = getEnemyList;
+        this.isFloor = isFloor;
     }
 
     position() {
@@ -151,7 +153,7 @@ export class Enemy implements IFieldActor {
                 }
             }
         }
-        if (GameConstants.FIELD[nextPosition.row][nextPosition.column] === 1) {
+        if (!this.isFloor({row: nextPosition.row, column: nextPosition.column})) {
             return false;
         }
         return true;

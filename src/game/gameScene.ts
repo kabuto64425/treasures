@@ -7,7 +7,6 @@ import * as Util from "./utils";
 import { SceneContext } from "./sceneContext";
 import { WrapArrowFactory } from "./wrapArrowFactory";
 import { GameSceneContainerContext } from "./gameSceneContainerContext";
-import { Logger } from "./logger";
 
 export class GameScene extends Phaser.Scene {
 
@@ -54,17 +53,10 @@ export class GameScene extends Phaser.Scene {
             frameHeight: 32, // 1アイコンの高さ
         });
 
-        //https://pipoya.net/sozai/assets/charachip/character-chip-1/
-        /*this.load.spritesheet('player', '/treasures/charachip/pipo-charachip018a.png', {
-            frameWidth: 32,  // 1アイコンの幅
-            frameHeight: 32, // 1アイコンの高さ
-        });*/
-
         // https://dot-illust.net/category/character/page/8/
         this.load.image('renga_gray', '/treasures/block_renga_gray.svg');
         this.load.image('goal', '/treasures/goal.png');
-        this.load.image('floor', '/treasures/block_silver_resize.png');
-        this.load.tilemapTiledJSON('map', '/treasures/map.json');
+        this.load.image("batsu", "/treasures/batsu.png");
 
         //オリジナル素材とダミー素材
         this.load.image('player', '/treasures/player_2.png');
@@ -85,17 +77,6 @@ export class GameScene extends Phaser.Scene {
         // 必ずSceneContext.setup(this)よりも後にセットアップすること
         GameSceneContainerContext.setup();
         WrapArrowFactory.setup();
-
-        const map = SceneContext.make.tilemap({ key: 'map' });
-        const tileset = map.addTilesetImage('tileset', 'floor');
-
-        const layer = map.createLayer('Tile Layer 1', tileset, GameSceneContainerContext.fieldContainer.x, GameSceneContainerContext.fieldContainer.y);
-
-        // コンテナを作って、レイヤーを入れる
-        GameSceneContainerContext.fieldContainer.add(SceneContext.add.rectangle(0, 0, map.widthInPixels, map.heightInPixels, 0x000000)
-    .setOrigin(0));
-        GameSceneContainerContext.fieldContainer.add(layer);
-        Logger.debug(GameSceneContainerContext.fieldContainer.list);
 
         this.gameSceneGeneralSupervision = new GameSceneGeneralSupervision(this);
         this.gameSceneGeneralSupervision.setupSupervision();

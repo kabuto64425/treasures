@@ -5,22 +5,28 @@ import * as Util from "./utils"
 import { WrapArrow, WrapArrowFactory } from "./wrapArrowFactory";
 
 export class FieldSupervision {
-    //private readonly floorImage: Phaser.GameObjects.Image;
     private readonly fieldGraphics: Phaser.GameObjects.Graphics;
     private readonly visibleRoomRanges: boolean;
-    private readonly playerPosition: () => Util.Position;
+
+    private isAppearanceBlock;
+
+    private readonly currentField: number[][];
 
     private readonly wrapAroundArrowRegistryList: {
         viewRange: { topLeft: Util.Position, bottomRight: Util.Position },
         wrapAroundArrowList: WrapArrow[]
     }[];
 
-    constructor(params: any, playerPosition: () => Util.Position) {
+    constructor(params: any) {
         this.fieldGraphics = SceneContext.make.graphics({
             lineStyle: { width: 1, color: 0x000000, alpha: 1 },
             fillStyle: { color: 0xffffff, alpha: 1 }
         });
         this.visibleRoomRanges = params.visibleRoomRanges;
+
+        this.isAppearanceBlock = false;
+
+        this.currentField = GameConstants.FIELD.map(row => [...row]);
 
         this.wrapAroundArrowRegistryList = [
             // 左上→左下
@@ -56,8 +62,6 @@ export class FieldSupervision {
                 ]
             },
         ];
-
-        this.playerPosition = playerPosition;;
     }
 
     setup() {
@@ -128,7 +132,7 @@ export class FieldSupervision {
         // 壁描画
         for (let i = 0; i < GameConstants.H; i++) {
             for (let j = 0; j < GameConstants.W; j++) {
-                if (GameConstants.FIELD[i][j] === 1) {
+                if (this.currentField[i][j] === 1) {
                     const fillRect = SceneContext.make.graphics({
                         lineStyle: { width: 1, color: 0x000000, alpha: 1 },
                         fillStyle: { color: 0x000000, alpha: 1 }
@@ -140,6 +144,45 @@ export class FieldSupervision {
         }
     }
 
+    isFloor = (position: Util.Position) => {
+        if (this.currentField[position.row][position.column] === 0) {
+            return true;
+        }
+        return false;
+    }
+
+    isWall = (position: Util.Position) => {
+        if (this.currentField[position.row][position.column] === 1) {
+            return true;
+        }
+        return false;
+    }
+
+    onFinalRound = () => {
+        this.blockPositionsForFinalRound();
+        this.drawBlockForFinalRound();
+        this.isAppearanceBlock = true;
+    }
+
+    private blockPositionsForFinalRound() {
+        for (const position of GameConstants.FINAL_ROUND_BLOCK_POSITIONS) {
+            this.currentField[position.row][position.column] = 2;
+        }
+        this.isAppearanceBlock = true;
+    }
+
+    private drawBlockForFinalRound() {
+        const fieldContainer = GameSceneContainerContext.fieldContainer;
+        // 描画
+        for (const position of GameConstants.FINAL_ROUND_BLOCK_POSITIONS) {
+            const row = position.row;
+            const column = position.column;
+            const batsuImage = SceneContext.make.image({key: "batsu", x: column * GameConstants.GRID_SIZE + 4, y: row * GameConstants.GRID_SIZE + 4}, false);
+            batsuImage.setOrigin(0);
+            fieldContainer.add(batsuImage);
+        }
+    }
+
     bringAllWrapAroundArrowsToTop() {
         for (const wrapAroundArrowResistry of this.wrapAroundArrowRegistryList) {
             for (const wrapAroundArrow of wrapAroundArrowResistry.wrapAroundArrowList) {
@@ -148,15 +191,16 @@ export class FieldSupervision {
         }
     }
 
-    updatePerFrame() {
-        const playerPostion = this.playerPosition();
+    updatePerFrame(playerPostion: Util.Position) {
         for (const wrapAroundArrowResistry of this.wrapAroundArrowRegistryList) {
             const top = wrapAroundArrowResistry.viewRange.topLeft.row;
             const left = wrapAroundArrowResistry.viewRange.topLeft.column;
             const bottom = wrapAroundArrowResistry.viewRange.bottomRight.row;
             const right = wrapAroundArrowResistry.viewRange.bottomRight.column;
 
-            if ((playerPostion.row >= top && playerPostion.row <= bottom) && (playerPostion.column >= left && playerPostion.column <= right)) {
+            const visibleWrapAroundArrow = (!this.isAppearanceBlock) && (playerPostion.row >= top && playerPostion.row <= bottom) && (playerPostion.column >= left && playerPostion.column <= right);
+
+            if (visibleWrapAroundArrow) {
                 for (const wrapAroundArrow of wrapAroundArrowResistry.wrapAroundArrowList) {
                     wrapAroundArrow.show();
                 }

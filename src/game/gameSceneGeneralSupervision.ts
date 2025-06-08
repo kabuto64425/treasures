@@ -52,24 +52,25 @@ export class GameSceneGeneralSupervision {
         
         this.ui = new Ui(this, scene.getBestRecord());
 
-        // プレイヤー
-        this.player = new Player(GameConstants.parameterPlayer.row, GameConstants.parameterPlayer.column, this.params);
-
         // フィールド監督
-        this.fieldSupervision = new FieldSupervision(this.params, this.player.position);
+        this.fieldSupervision = new FieldSupervision(this.params);
+
+        // プレイヤー
+        this.player = new Player(GameConstants.parameterPlayer.row, GameConstants.parameterPlayer.column, this.params, this.fieldSupervision.isFloor);
 
         //フィールド評価
-        this.fieldEvaluation = new FieldEvaluation(this.player.getFootPrint().getFirstPrint);
+        this.fieldEvaluation = new FieldEvaluation(this.player.getFootPrint().getFirstPrint, this.fieldSupervision.isWall);
 
         // ラウンド進行監督
-        this.roundsSupervision = new RoundsSupervision(this.onGameCompleted);
+        this.roundsSupervision = new RoundsSupervision(this.onGameCompleted, this.fieldSupervision.isFloor, this.fieldSupervision.onFinalRound);
 
         // 敵
         this.enemiesSupervision = new EnemiesSupervision(
             this.params, this.onPlayerCaptured,
             this.player.getFootPrint(), this.fieldEvaluation.isShortestDirection,
             this.player.getRoomId, this.roundsSupervision.isFinalRound,
-            this.roundsSupervision.extractCurrentAppearanceTreasures
+            this.roundsSupervision.extractCurrentAppearanceTreasures,
+            this.fieldSupervision.isFloor
         );
 
     }
@@ -126,7 +127,7 @@ export class GameSceneGeneralSupervision {
         this.player.resolvePlayerFrame(playerDirection, this.recorder.getElapsedFrame());
 
         // フィールドの更新
-        this.fieldSupervision.updatePerFrame();
+        this.fieldSupervision.updatePerFrame(this.player.position());
 
         // 敵との接触判定・ゲームオーバー更新
         for (const enemy of this.enemiesSupervision.getEnemyList()) {

@@ -1,12 +1,15 @@
 import { ISingleRoundSupervision } from "./iSingleRoundSupervision";
 import { Treasure } from "./treasure";
 import * as GameConstants from "./gameConstants";
+import * as Util from "./utils";
 
 export class TreasuresRoundSupervision implements ISingleRoundSupervision {
 
     private readonly treasureList: Treasure[];
+    private readonly isFloor: (position: Util.Position) => boolean;
 
-    constructor() {
+    constructor(isFloor: (position: Util.Position) => boolean) {
+        this.isFloor = isFloor;
         this.treasureList = Array.from({ length: GameConstants.numberOfTreasuresPerRound }, _ => {
             return new Treasure(0xffff00, false);
         });
@@ -17,12 +20,22 @@ export class TreasuresRoundSupervision implements ISingleRoundSupervision {
     }
 
     private setupTreasures() {
+        GameConstants.FINAL_ROUND_BLOCK_POSITIONS;
+        const excludedPositions = [...GameConstants.FINAL_ROUND_BLOCK_POSITIONS];
+
+        const isExcludedPosition = (treasurePos: Util.Position) => {
+            return excludedPositions.some(pos => {
+                return pos.row === treasurePos.row && pos.column === treasurePos.column;
+            });
+        };
+
         for (const treasure of this.treasureList) {
             let treasurePos = { row: Math.floor(Math.random() * GameConstants.H), column: Math.floor(Math.random() * GameConstants.W) };
-            // 壁が存在するところに宝を配置しないようにする
-            while (GameConstants.FIELD[treasurePos.row][treasurePos.column] === 1) {
+            // 床に宝を配置しないようにする
+            while (!this.isFloor(treasurePos) || isExcludedPosition(treasurePos)) {
                 treasurePos = { row: Math.floor(Math.random() * GameConstants.H), column: Math.floor(Math.random() * GameConstants.W) };
             }
+            excludedPositions.push(treasurePos);
             treasure.setup(treasurePos);
         }
     }

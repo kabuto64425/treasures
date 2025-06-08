@@ -28,14 +28,15 @@ export class EnemiesSupervision {
     constructor(params: any,
         onPlayerCaptured: () => void, footprint: Footprint,
         isShortestDirection: (from: Util.Position, to: Util.Position, direction: DIRECTION) => boolean,
-        getPlayerRoomId: () => number, isFinalRound: () => boolean, extractCurrentAppearanceTreasures: () => IFieldActor[]
+        getPlayerRoomId: () => number, isFinalRound: () => boolean, extractCurrentAppearanceTreasures: () => IFieldActor[],
+        isFloor: (position: Util.Position) => boolean
     ) {
         this.lastSpottedRoomId = getPlayerRoomId();
         this.extractCurrentAppearanceTreasures = extractCurrentAppearanceTreasures;
         this.enemyList = Array.from({ length: GameConstants.numberOfEnemyies }, (_, i) => {
             return this.createEnemy(
                 i, params, onPlayerCaptured,
-                footprint, isShortestDirection, getPlayerRoomId, isFinalRound
+                footprint, isShortestDirection, getPlayerRoomId, isFinalRound, isFloor
             );
         });
     }
@@ -44,7 +45,8 @@ export class EnemiesSupervision {
         index: number, params: any,
         onPlayerCaptured: () => void, footprint: Footprint,
         isShortestDirection: (from: Util.Position, to: Util.Position, direction: DIRECTION) => boolean,
-        getPlayerRoomId: () => number, isFinalRound: () => boolean
+        getPlayerRoomId: () => number, isFinalRound: () => boolean,
+        isFloor: (position: Util.Position) => boolean
     ) {
         const strategyInitArgs: StrategyInitArgs = {
             firstTargetRoomId: this.lastSpottedRoomId,
@@ -59,7 +61,8 @@ export class EnemiesSupervision {
             GameConstants.parametersOfEnemies[index].row, GameConstants.parametersOfEnemies[index].column,
             params, GameConstants.parametersOfEnemies[index].priorityScanDirections, strategy,
             onPlayerCaptured, footprint.getFirstPrint, footprint.onSteppedOnByEnemy,
-            isShortestDirection, getPlayerRoomId, isFinalRound, this.onPlayerSpotted, this.getEnemyList
+            isShortestDirection, getPlayerRoomId, isFinalRound, this.onPlayerSpotted, this.getEnemyList,
+            isFloor
         );
     }
 

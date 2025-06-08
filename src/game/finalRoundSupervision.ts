@@ -4,9 +4,11 @@ import * as GameConstants from "./gameConstants";
 
 export class FinalRoundSupervision implements ISingleRoundSupervision {
     private readonly goal: Treasure;
+    private onFinalRoundForFieldSupervision: () => void;
 
-    constructor() {
+    constructor(onFinalRoundForFieldSupervision: () => void) {
         this.goal = new Treasure(0xffa500, true);
+        this.onFinalRoundForFieldSupervision = onFinalRoundForFieldSupervision;
     }
 
     setup(): void {
@@ -20,6 +22,9 @@ export class FinalRoundSupervision implements ISingleRoundSupervision {
     startRound(): void {
         this.setStateAppearance();
         this.draw();
+        // ファイナルラウンドをフィールドに通知
+        // ループ道を塞ぐため
+        this.onFinalRoundForFieldSupervision();
     }
 
     isRoundCompleted(): boolean {

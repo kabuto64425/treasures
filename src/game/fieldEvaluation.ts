@@ -2,19 +2,22 @@ import { DIRECTION } from "./drection";
 import * as GameConstants from "./gameConstants";
 import { GameSceneContainerContext } from "./gameSceneContainerContext";
 import { SceneContext } from "./sceneContext";
-import { Position } from "./utils";
+import * as Util from "./utils"
 
 export class FieldEvaluation {
     private readonly evaluationMap: Map<string, Map<string, boolean>[][]>;
 
     private readonly graphics: Phaser.GameObjects.Graphics;
-    private readonly getFirstPrint: () => Position;
+    private readonly getFirstPrint: () => Util.Position;
 
-    constructor(getFirstPrint: () => Position) {
+    private readonly isWall: (position: Util.Position) => boolean;
+
+    constructor(getFirstPrint: () => Util.Position, isWall : (position: Util.Position) => boolean) {
         this.evaluationMap = new Map<string, Map<string, boolean>[][]>();
 
         this.graphics = SceneContext.make.graphics({});
         this.getFirstPrint = getFirstPrint;
+        this.isWall = isWall;
     }
 
     setup(isVisible: boolean) {
@@ -28,7 +31,7 @@ export class FieldEvaluation {
         this.draw();
     }
 
-    isShortestDirection = (from: Position, to: Position, direction: DIRECTION) => {
+    isShortestDirection = (from: Util.Position, to: Util.Position, direction: DIRECTION) => {
         const mapKey = this.createMapKeyFromPosition(to);
         if(!this.evaluationMap.has(mapKey)) {
             this.evaluationMap.set(mapKey, this.createEvaluation(to));
@@ -38,11 +41,11 @@ export class FieldEvaluation {
         return this.evaluationMap.get(mapKey)![from.row][from.column].get(direction.keyName)??false;
     }
 
-    private createMapKeyFromPosition(position : Position) {
+    private createMapKeyFromPosition(position : Util.Position) {
         return `${position.row},${position.column}`;
     }
 
-    private createEvaluation(centerPosition: Position) {
+    private createEvaluation(centerPosition: Util.Position) {
         const map = [...Array(GameConstants.H)].map(() => [...Array(GameConstants.W)].map(() => this.generateDirectionFlagMap() as Map<string, boolean>));
 
         const queue = [];
@@ -61,7 +64,9 @@ export class FieldEvaluation {
                 if (next_row < 0 || GameConstants.H <= next_row) continue;
                 if (next_column < 0 || GameConstants.W <= next_column) continue;
 
-                if (GameConstants.FIELD[next_row][next_column] === 1) continue;
+                // ファイナルラウンドの封鎖場所は評価対象とする
+                // ファイナルラウンド時の敵のハマりを防ぐため
+                if (this.isWall({row: next_row, column: next_column})) continue;
 
                 if (dist[next_row][next_column] !== -1) {
                     if (dist[next_row][next_column] === dist[v[0]][v[1]] + 1) {

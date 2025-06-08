@@ -22,7 +22,9 @@ export class Player {
 
     private footPrint: Footprint;
 
-    constructor(iniRow: number, iniColumn: number, params: any) {
+    private readonly isFloor: (position: Util.Position) => boolean;
+
+    constructor(iniRow: number, iniColumn: number, params: any, isFloor: (position: Util.Position) => boolean) {
         this.image = SceneContext.make.image({ key: "player" }, false);
         this.graphics = SceneContext.make.graphics({}, false);
         this.row = iniRow;
@@ -34,6 +36,7 @@ export class Player {
         this.playerDirectionBuffer = new PlayerDirectionBuffer(params.playerMoveCost, params.playerMoveCost, this.getLastMoveDirection);
         this.lastMoveDirection = undefined;
         this.footPrint = new Footprint(params.footPrintLimitFrame);
+        this.isFloor = isFloor;
     }
 
     position = () => {
@@ -117,7 +120,7 @@ export class Player {
 
     private canMove(direction: DIRECTION) {
         const nextPosition = Util.calculateNextPosition(this.position(), direction);
-        if (GameConstants.FIELD[nextPosition.row][nextPosition.column] === 1) {
+        if (!this.isFloor({row: nextPosition.row, column: nextPosition.column})) {
             return false;
         }
         return true;

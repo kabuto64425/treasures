@@ -2,19 +2,23 @@ import { ISingleRoundSupervision } from "./iSingleRoundSupervision";
 import * as GameConstants from "./gameConstants";
 import { FinalRoundSupervision } from "./finalRoundSupervision";
 import { TreasuresRoundSupervision } from "./treasuresRoundSupervision";
+import * as Util from "./utils";
 
 export class RoundsSupervision {
     private currentRound: number;
     private readonly singleRoundSupervisionList: ISingleRoundSupervision[];
     private readonly onGameCompleted: () => void;
 
-    constructor(onGameCompleted: () => void) {
+    constructor(onGameCompleted: () => void
+        , isFloor: (position: Util.Position) => boolean
+        , onFinalRoundForFieldSupervision: () => void
+    ) {
         this.currentRound = 0;
         this.onGameCompleted = onGameCompleted;
         // +1でファイナルラウンドに対応しているのは暫定
         const totalRounds = GameConstants.numberOfTreasuresRounds + 1;
         this.singleRoundSupervisionList = Array.from({ length: totalRounds }, (_, i) =>
-            (i === totalRounds - 1) ? new FinalRoundSupervision() : new TreasuresRoundSupervision()
+            (i === totalRounds - 1) ? new FinalRoundSupervision(onFinalRoundForFieldSupervision) : new TreasuresRoundSupervision(isFloor)
         );
     }
 
