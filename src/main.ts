@@ -23,8 +23,6 @@ function initGame(params: any) {
     // Phaser3の設定データ
     const config: Phaser.Types.Core.GameConfig = {
         type: Phaser.AUTO,
-        //width: Math.min(window.innerWidth, Game.D_WIDTH),// ゲーム画面の横幅
-        //height: Math.min(window.innerHeight, Game.D_HEIGHT),// ゲーム画面の高さ
         backgroundColor: "#FFFFFF", // 背景色を設定
         antialias: false,
         scene: new Game.GameScene(params, bestRecord),
@@ -51,12 +49,12 @@ function initGame(params: any) {
         },
         scale: {
             mode: Phaser.Scale.FIT,
-            autoCenter: Phaser.Scale.CENTER_BOTH,
+            parent: "phaser",
             width: Game.D_WIDTH,// ゲーム画面の横幅
             height: Game.D_HEIGHT// ゲーム画面の高さ
         }
     }
-    new Phaser.Game(config);
+    return new Phaser.Game(config);
 }
 
 // エントリポイント

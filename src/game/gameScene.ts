@@ -80,7 +80,7 @@ export class GameScene extends Phaser.Scene {
 
         this.gameSceneGeneralSupervision = new GameSceneGeneralSupervision(this);
         this.gameSceneGeneralSupervision.setupSupervision();
-        if (Util.isDebugEnv()) {
+        /*if (Util.isDebugEnv()) {
             const view = new DebugView(this.debugData);
             view.setup();
             this.events.once("shutdown", () => {
@@ -88,7 +88,7 @@ export class GameScene extends Phaser.Scene {
                 // restartを繰り返すうちに処理が重くなるから
                 view.destroy();
             });
-        }
+        }*/
         if (this.isDebugStepMode) {
             this.input.keyboard.on('keydown-N', () => {
                 this.doStepOnce = true;
