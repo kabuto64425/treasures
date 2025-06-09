@@ -23,8 +23,8 @@ function initGame(params: any) {
     // Phaser3の設定データ
     const config: Phaser.Types.Core.GameConfig = {
         type: Phaser.AUTO,
-        width: Game.D_WIDTH,// ゲーム画面の横幅
-        height: Game.D_HEIGHT,// ゲーム画面の高さ
+        //width: Math.min(window.innerWidth, Game.D_WIDTH),// ゲーム画面の横幅
+        //height: Math.min(window.innerHeight, Game.D_HEIGHT),// ゲーム画面の高さ
         backgroundColor: "#FFFFFF", // 背景色を設定
         antialias: false,
         scene: new Game.GameScene(params, bestRecord),
@@ -48,6 +48,12 @@ function initGame(params: any) {
             antialias: false,           // キャンバスのアンチエイリアスをオフ
             pixelArt: true,             // 内部的にもピクセル補完を無効に
             antialiasGL: false,         // WebGLレンダラ用のアンチエイリアスもオフ
+        },
+        scale: {
+            mode: Phaser.Scale.FIT,
+            autoCenter: Phaser.Scale.CENTER_BOTH,
+            width: Game.D_WIDTH,// ゲーム画面の横幅
+            height: Game.D_HEIGHT// ゲーム画面の高さ
         }
     }
     new Phaser.Game(config);
