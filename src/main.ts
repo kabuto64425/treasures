@@ -16,8 +16,22 @@ declare global {
 
 const configFile = `/treasures//config/${(Util.isDebugEnv()) ? "dev.json" : "prod.json"}`
 
+// ウィンドウの幅に応じてゲーム画面のサイズを変更する
+function resizePhaserDom() {
+    const el = window.document.getElementById("phaser");
+    if (el) {
+        const usableWidth = window.visualViewport?.width || window.innerWidth;
+        const usableHeight = window.visualViewport?.height || window.innerHeight;
+        el.style.width = `${usableWidth}px`;
+        el.style.height = `${usableHeight}px`;
+    }
+}
+
 // Phaser3オブジェクトを作る
 function initGame(params: any) {
+    // ウィンドウの幅に応じてゲーム画面のサイズを変更する
+    resizePhaserDom();
+
     Logger.setLogLevel(params.logLevel);
     const bestRecord = new Game.BestRecord(params.enableUsingLocalstorage);
     // Phaser3の設定データ
@@ -48,8 +62,9 @@ function initGame(params: any) {
             antialiasGL: false,         // WebGLレンダラ用のアンチエイリアスもオフ
         },
         scale: {
-            mode: Phaser.Scale.FIT,
+            mode: Phaser.Scale.FIT, // parent: "phaser"なので、idがphaser要素のwidth,heightの大きさに応じてゲーム画面が拡大・縮小される
             parent: "phaser",
+            //autoCenter: Phaser.Scale.CENTER_BOTH,
             width: Game.D_WIDTH,// ゲーム画面の横幅
             height: Game.D_HEIGHT// ゲーム画面の高さ
         }
@@ -63,6 +78,9 @@ async function main() {
     const data = await res.json();
     await document.fonts.load("1em BestTen-CRT");
     await Promise.resolve(initGame(data));
+    // ウィンドウのサイズが変更されるたびに
+    // ウィンドウの幅に応じて動的にゲーム画面のサイズを変更するため
+    await Promise.resolve(window.addEventListener('resize', resizePhaserDom));
 }
 
 main();
