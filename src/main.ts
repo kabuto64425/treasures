@@ -30,7 +30,7 @@ function resizePhaserDom() {
 // Phaser3オブジェクトを作る
 function initGame(params: any) {
     // ウィンドウの幅に応じてゲーム画面のサイズを変更する
-    //resizePhaserDom();
+    resizePhaserDom();
 
     Logger.setLogLevel(params.logLevel);
     const bestRecord = new Game.BestRecord(params.enableUsingLocalstorage);
