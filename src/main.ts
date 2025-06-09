@@ -17,7 +17,7 @@ declare global {
 const configFile = `/treasures//config/${(Util.isDebugEnv()) ? "dev.json" : "prod.json"}`
 
 // ウィンドウの幅に応じてゲーム画面のサイズを変更する
-/*function resizePhaserDom() {
+function resizePhaserDom() {
     const el = window.document.getElementById("phaser");
     if (el) {
         const usableWidth = window.visualViewport?.width || window.innerWidth;
@@ -25,7 +25,7 @@ const configFile = `/treasures//config/${(Util.isDebugEnv()) ? "dev.json" : "pro
         el.style.width = `${usableWidth}px`;
         el.style.height = `${usableHeight}px`;
     }
-}*/
+}
 
 // Phaser3オブジェクトを作る
 function initGame(params: any) {
