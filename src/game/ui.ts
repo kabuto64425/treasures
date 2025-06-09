@@ -104,6 +104,7 @@ export class Ui {
         this.uiContainer = GameSceneContainerContext.uiContainer;
 
         this.play = SceneContext.make.image({ x: 405, y: 277, key: "play" }, false);
+        this.play.setScale(0.5859375);
 
         this.timerEvent = new Phaser.Time.TimerEvent({
             delay: 0,
@@ -146,7 +147,7 @@ export class Ui {
 
         this.pause = SceneContext.make.image({ x: 46, y: 550, key: "pause" }, false);
         this.pause.setOrigin(0, 0);
-        this.pause.setScale(0.5);
+        this.pause.setScale(0.2929685);
         this.uiContainer.add(this.pause);
 
         this.restartButton = new RestartButton(generalSupervision, { x: 146, y: 550 });

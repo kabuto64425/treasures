@@ -42,10 +42,11 @@ export class GameScene extends Phaser.Scene {
         this.load.atlas('ui', 'nine-slice.png', 'nine-slice.json');
 
         //https://icon-rainbow.com/
-        this.load.image("play", "/treasures/play.svg");
-        this.load.image("pause", "/treasures/pause.svg");
-        this.load.image("retry", "/treasures/retry.svg");
-        this.load.image("delete", "/treasures/delete.svg");
+        this.load.image("play", "/treasures/play.png");
+        this.load.image("pause", "/treasures/pause.png");
+        // おそらくrestartというキーが使えなさそう。なので、restart_で代用
+        this.load.image("restart_", "/treasures/restart.png");
+        this.load.image("delete", "/treasures/delete.png");
 
         // https://pipoya.net/sozai/assets/icon/icon-image/
         this.load.spritesheet('emotion', '/treasures/pipo-emotion.png', {

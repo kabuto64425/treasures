@@ -47,14 +47,14 @@ export class DeleteBestRecordButton {
 
         this.image = SceneContext.make.image({ x: 0, y: 0, key: "delete" }, false);
         this.image.setOrigin(0, 0);
-        this.image.setScale(0.5);
+        this.image.setScale(0.2929685);
 
-        this.progressBox = SceneContext.make.graphics({ x: 0, y: -23, key: "retry" }, false);
+        this.progressBox = SceneContext.make.graphics({ x: 0, y: -23, key: "delete" }, false);
         this.progressBox.setVisible(false);
         this.progressBox.fillStyle(0x222222, 0.8);
         this.progressBox.fillRect(0, 0, this.barWidth, this.barHeight);
 
-        this.progressBar = SceneContext.make.graphics({ x: 0, y: -23, key: "retry" }, false);
+        this.progressBar = SceneContext.make.graphics({ x: 0, y: -23, key: "delete" }, false);
         this.progressBar.setVisible(false);
         this.progressBar.fillStyle(0xffff00, 0.8);
         this.progressBar.fillRect(0, 0, this.barWidth, this.barHeight);

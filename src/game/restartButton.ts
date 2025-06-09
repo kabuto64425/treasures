@@ -1,5 +1,6 @@
 import * as GameConstants from "./gameConstants";
 import { GameSceneGeneralSupervision } from "./gameSceneGeneralSupervision";
+import { Logger } from "./logger";
 import { SceneContext } from "./sceneContext";
 
 export class RestartButton {
@@ -43,16 +44,18 @@ export class RestartButton {
         this.restartGame = generalSupervision.restartGame;
         this.hasGameStarted = generalSupervision.hasGameStarted;
         this.requestRetryGameFromUi = generalSupervision.getInputCoordinator().requestRetryGameFromUi;
-
-        this.image = SceneContext.make.image({ x: 0, y: 0, key: "retry" }, false);
+        
+        // おそらくrestartというキーが使えなさそう。なので、restart_で代用している
+        this.image = SceneContext.make.image({ x: 0, y: 0, key: "restart_" }, false);
         this.image.setOrigin(0, 0);
-        this.image.setScale(0.5);
+        this.image.setScale(0.2929685);
+        Logger.debug(this.image.displayHeight);
 
-        this.progressBox = SceneContext.make.graphics({ x: 0, y: -23, key: "retry" }, false);
+        this.progressBox = SceneContext.make.graphics({ x: 0, y: -23, key: "retart" }, false);
         this.progressBox.setVisible(false);
         this.progressBox.fillStyle(0x222222, 0.8);
         this.progressBox.fillRect(0, 0, this.barWidth, this.barHeight);
-        this.progressBar = SceneContext.make.graphics({ x: 0, y: -23, key: "retry" }, false);
+        this.progressBar = SceneContext.make.graphics({ x: 0, y: -23, key: "retart" }, false);
         this.progressBar.setVisible(false);
         this.progressBar.fillStyle(0xffff00, 0.8);
         this.progressBar.fillRect(0, 0, this.barWidth, this.barHeight);
