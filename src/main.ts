@@ -80,7 +80,7 @@ async function main() {
     await Promise.resolve(initGame(data));
     // ウィンドウのサイズが変更されるたびに
     // ウィンドウの幅に応じて動的にゲーム画面のサイズを変更するため
-    await Promise.resolve(window.addEventListener('resize', resizePhaserDom));
+    //await Promise.resolve(window.addEventListener('resize', resizePhaserDom));
 }
 
 main();
