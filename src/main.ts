@@ -62,11 +62,11 @@ function initGame(params: any) {
             antialiasGL: false,         // WebGLレンダラ用のアンチエイリアスもオフ
         },
         scale: {
-            mode: Phaser.Scale.FIT, // parent: "phaser"なので、idがphaser要素のwidth,heightの大きさに応じてゲーム画面が拡大・縮小される
+            //mode: Phaser.Scale.FIT, // parent: "phaser"なので、idがphaser要素のwidth,heightの大きさに応じてゲーム画面が拡大・縮小される
             parent: "phaser",
             //autoCenter: Phaser.Scale.CENTER_BOTH,
-            width: Game.D_WIDTH,// ゲーム画面の横幅
-            height: Game.D_HEIGHT// ゲーム画面の高さ
+            //width: Game.D_WIDTH,// ゲーム画面の横幅
+            //height: Game.D_HEIGHT// ゲーム画面の高さ
         }
     }
     return new Phaser.Game(config);
