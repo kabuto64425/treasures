@@ -15,10 +15,10 @@ export class GameSceneContainerContext {
             uiContainer:SceneContext.add.container()
         } as const;
 
-        this.containers.fieldContainer.setPosition(30, 8);
+        this.containers.fieldContainer.setPosition(178, 8);
         this.containers.fieldContainer.setDepth(98);
 
-        this.containers.uiContainer.setPosition(954, 0);
+        this.containers.uiContainer.setPosition(1102, 0);
         this.containers.uiContainer.setDepth(98);
     }
 

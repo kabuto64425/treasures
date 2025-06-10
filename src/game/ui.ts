@@ -146,33 +146,33 @@ export class Ui {
 
         this.progressBar = SceneContext.make.graphics({ x: 255, y: 403 }, false);
 
-        this.pause = SceneContext.make.image({ x: 46, y: 550, key: "pause" }, false);
+        this.pause = SceneContext.make.image({ x: 30, y: 390, key: "pause" }, false);
         this.pause.setOrigin(0, 0);
-        this.pause.setScale(0.2929685);
+        this.pause.setScale(0.449);
         this.uiContainer.add(this.pause);
 
-        this.restartButton = new RestartButton(generalSupervision, { x: 146, y: 550 });
+        this.restartButton = new RestartButton(generalSupervision, { x: 30, y: 210 });
 
-        this.deleteBestRecordButton = new DeleteBestRecordButton(bestRecord, generalSupervision, { x: 241, y: 550 });
+        this.deleteBestRecordButton = new DeleteBestRecordButton(bestRecord, generalSupervision, { x: 30, y: 570 });
 
-
-        this.timeText = SceneContext.make.text({ x: 16, y: 10, text: "0:00.000", style: textStyle }, false);
+        this.timeText = SceneContext.make.text({ x: 5, y: 10, text: "0:00.000", style: textStyle }, false);
         this.uiContainer.add(this.timeText);
+        Logger.debug(this.timeText.displayHeight);
 
-        this.collectedTreasuresText = SceneContext.make.text({ x: 16, y: 92, text: `0/${Util.calculateNumberOfTreasuresInALLRounds()}`, style: textStyle }, false);
+        this.collectedTreasuresText = SceneContext.make.text({ x: 5, y: 40, text: `0/${Util.calculateNumberOfTreasuresInALLRounds()}`, style: textStyle }, false);
         this.uiContainer.add(this.collectedTreasuresText);
 
-        this.gameOverText = SceneContext.make.text({ x: 16, y: 174, text: "GAME OVER!", style: textStyle }, false);
+        this.gameOverText = SceneContext.make.text({ x: 5, y: 70, text: "GAME OVER!", style: textStyle }, false);
         this.gameOverText.setVisible(false);
         this.uiContainer.add(this.gameOverText);
 
-        this.congratulationsText = SceneContext.make.text({ x: 16, y: 174, text: "CONGRATULATIONS!", style: textStyle }, false);
-        this.congratulationsText.setVisible(true);
+        this.congratulationsText = SceneContext.make.text({ x: 5, y: 70, text: "CONGRATULATIONS!", style: textStyle }, false);
+        this.congratulationsText.setVisible(false);
         this.uiContainer.add(this.congratulationsText);
 
-        const bestText = SceneContext.make.text({ x: 16, y: 256, text: "BEST", style: textStyle }, false);
+        const bestText = SceneContext.make.text({ x: 5, y: 100, text: "BEST", style: textStyle }, false);
         this.uiContainer.add(bestText);
-        this.bestRecordText = SceneContext.make.text({ x: 16, y: 338, text: this.createBestRecordStr(), style: textStyle }, false);
+        this.bestRecordText = SceneContext.make.text({ x: 5, y: 130, text: this.createBestRecordStr(), style: textStyle }, false);
         this.uiContainer.add(this.bestRecordText);
     }
 

@@ -10,6 +10,7 @@ import { EnemiesSupervision } from "./enemiesSupervision";
 import { SceneContext } from "./sceneContext";
 import { GameSceneOverlay } from "./gameSceneOverlay";
 import { FieldSupervision } from "./fieldSupervision";
+import { Logger } from "./logger";
 
 export class GameSceneGeneralSupervision {
     private readonly params: any;
@@ -179,7 +180,7 @@ export class GameSceneGeneralSupervision {
     readonly pauseGame = () => {
         GameSceneOverlay.onPauseGame();
         this.gameState = GameSceneGeneralSupervision.GAME_STATE.PAUSE;
-
+        Logger.debug("pause"); 
         this.fieldSupervision.handlePause();
         this.enemiesSupervision.handlePause();
         this.roundsSupervision.getCurrentRoundSupervision().handlePause();

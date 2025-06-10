@@ -7,7 +7,6 @@ import { Position } from "./utils";
 
 export class Treasure implements IFieldActor {
     private readonly image: Phaser.GameObjects.Image;
-    private readonly graphics: Phaser.GameObjects.Graphics;
     private readonly color: number;
     // undefinedのまま呼び出すとエラー・バグになるので注意!!
     private row!: number;
@@ -25,7 +24,6 @@ export class Treasure implements IFieldActor {
 
     constructor(color: number, isGoal: boolean) {
         this.image = SceneContext.make.image({ key: "dummy" }, false);
-        this.graphics = SceneContext.make.graphics({}, false);
         this.color = color;
         this.state = Treasure.TREASURE_STATE.NON_APPEARANCE;
         this.isGoal = isGoal;
@@ -72,23 +70,18 @@ export class Treasure implements IFieldActor {
         // 1ピクセル左にずらすとうまく収まるから。不都合があればまた調整
         this.image.setDisplayOrigin(1, 0);
         this.image.setPosition(this.column * GameConstants.GRID_SIZE, this.row * GameConstants.GRID_SIZE);
-        this.graphics.clear();
-        this.graphics.lineStyle(0, this.color);
-        this.graphics.fillStyle(this.color);
-        this.graphics.fillRect(this.column * GameConstants.GRID_SIZE, this.row * GameConstants.GRID_SIZE, GameConstants.GRID_SIZE, GameConstants.GRID_SIZE);
     }
 
     show() {
-        this.graphics.setVisible(true);
+        this.image.setVisible(true);
     }
 
     hide() {
-        this.graphics.setVisible(false);
+        this.image.setVisible(false);
     }
 
     private clearDisplay() {
         this.image.destroy();
-        this.graphics.clear();
     }
 
     onCollideWithPlayer(): void {

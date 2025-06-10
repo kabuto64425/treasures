@@ -46,7 +46,7 @@ export class DeleteBestRecordButton {
 
         this.image = SceneContext.make.image({ x: 0, y: 0, key: "delete" }, false);
         this.image.setOrigin(0, 0);
-        this.image.setScale(0.2929685);
+        this.image.setScale(0.449);
 
         this.progressBox = SceneContext.make.graphics({ x: 0, y: -23, key: "delete" }, false);
         this.progressBox.setVisible(false);

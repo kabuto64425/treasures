@@ -10,7 +10,7 @@ export class GameSceneOverlay {
 
     static onPauseGame() {
         this.overlay.clear();
-        this.overlay.fillStyle(0xffffff, 0.5).fillRect(30, 8, GameConstants.FIELD_WIDTH, GameConstants.FIELD_HEIGHT);
+        this.overlay.fillStyle(0xffffff, 0.5).fillRect(178, 8, GameConstants.FIELD_WIDTH, GameConstants.FIELD_HEIGHT);
         this.overlay.setDepth(99);
     }
 
@@ -20,7 +20,7 @@ export class GameSceneOverlay {
 
     static onPlayerCaptured() {
         this.overlay.clear();
-        this.overlay.fillStyle(0xa52a2a, 0.5).fillRect(30, 8, GameConstants.FIELD_WIDTH, GameConstants.FIELD_HEIGHT);
+        this.overlay.fillStyle(0xa52a2a, 0.5).fillRect(178, 8, GameConstants.FIELD_WIDTH, GameConstants.FIELD_HEIGHT);
         this.overlay.setDepth(99);
     }
 

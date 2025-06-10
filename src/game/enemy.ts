@@ -12,7 +12,6 @@ enum EnemyState {
 
 export class Enemy implements IFieldActor {
     private readonly image: Phaser.GameObjects.Image;
-    private readonly graphics: Phaser.GameObjects.Graphics;
     private state: EnemyState;
     behaviorMap = {
         [EnemyState.SEARCHING]: new SearchingBehavior(),
@@ -47,8 +46,7 @@ export class Enemy implements IFieldActor {
         getEnemyList: () => Enemy[], isFloor: (position: Util.Position) => boolean
     ) {
         this.image = SceneContext.make.image({ key: "enemy" }, false);
-        this.graphics = SceneContext.make.graphics({}, false);
-        this.graphics.depth = 10;
+        this.image.setDepth(10);
         this.state = EnemyState.SEARCHING;
         this.row = iniRow;
         this.column = iniColumn;
@@ -80,7 +78,6 @@ export class Enemy implements IFieldActor {
 
     setup() {
         GameSceneContainerContext.fieldContainer.add(this.image);
-        GameSceneContainerContext.fieldContainer.add(this.graphics);
         this.image.setPosition(this.column * GameConstants.GRID_SIZE, this.row * GameConstants.GRID_SIZE);
         // 1ピクセル左にずらすとうまく収まるから。不都合があればまた調整
         this.image.setDisplayOrigin(1, 0);
@@ -183,11 +180,11 @@ export class Enemy implements IFieldActor {
     }
 
     show() {
-        this.graphics.setVisible(true);
+        this.image.setVisible(true);
     }
 
     hide() {
-        this.graphics.setVisible(false);
+        this.image.setVisible(false);
     }
 
     onCollideWithPlayer(): void {

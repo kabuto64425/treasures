@@ -47,7 +47,7 @@ export class RestartButton {
         // おそらくrestartというキーが使えなさそう。なので、restart_で代用している
         this.image = SceneContext.make.image({ x: 0, y: 0, key: "restart_" }, false);
         this.image.setOrigin(0, 0);
-        this.image.setScale(0.2929685);
+        this.image.setScale(0.449);
 
         this.progressBox = SceneContext.make.graphics({ x: 0, y: -23, key: "retart" }, false);
         this.progressBox.setVisible(false);
