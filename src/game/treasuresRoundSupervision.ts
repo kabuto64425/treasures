@@ -11,7 +11,7 @@ export class TreasuresRoundSupervision implements ISingleRoundSupervision {
     constructor(isFloor: (position: Util.Position) => boolean) {
         this.isFloor = isFloor;
         this.treasureList = Array.from({ length: GameConstants.numberOfTreasuresPerRound }, _ => {
-            return new Treasure(0xffff00, false);
+            return new Treasure(false);
         });
     }
 

@@ -7,7 +7,7 @@ export class FinalRoundSupervision implements ISingleRoundSupervision {
     private onFinalRoundForFieldSupervision: () => void;
 
     constructor(onFinalRoundForFieldSupervision: () => void) {
-        this.goal = new Treasure(0xffa500, true);
+        this.goal = new Treasure(true);
         this.onFinalRoundForFieldSupervision = onFinalRoundForFieldSupervision;
     }
 

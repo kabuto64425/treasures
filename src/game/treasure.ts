@@ -7,7 +7,6 @@ import { Position } from "./utils";
 
 export class Treasure implements IFieldActor {
     private readonly image: Phaser.GameObjects.Image;
-    private readonly color: number;
     // undefinedのまま呼び出すとエラー・バグになるので注意!!
     private row!: number;
     private column!: number;
@@ -22,9 +21,8 @@ export class Treasure implements IFieldActor {
         COLLECTED: 2,
     };
 
-    constructor(color: number, isGoal: boolean) {
+    constructor(isGoal: boolean) {
         this.image = SceneContext.make.image({ key: "dummy" }, false);
-        this.color = color;
         this.state = Treasure.TREASURE_STATE.NON_APPEARANCE;
         this.isGoal = isGoal;
     }

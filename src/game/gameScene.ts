@@ -1,7 +1,6 @@
 import Phaser from "phaser";
 import { GameSceneGeneralSupervision } from "./gameSceneGeneralSupervision";
 import { BestRecord } from "./bestRecord";
-import { DebugView } from "./debugView";
 import { DebugData, DebugDataMediator } from "./debugData";
 import * as Util from "./utils";
 import { SceneContext } from "./sceneContext";
