@@ -9,6 +9,7 @@ import { JSX as JSXDom } from "jsx-dom";
 import { SceneContext } from "./sceneContext";
 import { DeleteBestRecordButton } from "./deleteBestRecordButton";
 import { GameSceneContainerContext } from "./gameSceneContainerContext";
+import { DebugDataMediator } from "./debugData";
 
 declare global {
     namespace JSX {
@@ -19,7 +20,7 @@ declare global {
 
 const textStyle = {
     fontFamily: 'BestTen-CRT',
-    fontSize: '32px',
+    fontSize: '18px',
     color: '#000000'
 };
 
@@ -154,6 +155,7 @@ export class Ui {
 
         this.deleteBestRecordButton = new DeleteBestRecordButton(bestRecord, generalSupervision, { x: 241, y: 550 });
 
+
         this.timeText = SceneContext.make.text({ x: 16, y: 10, text: "0:00.000", style: textStyle }, false);
         this.uiContainer.add(this.timeText);
 
@@ -165,7 +167,7 @@ export class Ui {
         this.uiContainer.add(this.gameOverText);
 
         this.congratulationsText = SceneContext.make.text({ x: 16, y: 174, text: "CONGRATULATIONS!", style: textStyle }, false);
-        this.congratulationsText.setVisible(false);
+        this.congratulationsText.setVisible(true);
         this.uiContainer.add(this.congratulationsText);
 
         const bestText = SceneContext.make.text({ x: 16, y: 256, text: "BEST", style: textStyle }, false);
@@ -243,6 +245,7 @@ export class Ui {
 
         this.restartButton.handleApprovedAction(approvedActionInfo.retryGame);
         this.deleteBestRecordButton.handleApprovedAction(approvedActionInfo.deleteBestRecord);
+        this.updateDebugData();
     }
 
     private executeStartGameAction() {
@@ -276,5 +279,16 @@ export class Ui {
 
     showCongratulationsText() {
         this.congratulationsText.setVisible(true);
+    }
+
+    updateDebugData() {
+        DebugDataMediator.setPauseButtonValue(this.getPauseButtonValueData());
+    }
+
+    private getPauseButtonValueData() {
+        return {
+            displayWidth: this.pause.displayWidth,
+            displayHeight: this.pause.displayHeight
+        };
     }
 }

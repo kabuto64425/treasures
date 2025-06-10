@@ -3,7 +3,6 @@ import { BestRecord } from "./bestRecord";
 import * as GameConstants from "./gameConstants";
 import { GameSceneGeneralSupervision } from "./gameSceneGeneralSupervision";
 import { GameSceneOverlay } from "./gameSceneOverlay";
-import { Logger } from "./logger";
 import { SceneContext } from "./sceneContext";
 
 export class DeleteBestRecordButton {
@@ -73,7 +72,6 @@ export class DeleteBestRecordButton {
             }
         }));
         this.deleteModal.setOrigin(0, 0);
-        Logger.debug(this.deleteModal.width);
         this.deleteModal.setVisible(false);
     }
 

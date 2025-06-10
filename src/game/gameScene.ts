@@ -118,6 +118,9 @@ export class GameScene extends Phaser.Scene {
         if (this.isDebugStepMode) {
             this.doStepOnce = false;
         }
+
+        this.debugData.scaleX = this.scale.displayScale.x;
+        this.debugData.scaleY = this.scale.displayScale.y;
     }
 
     getParams() {

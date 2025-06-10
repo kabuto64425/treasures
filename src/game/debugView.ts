@@ -15,6 +15,28 @@ export class DebugView {
         this.gui.add(this.data, "updateDuration").listen();
         this.gui.add(this.data, "frameDelta").listen();
         this.gui.add(this.data, "fps").listen();
+        this.gui.add(this.data, "scaleX").listen();
+        this.gui.add(this.data, "scaleY").listen();
+
+        this.gui.add({
+            get actualWidth() {
+                if(view.data.pauseButton.displayWidth !== undefined) {
+                    return view.data.pauseButton.displayWidth / view.data.scaleX;
+                } else {
+                    return "NONE";
+                }
+            }
+        }, "actualWidth").listen();
+
+        this.gui.add({
+            get actualHeight() {
+                if(view.data.pauseButton.displayHeight !== undefined) {
+                    return view.data.pauseButton.displayHeight / view.data.scaleY;
+                } else {
+                    return "NONE";
+                }
+            }
+        }, "actualHeight").listen();
 
         const playerFolder = this.gui.addFolder("player");
 

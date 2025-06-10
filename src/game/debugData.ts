@@ -6,6 +6,17 @@ export class DebugData {
     frameDelta: number = 0;
     fps: string = "";
 
+    scaleX: number = 0;
+    scaleY: number = 0;
+
+    pauseButton: {
+        displayHeight?: number;
+        displayWidth?: number;
+    } = {
+            displayHeight: undefined,
+            displayWidth: undefined,
+        };
+
     player: {
         chargeAmount?: number,
         position?: Position,
@@ -30,6 +41,14 @@ export class DebugDataMediator {
 
     static setDebugData(data: DebugData) {
         this.data = data;
+    }
+
+    static setPauseButtonValue(data: Partial<DebugData["pauseButton"]>) {
+        if (!this.data) {
+            console.warn("DebugData is not set yet.");
+            return;
+        }
+        Object.assign(this.data.pauseButton, data);
     }
 
     static setPlayerDebugValue(data: Partial<DebugData["player"]>) {

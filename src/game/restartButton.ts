@@ -1,6 +1,5 @@
 import * as GameConstants from "./gameConstants";
 import { GameSceneGeneralSupervision } from "./gameSceneGeneralSupervision";
-import { Logger } from "./logger";
 import { SceneContext } from "./sceneContext";
 
 export class RestartButton {
@@ -49,7 +48,6 @@ export class RestartButton {
         this.image = SceneContext.make.image({ x: 0, y: 0, key: "restart_" }, false);
         this.image.setOrigin(0, 0);
         this.image.setScale(0.2929685);
-        Logger.debug(this.image.displayHeight);
 
         this.progressBox = SceneContext.make.graphics({ x: 0, y: -23, key: "retart" }, false);
         this.progressBox.setVisible(false);
