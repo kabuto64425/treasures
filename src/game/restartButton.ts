@@ -18,7 +18,7 @@ export class RestartButton {
 
     private readonly requestRetryGameFromUi: () => void;
 
-    private readonly barWidth = 70;
+    private readonly barWidth = 100;
     private readonly barHeight = 17;
 
     private repeatCount = 0;
@@ -49,11 +49,11 @@ export class RestartButton {
         this.image.setOrigin(0, 0);
         this.image.setScale(0.449);
 
-        this.progressBox = SceneContext.make.graphics({ x: 0, y: -23, key: "retart" }, false);
+        this.progressBox = SceneContext.make.graphics({ x: 7, y: -38, key: "retart" }, false);
         this.progressBox.setVisible(false);
         this.progressBox.fillStyle(0x222222, 0.8);
         this.progressBox.fillRect(0, 0, this.barWidth, this.barHeight);
-        this.progressBar = SceneContext.make.graphics({ x: 0, y: -23, key: "retart" }, false);
+        this.progressBar = SceneContext.make.graphics({ x: 7, y: -38, key: "retart" }, false);
         this.progressBar.setVisible(false);
         this.progressBar.fillStyle(0xffff00, 0.8);
         this.progressBar.fillRect(0, 0, this.barWidth, this.barHeight);
