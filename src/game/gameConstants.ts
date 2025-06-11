@@ -114,6 +114,12 @@ export const ENEMY_SEARCH_WAYPOINTS: Record<number, Position[]> = {
 
 export const PATROL_ENEMY_ROOM_ROUTE: number[] = [8, 0, 3, 11];
 
+// 敵が索敵部屋とすべき条件と合致するかを、どの部屋から見ていくか記録する初期配列
+export const INITIAL_ROOM_CONDITION_CHECK_ORDER = [9, 2, 5, 6, 1, 10, 8, 3, 4, 7, 0, 11] as const;
+
+// 敵が索敵部屋とすべき条件と合致するかをどの部屋から見ていくか？その順番を更新する間隔(秒)
+export const DESTINATION_UPDATE_ROOM_CONDITION_CHECK_ORDER: number = 20;
+
 // 敵が索敵時に目的地到達の有無に関わらず、目的地を更新する秒数。
 export const DESTINATION_FORCE_UPDATE_INTERVAL: number = 20;
 

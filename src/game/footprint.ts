@@ -1,6 +1,5 @@
 import { Position } from "./utils";
 import * as GameConstants from "./gameConstants";
-import { Logger } from "./logger";
 import { SceneContext } from "./sceneContext";
 import { GameSceneContainerContext } from "./gameSceneContainerContext";
 
@@ -67,7 +66,6 @@ export class Footprint {
     }
 
     private removeFirstPrint() {
-        Logger.debug("removefirstprint");
         this.queue.shift();
     }
 }

@@ -10,13 +10,18 @@ interface StrategyInitArgs {
     firstTargetRoomId: number,
     getLastSpottedRoomId: () => number,
     findRoomIdWithMostTreasures: () => number,
-    findRoomIdWithoutEnemies: () => number
+    findRoomIdNotBeingScouted: () => number
 }
 
 export class EnemiesSupervision {
     private readonly enemyList: Enemy[];
     private lastSpottedRoomId: number;
     private extractCurrentAppearanceTreasures: () => IFieldActor[];
+
+    // 敵が索敵部屋とすべき条件と合致するかをどの部屋から見ていくか？その順番を記録する配列
+    private roomConditionCheckOrder: number[];
+    // 最後にroomConditionCheckOrderの順番を更新してから経過したフレーム数
+    private framesSinceRoomCheckOrderUpdate = 0;
 
     private readonly enemyStrategyOrders = [
         "Follower",
@@ -39,6 +44,8 @@ export class EnemiesSupervision {
                 footprint, isShortestDirection, getPlayerRoomId, isFinalRound, isFloor
             );
         });
+        this.framesSinceRoomCheckOrderUpdate = 0;
+        this.roomConditionCheckOrder = [...GameConstants.INITIAL_ROOM_CONDITION_CHECK_ORDER];
     }
 
     private createEnemy(
@@ -52,7 +59,7 @@ export class EnemiesSupervision {
             firstTargetRoomId: this.lastSpottedRoomId,
             getLastSpottedRoomId: this.getLastSpottedRoomId,
             findRoomIdWithMostTreasures: this.findRoomIdWithMostTreasures,
-            findRoomIdWithoutEnemies: this.findRoomIdWithoutEnemies
+            findRoomIdNotBeingScouted: this.findRoomIdNotBeingScouted
         };
 
         const strategy = this.createStrategy(this.enemyStrategyOrders[index], strategyInitArgs);
@@ -75,7 +82,7 @@ export class EnemiesSupervision {
             case "Intercept":
                 return new InterceptStrategy(args.findRoomIdWithMostTreasures);
             case "Flanking":
-                return new FlankingStrategy(args.findRoomIdWithoutEnemies);
+                return new FlankingStrategy(args.findRoomIdNotBeingScouted);
             default:
                 throw new Error(`Unknown strategy type: ${order}`);
         }
@@ -91,6 +98,17 @@ export class EnemiesSupervision {
     }
 
     resolveFrame() {
+        this.framesSinceRoomCheckOrderUpdate++;
+
+        if(this.framesSinceRoomCheckOrderUpdate >= GameConstants.DESTINATION_FORCE_UPDATE_INTERVAL) {
+            // 最後にroomConditionCheckOrderの順番を更新してから一定時間経過したから、ローテーション
+            const roomId = this.roomConditionCheckOrder.shift();
+            if(roomId !== undefined) {
+                this.roomConditionCheckOrder.push(roomId);
+            }
+            this.framesSinceRoomCheckOrderUpdate = 0;
+        }
+
         for (const enemy of this.enemyList) {
             enemy.resolveEnemyFrame();
         }
@@ -146,18 +164,18 @@ export class EnemiesSupervision {
         return GameConstants.ROOM_COUNT - 1;
     }
 
-    readonly findRoomIdWithoutEnemies = () => {
+    readonly findRoomIdNotBeingScouted = () => {
         const roomIdList = this.getEnemyList().map(m => {
-            return Util.findRoomId(m.position());
+            return m.getTargetRoomId();
         });
 
         const roomIdSet = new Set(roomIdList);
 
-        for (let i = 0; i < GameConstants.ROOM_COUNT; i++) {
-            if (!roomIdSet.has(i)) {
+        for (const candidateRoomId of this.roomConditionCheckOrder) {
+            if (!roomIdSet.has(candidateRoomId)) {
                 // とりあえず最初に見つけた部屋。
                 // 優先度含めた細かい調整を実装する必要あり
-                return i;
+                return candidateRoomId;
             }
         }
         // この処理が実行されることはないはずだが、undefinedを回避するため

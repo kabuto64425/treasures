@@ -229,6 +229,10 @@ export class Enemy implements IFieldActor {
         return this.getFirstFootprint();
     }
 
+    getTargetRoomId() {
+        return this.strategy.getTargetRoomId();
+    }
+
     private decideMoveDirection(targetPosition: Util.Position) {
         for (const d of this.priorityScanDirections) {
             if (this.isShortestDirection({ row: this.row, column: this.column }, targetPosition, d)) {
@@ -266,6 +270,7 @@ export interface SearchingStrategy {
     setup(): void;
     resolveFrame(): void;
     updateStrategyInfo(): void;
+    getTargetRoomId(): number;
     getTargetPosition(): Util.Position;
 }
 
@@ -289,6 +294,7 @@ abstract class BaseStrategy implements SearchingStrategy {
 
     abstract setup(): void;
     abstract updateStrategyInfo(): void;
+    abstract getTargetRoomId(): number;
     abstract getTargetPosition(): Util.Position;
 }
 
@@ -329,6 +335,10 @@ export class PatrolStrategy extends BaseStrategy {
 
         this.targetPosition = wayPoints[this.wayPointRouteIndex];
         this.framesSinceLastDestinationUpdate = 0;
+    }
+
+    getTargetRoomId(): number {
+        return this.targetRoomId;
     }
 
     getTargetPosition(): Util.Position {
@@ -383,6 +393,10 @@ export class FollowerStrategy extends BaseStrategy {
         this.framesSinceLastDestinationUpdate = 0;
     }
 
+    getTargetRoomId(): number {
+        return this.targetRoomId;
+    }
+
     getTargetPosition(): Util.Position {
         return this.targetPosition;
     }
@@ -424,6 +438,11 @@ export class InterceptStrategy extends BaseStrategy {
         this.framesSinceLastDestinationUpdate = 0;
     }
 
+    getTargetRoomId(): number {
+        // undefined時に返すIDは、考える。(??にする必要があるかも含めて)
+        return this.targetRoomId ?? (GameConstants.ROOM_COUNT - 1);
+    }
+
     getTargetPosition(): Util.Position {
         // undefined時に返すポジションは、考える。(??にする必要があるかも含めて)
         return this.targetPosition ?? { row: GameConstants.H - 2, column: GameConstants.W - 2 };
@@ -431,20 +450,20 @@ export class InterceptStrategy extends BaseStrategy {
 }
 
 // 裏取り型
-// 敵が誰もいない部屋へ向かう
-// (更新時は、現在の自分の部屋も含めて、敵が誰もいない部屋へ向かわせる。)
+// どの敵も索敵部屋としていない部屋へ向かう
+// (更新時は、現在の自分の部屋も含めて、どの敵も索敵部屋としてない部屋へ向かわせる。)
 export class FlankingStrategy extends BaseStrategy {
     private targetPosition?: Util.Position;
     private targetRoomId?: number;
 
     private wayPointRouteIndex: number;
 
-    private findRoomIdWithoutEnemies: () => number;
+    private findRoomIdNotBeingScouted: () => number;
 
-    constructor(findRoomIdWithoutEnemies: () => number) {
+    constructor(findRoomIdNotBeingScouted: () => number) {
         super();
         this.wayPointRouteIndex = 0;
-        this.findRoomIdWithoutEnemies = findRoomIdWithoutEnemies;
+        this.findRoomIdNotBeingScouted = findRoomIdNotBeingScouted;
     }
 
     setup(): void {
@@ -452,7 +471,7 @@ export class FlankingStrategy extends BaseStrategy {
     }
 
     updateStrategyInfo(): void {
-        const newTargetRoomId = this.findRoomIdWithoutEnemies();
+        const newTargetRoomId = this.findRoomIdNotBeingScouted();
         const wayPoints = GameConstants.ENEMY_SEARCH_WAYPOINTS[newTargetRoomId];
 
         if (this.targetRoomId === newTargetRoomId) {
@@ -464,6 +483,11 @@ export class FlankingStrategy extends BaseStrategy {
 
         this.targetPosition = wayPoints[this.wayPointRouteIndex];
         this.framesSinceLastDestinationUpdate = 0;
+    }
+
+    getTargetRoomId(): number {
+        // undefined時に返すIDは、考える。(??にする必要があるかも含めて)
+        return this.targetRoomId ?? (GameConstants.ROOM_COUNT - 1);
     }
 
     getTargetPosition(): Util.Position {

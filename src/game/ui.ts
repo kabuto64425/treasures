@@ -157,7 +157,6 @@ export class Ui {
 
         this.timeText = SceneContext.make.text({ x: 5, y: 10, text: "0:00.000", style: textStyle }, false);
         this.uiContainer.add(this.timeText);
-        Logger.debug(this.timeText.displayHeight);
 
         this.collectedTreasuresText = SceneContext.make.text({ x: 5, y: 40, text: `0/${Util.calculateNumberOfTreasuresInALLRounds()}`, style: textStyle }, false);
         this.uiContainer.add(this.collectedTreasuresText);
