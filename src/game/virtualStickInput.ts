@@ -16,7 +16,7 @@ export class VirtualStickInput {
             y: 400,
             radius: 89,
             base: scene.add.circle(0, 0, 89, 0x888888),
-            thumb: scene.add.circle(0, 0, 20, 0xcccccc),
+            thumb: scene.add.circle(0, 0, 70, 0xcccccc),
             // 方向の制限（水平・垂直）も可能
             dir: '4dir',
             forceMin: 0,
