@@ -12,14 +12,16 @@ export class VirtualStickInput {
     // SceneContext を通さず直接 scene を渡すのが正しい設計判断らしい。 by chatgpt
     static setup(scene: Phaser.Scene) {
         const joystick = (scene.plugins.get('rexVirtualJoyStick') as VirtualJoyStickPlugin).add(scene, {
-            x: 100,
+            x: 89,
             y: 400,
-            radius: 50,
-            base: scene.add.circle(0, 0, 50, 0x888888),
-            thumb: scene.add.circle(0, 0, 25, 0xcccccc),
+            radius: 89,
+            base: scene.add.circle(0, 0, 89, 0x888888),
+            thumb: scene.add.circle(0, 0, 20, 0xcccccc),
             // 方向の制限（水平・垂直）も可能
             dir: '4dir',
+            forceMin: 0,
         });
+
         this.cusorKeys = joystick.createCursorKeys();
     }
 
