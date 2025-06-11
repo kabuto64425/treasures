@@ -5,7 +5,6 @@ import * as Util from "./game/utils"
 
 import { JSX as JSXDom } from "jsx-dom";
 import './style/fonts.css';
-import { TestScene } from "./game/testscene";
 
 import VirtualJoystickPlugin from 'phaser3-rex-plugins/plugins/virtualjoystick-plugin.js';
 
