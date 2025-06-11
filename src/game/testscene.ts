@@ -1,6 +1,10 @@
+import VirtualJoyStickPlugin from "phaser3-rex-plugins/plugins/virtualjoystick-plugin";
 import { SceneContext } from "./sceneContext";
+import VirtualJoyStick from "phaser3-rex-plugins/plugins/input/virtualjoystick/VirtualJoyStick";
 
 export class TestScene extends Phaser.Scene {
+    private joystick?: VirtualJoyStick;
+
     constructor() {
         super("test")
     }
@@ -45,5 +49,23 @@ export class TestScene extends Phaser.Scene {
 
         const icon = this.add.sprite(200, 200, 'emotion');
         icon.play('iconAnim');
+
+        this.joystick = (this.plugins.get('rexVirtualJoyStick') as VirtualJoyStickPlugin).add(this, {
+            x: 100,
+            y: 400,
+            radius: 50,
+            base: this.add.circle(0, 0, 50, 0x888888),
+            thumb: this.add.circle(0, 0, 25, 0xcccccc),
+            // 方向の制限（水平・垂直）も可能
+            dir: '4dir',
+        });
+    }
+
+    update() {
+        var cursorKeys = this.joystick?.createCursorKeys();
+
+        if (cursorKeys?.left.isDown) {
+            console.log("left");
+        }
     }
 }

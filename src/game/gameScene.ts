@@ -6,6 +6,7 @@ import * as Util from "./utils";
 import { SceneContext } from "./sceneContext";
 import { WrapArrowFactory } from "./wrapArrowFactory";
 import { GameSceneContainerContext } from "./gameSceneContainerContext";
+import { VirtualStickInput } from "./virtualStickInput";
 
 export class GameScene extends Phaser.Scene {
 
@@ -76,6 +77,7 @@ export class GameScene extends Phaser.Scene {
         // GameSceneContainerContext, WrapArrowFactoryは
         // 必ずSceneContext.setup(this)よりも後にセットアップすること
         GameSceneContainerContext.setup();
+        VirtualStickInput.setup(this);
         WrapArrowFactory.setup();
 
         this.gameSceneGeneralSupervision = new GameSceneGeneralSupervision(this);

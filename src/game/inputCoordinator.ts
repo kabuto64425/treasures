@@ -2,8 +2,16 @@ import Phaser from "phaser";
 import { Logger } from "./logger";
 import { DIRECTION } from "./drection";
 import { SceneContext } from "./sceneContext";
+import { VirtualStickInput } from "./virtualStickInput";
 
 const NO_PRESS_RANK = -1;
+
+type StickCursorKeys = {
+    up: Phaser.Input.Keyboard.Key;
+    down: Phaser.Input.Keyboard.Key;
+    left: Phaser.Input.Keyboard.Key;
+    right: Phaser.Input.Keyboard.Key;
+}
 
 export class InputCoordinator {
     private readonly inputPlugin: Phaser.Input.InputPlugin;
@@ -13,6 +21,8 @@ export class InputCoordinator {
     private readonly enterKey: Phaser.Input.Keyboard.Key;
     private readonly spaceKey: Phaser.Input.Keyboard.Key;
     private readonly shiftKey: Phaser.Input.Keyboard.Key;
+
+    private readonly stickKeys: StickCursorKeys;
 
     private isStartGameRequestedFromKey = false;
     private isRetryGameRequestedFromKey = false;
@@ -42,6 +52,9 @@ export class InputCoordinator {
         this.enterKey = this.inputPlugin.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ENTER);
         this.spaceKey = this.inputPlugin.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
         this.shiftKey = this.inputPlugin.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SHIFT);
+
+        // スティック登録
+        this.stickKeys = VirtualStickInput.getCusorKeys();
 
         this.approvedActionInfo = {
             startGame: false,
@@ -74,8 +87,8 @@ export class InputCoordinator {
         return undefined;
     }
 
-    private updateCursorKeyRank(cursorKey: Phaser.Input.Keyboard.Key, direction: DIRECTION, maxRank: number, inputInspector: string[]) {
-        if (cursorKey.isDown) {
+    private updateCursorKeyRank(cursorKey: Phaser.Input.Keyboard.Key, stickKey: Phaser.Input.Keyboard.Key, direction: DIRECTION, maxRank: number, inputInspector: string[]) {
+        if (cursorKey.isDown || stickKey.isDown) {
             inputInspector.push(direction.keyName);
             if (this.cursorKeysPressOrderRankMap.get(direction.keyName) === NO_PRESS_RANK) {
                 this.cursorKeysPressOrderRankMap.set(direction.keyName, maxRank + 1);
@@ -101,10 +114,10 @@ export class InputCoordinator {
         // デバッグ用
         const inputInspector: string[] = [];
 
-        this.updateCursorKeyRank(this.cursorKey.left, DIRECTION.LEFT, maxRank, inputInspector);
-        this.updateCursorKeyRank(this.cursorKey.up, DIRECTION.UP, maxRank, inputInspector);
-        this.updateCursorKeyRank(this.cursorKey.right, DIRECTION.RIGHT, maxRank, inputInspector);
-        this.updateCursorKeyRank(this.cursorKey.down, DIRECTION.DOWN, maxRank, inputInspector);
+        this.updateCursorKeyRank(this.cursorKey.left, this.stickKeys.left, DIRECTION.LEFT, maxRank, inputInspector);
+        this.updateCursorKeyRank(this.cursorKey.up, this.stickKeys.up, DIRECTION.UP, maxRank, inputInspector);
+        this.updateCursorKeyRank(this.cursorKey.right, this.stickKeys.right, DIRECTION.RIGHT, maxRank, inputInspector);
+        this.updateCursorKeyRank(this.cursorKey.down, this.stickKeys.down, DIRECTION.DOWN, maxRank, inputInspector);
     }
 
     private readonly requestStartGameFromKey = () => {

@@ -5,6 +5,9 @@ import * as Util from "./game/utils"
 
 import { JSX as JSXDom } from "jsx-dom";
 import './style/fonts.css';
+import { TestScene } from "./game/testscene";
+
+import VirtualJoystickPlugin from 'phaser3-rex-plugins/plugins/virtualjoystick-plugin.js';
 
 // Add global JSX namespace for jsx-dom
 declare global {
@@ -67,6 +70,13 @@ function initGame(params: any) {
             //autoCenter: Phaser.Scale.CENTER_BOTH,
             width: Game.D_WIDTH,// ゲーム画面の横幅
             height: Game.D_HEIGHT// ゲーム画面の高さ
+        },
+        plugins: {
+            global: [{
+                key: 'rexVirtualJoyStick',
+                plugin: VirtualJoystickPlugin,
+                start: true
+            }]
         }
     }
     return new Phaser.Game(config);

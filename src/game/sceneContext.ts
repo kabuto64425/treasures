@@ -7,7 +7,8 @@ export class SceneContext {
         inputPlugin: Phaser.Input.InputPlugin,
         time: Phaser.Time.Clock,
         anims: Phaser.Animations.AnimationManager,
-        textures: Phaser.Textures.TextureManager
+        textures: Phaser.Textures.TextureManager,
+        pluginManager: Phaser.Plugins.PluginManager
     };
 
     static setup(scene: Phaser.Scene) {
@@ -18,13 +19,13 @@ export class SceneContext {
             inputPlugin: scene.input,
             time: scene.time,
             anims: scene.anims,
-            textures: scene.textures
+            textures: scene.textures,
+            pluginManager: scene.plugins
         } as const;
     }
 
     // これを使用してゲームの物体を生成すると、シーンに自動的に加わる
     static get add(): Phaser.GameObjects.GameObjectFactory {
-        
         return this.components.add;
     }
 
@@ -51,5 +52,9 @@ export class SceneContext {
 
     static get textures(): Phaser.Textures.TextureManager {
         return this.components.textures;
+    }
+
+    static get pluginManager(): Phaser.Plugins.PluginManager {
+        return this.components.pluginManager;
     }
 }
