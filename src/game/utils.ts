@@ -61,19 +61,47 @@ export function findRoomColumnIndex(i: number): number {
 export function findRoomId(position: Position) {
     const roomRow = findRoomRowIndex(position.row);
     const roomColumn = findRoomColumnIndex(position.column);
-    return roomColumn + roomRow * GameConstants.ROOM_COLUMN_COUNT;
+    return calculateRoomId(roomRow, roomColumn);
 }
 
 export function isDebugEnv() {
     return (import.meta.env.MODE === "development");
 }
 
-export function culculateRoomDistanceManhattan(roomId1 : number, roomId2 : number) {
-    const room1Row = Math.floor(roomId1 / GameConstants.ROOM_COLUMN_COUNT);
-    const room1Column = roomId1 % GameConstants.ROOM_COLUMN_COUNT;
+export function calculateRoomDistanceManhattan(roomId1: number, roomId2: number) {
+    const room1RowColumn = calculateRoomRowColumn(roomId1);
+    const room2RowColumn = calculateRoomRowColumn(roomId2);
 
-    const room2Row = Math.floor(roomId2 / GameConstants.ROOM_COLUMN_COUNT);
-    const room2Column = roomId2 % GameConstants.ROOM_COLUMN_COUNT;
+    return Math.abs(room1RowColumn.roomRow - room2RowColumn.roomRow) + Math.abs(room1RowColumn.roomColumn - room2RowColumn.roomColumn);
+}
 
-    return Math.abs(room1Row - room2Row) + Math.abs(room1Column - room2Column);
+export function calculateRoomRowColumn(roomId: number) {
+    const roomRow = Math.floor(roomId / GameConstants.ROOM_COLUMN_COUNT);
+    const roomColumn = roomId % GameConstants.ROOM_COLUMN_COUNT;
+    return {roomRow: roomRow, roomColumn: roomColumn};
+}
+
+export function calculateRoomId(roomRow: number, roomColumn: number) {
+    return roomColumn + roomRow * GameConstants.ROOM_COLUMN_COUNT;
+}
+
+export function findSurroundingRoomIds(roomId: number) {
+    const roomRowColumn = calculateRoomRowColumn(roomId);
+    const roomRow = roomRowColumn.roomRow;
+    const roomColumn = roomRowColumn.roomColumn;
+
+    const res = [];
+    if (roomRow - 1 >= 0) {
+        res.push(calculateRoomId(roomRow - 1, roomColumn));
+    }
+    if (roomColumn - 1 >= 0) {
+        res.push(calculateRoomId(roomRow, roomColumn - 1));
+    }
+    if (roomRow + 1 <= GameConstants.ROOM_ROW_COUNT - 1) {
+        res.push(calculateRoomId(roomRow + 1, roomColumn));
+    }
+    if (roomColumn + 1 <= GameConstants.ROOM_COLUMN_COUNT - 1) {
+        res.push(calculateRoomId(roomRow, roomColumn + 1));
+    }
+    return res;
 }

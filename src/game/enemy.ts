@@ -98,7 +98,7 @@ export class Enemy implements IFieldActor {
             // ファイナルラウンドの場合は常時追跡
             if (!this.isFinalRound()) {
                 // 2部屋以上離れたら索敵にする
-                if (Util.culculateRoomDistanceManhattan(this.roomId, this.getPlayerRoomId()) >= 2) {
+                if (Util.calculateRoomDistanceManhattan(this.roomId, this.getPlayerRoomId()) >= 2) {
                     this.state = EnemyState.SEARCHING;
                     // 索敵に変わると、更新する
                     this.strategy.updateStrategyInfo();
@@ -150,7 +150,7 @@ export class Enemy implements IFieldActor {
                 }
             }
         }
-        if (!this.isFloor({row: nextPosition.row, column: nextPosition.column})) {
+        if (!this.isFloor({ row: nextPosition.row, column: nextPosition.column })) {
             return false;
         }
         return true;
@@ -356,11 +356,21 @@ export class FollowerStrategy extends BaseStrategy {
 
     private getLastSpottedRoomId: () => number;
 
+    private spottedRoomId: number;
+    private watchRouteRoomIds: number[];
+    private watchRouteRoomIndex: number;
+
     constructor(firstTargetRoomId: number, getLastSpottedRoomId: () => number) {
         super();
         this.wayPointRouteIndex = 0;
         this.targetRoomId = firstTargetRoomId;
         this.getLastSpottedRoomId = getLastSpottedRoomId;
+
+        this.spottedRoomId = this.targetRoomId;
+        const surroundingRoomIds = Util.findSurroundingRoomIds(this.spottedRoomId);
+        this.watchRouteRoomIds = [this.spottedRoomId, ...surroundingRoomIds];
+        this.watchRouteRoomIndex = 0;
+
         const wayPoints = GameConstants.ENEMY_SEARCH_WAYPOINTS[this.targetRoomId];
         this.targetPosition = wayPoints[this.targetRoomId];
 
@@ -379,7 +389,17 @@ export class FollowerStrategy extends BaseStrategy {
     }
 
     updateStrategyInfo(): void {
-        const newTargetRoomId = this.getLastSpottedRoomId();
+        const newLastSpottedRoomId = this.getLastSpottedRoomId();
+        if (newLastSpottedRoomId === this.spottedRoomId) {
+            this.watchRouteRoomIndex = (this.watchRouteRoomIndex + 1) % (this.watchRouteRoomIds.length);
+        } else {
+            this.spottedRoomId = newLastSpottedRoomId;
+            const surroundingRoomIds = Util.findSurroundingRoomIds(this.spottedRoomId);
+            this.watchRouteRoomIds = [this.spottedRoomId, ...surroundingRoomIds];
+            this.watchRouteRoomIndex = 0;
+        }
+
+        const newTargetRoomId = this.watchRouteRoomIds[this.watchRouteRoomIndex];
         const wayPoints = GameConstants.ENEMY_SEARCH_WAYPOINTS[newTargetRoomId];
 
         if (this.targetRoomId === newTargetRoomId) {
@@ -412,11 +432,19 @@ export class InterceptStrategy extends BaseStrategy {
 
     private findRoomIdWithMostTreasures: () => number;
 
+    private mostTreasuresRoomId?: number;
+    private watchRouteRoomIds: number[];
+    private watchRouteRoomIndex: number;
+
     constructor(findRoomIdWithMostTreasures: () => number) {
         super();
         this.wayPointRouteIndex = 0;
 
         this.findRoomIdWithMostTreasures = findRoomIdWithMostTreasures;
+
+        // びるどえらーを防ぐための初期化
+        this.watchRouteRoomIds = [];
+        this.watchRouteRoomIndex = 0;
     }
 
     setup() {
@@ -424,7 +452,17 @@ export class InterceptStrategy extends BaseStrategy {
     }
 
     updateStrategyInfo(): void {
-        const newTargetRoomId = this.findRoomIdWithMostTreasures();
+        const newMostTreasuresRoomId = this.findRoomIdWithMostTreasures();
+        if (newMostTreasuresRoomId === this.mostTreasuresRoomId) {
+            this.watchRouteRoomIndex = (this.watchRouteRoomIndex + 1) % (this.watchRouteRoomIds.length);
+        } else {
+            this.mostTreasuresRoomId = newMostTreasuresRoomId;
+            const surroundingRoomIds = Util.findSurroundingRoomIds(this.mostTreasuresRoomId);
+            this.watchRouteRoomIds = [this.mostTreasuresRoomId, ...surroundingRoomIds];
+            this.watchRouteRoomIndex = 0;
+        }
+
+        const newTargetRoomId = this.watchRouteRoomIds[this.watchRouteRoomIndex];
         const wayPoints = GameConstants.ENEMY_SEARCH_WAYPOINTS[newTargetRoomId];
 
         if (this.targetRoomId === newTargetRoomId) {
