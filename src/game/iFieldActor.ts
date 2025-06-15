@@ -4,5 +4,7 @@ export interface IFieldActor {
         column: number;
     };
 
+    getSize(): number;
+
     onCollideWithPlayer(): void;
 }

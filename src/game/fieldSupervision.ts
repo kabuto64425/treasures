@@ -33,32 +33,32 @@ export class FieldSupervision {
             {
                 viewRange: { topLeft: { row: 0, column: 3 }, bottomRight: { row: 3, column: 4 } },
                 wrapAroundArrowList: [
-                    WrapArrowFactory.makeWrapAroundArrow({ x: 4 * GameConstants.GRID_SIZE - 17, y: 0 * GameConstants.GRID_SIZE - 4 }, 180, params.visibleWrapArrowFrameGraphic),
-                    WrapArrowFactory.makeWrapAroundArrow({ x: 4 * GameConstants.GRID_SIZE - 17, y: 31 * GameConstants.GRID_SIZE + 8 }, 180, params.visibleWrapArrowFrameGraphic)
+                    WrapArrowFactory.makeWrapAroundArrow({ x: 4 * GameConstants.GRID_UNIT_SIZE - 17, y: 0 * GameConstants.GRID_UNIT_SIZE - 4 }, 180, params.visibleWrapArrowFrameGraphic),
+                    WrapArrowFactory.makeWrapAroundArrow({ x: 4 * GameConstants.GRID_UNIT_SIZE - 17, y: 31 * GameConstants.GRID_UNIT_SIZE + 8 }, 180, params.visibleWrapArrowFrameGraphic)
                 ]
             },
             // 左下→左上
             {
                 viewRange: { topLeft: { row: GameConstants.H - 4, column: 3 }, bottomRight: { row: GameConstants.H - 1, column: 4 } },
                 wrapAroundArrowList: [
-                    WrapArrowFactory.makeWrapAroundArrow({ x: 4 * GameConstants.GRID_SIZE - 16, y: 0 * GameConstants.GRID_SIZE - 17 }, 0, params.visibleWrapArrowFrameGraphic),
-                    WrapArrowFactory.makeWrapAroundArrow({ x: 4 * GameConstants.GRID_SIZE - 16, y: 31 * GameConstants.GRID_SIZE - 5 }, 0, params.visibleWrapArrowFrameGraphic)
+                    WrapArrowFactory.makeWrapAroundArrow({ x: 4 * GameConstants.GRID_UNIT_SIZE - 16, y: 0 * GameConstants.GRID_UNIT_SIZE - 17 }, 0, params.visibleWrapArrowFrameGraphic),
+                    WrapArrowFactory.makeWrapAroundArrow({ x: 4 * GameConstants.GRID_UNIT_SIZE - 16, y: 31 * GameConstants.GRID_UNIT_SIZE - 5 }, 0, params.visibleWrapArrowFrameGraphic)
                 ]
             },
             //右上→右下
             {
                 viewRange: { topLeft: { row: 0, column: GameConstants.W - 5 }, bottomRight: { row: 3, column: GameConstants.W - 4 } },
                 wrapAroundArrowList: [
-                    WrapArrowFactory.makeWrapAroundArrow({ x: 38 * GameConstants.GRID_SIZE - 17, y: 0 * GameConstants.GRID_SIZE - 4 }, 180, params.visibleWrapArrowFrameGraphic),
-                    WrapArrowFactory.makeWrapAroundArrow({ x: 38 * GameConstants.GRID_SIZE - 17, y: 31 * GameConstants.GRID_SIZE + 8 }, 180, params.visibleWrapArrowFrameGraphic)
+                    WrapArrowFactory.makeWrapAroundArrow({ x: 38 * GameConstants.GRID_UNIT_SIZE - 17, y: 0 * GameConstants.GRID_UNIT_SIZE - 4 }, 180, params.visibleWrapArrowFrameGraphic),
+                    WrapArrowFactory.makeWrapAroundArrow({ x: 38 * GameConstants.GRID_UNIT_SIZE - 17, y: 31 * GameConstants.GRID_UNIT_SIZE + 8 }, 180, params.visibleWrapArrowFrameGraphic)
                 ]
             },
             // 右下→右上
             {
                 viewRange: { topLeft: { row: GameConstants.H - 4, column: GameConstants.W - 5 }, bottomRight: { row: GameConstants.H - 1, column: GameConstants.W - 4 } },
                 wrapAroundArrowList: [
-                    WrapArrowFactory.makeWrapAroundArrow({ x: 38 * GameConstants.GRID_SIZE - 16, y: 0 * GameConstants.GRID_SIZE - 17 }, 0, params.visibleWrapArrowFrameGraphic),
-                    WrapArrowFactory.makeWrapAroundArrow({ x: 38 * GameConstants.GRID_SIZE - 16, y: 31 * GameConstants.GRID_SIZE - 5 }, 0, params.visibleWrapArrowFrameGraphic)
+                    WrapArrowFactory.makeWrapAroundArrow({ x: 38 * GameConstants.GRID_UNIT_SIZE - 16, y: 0 * GameConstants.GRID_UNIT_SIZE - 17 }, 0, params.visibleWrapArrowFrameGraphic),
+                    WrapArrowFactory.makeWrapAroundArrow({ x: 38 * GameConstants.GRID_UNIT_SIZE - 16, y: 31 * GameConstants.GRID_UNIT_SIZE - 5 }, 0, params.visibleWrapArrowFrameGraphic)
                 ]
             },
         ];
@@ -78,8 +78,8 @@ export class FieldSupervision {
 
         // 横線
         for (let i = 0; i <= GameConstants.H - 1; i++) {
-            const top = i * GameConstants.GRID_SIZE;
-            const bottom = (i + 1) * GameConstants.GRID_SIZE - 1;
+            const top = i * GameConstants.GRID_UNIT_SIZE;
+            const bottom = (i + 1) * GameConstants.GRID_UNIT_SIZE - 1;
             // 1ピクセル削るとうまく収まるから。不都合があればまた調整
             this.fieldGraphics.strokeLineShape(new Phaser.Geom.Line(0, top, GameConstants.FIELD_WIDTH - 1, top));
             this.fieldGraphics.strokeLineShape(new Phaser.Geom.Line(0, bottom, GameConstants.FIELD_WIDTH - 1, bottom));
@@ -87,8 +87,8 @@ export class FieldSupervision {
 
         // 縦線
         for (let i = 0; i <= GameConstants.W - 1; i++) {
-            const left = i * GameConstants.GRID_SIZE;
-            const right = (i + 1) * GameConstants.GRID_SIZE - 1;
+            const left = i * GameConstants.GRID_UNIT_SIZE;
+            const right = (i + 1) * GameConstants.GRID_UNIT_SIZE - 1;
             this.fieldGraphics.strokeLineShape(new Phaser.Geom.Line(left, 0, left, GameConstants.FIELD_HEIGHT));
             this.fieldGraphics.strokeLineShape(new Phaser.Geom.Line(right, 0, right, GameConstants.FIELD_HEIGHT));
         }
@@ -116,7 +116,7 @@ export class FieldSupervision {
                     const color = (r << 16) | (g << 8) | b;
 
                     roomGraphics.fillStyle(color, 0.5);
-                    roomGraphics.fillRect(j * GameConstants.GRID_SIZE, i * GameConstants.GRID_SIZE, GameConstants.GRID_SIZE, GameConstants.GRID_SIZE);
+                    roomGraphics.fillRect(j * GameConstants.GRID_UNIT_SIZE, i * GameConstants.GRID_UNIT_SIZE, GameConstants.GRID_UNIT_SIZE, GameConstants.GRID_UNIT_SIZE);
                 }
             }
             fieldContainer.add(roomGraphics);
@@ -136,8 +136,8 @@ export class FieldSupervision {
                     const fillRect = SceneContext.make.graphics({
                         lineStyle: { width: 1, color: 0x000000, alpha: 1 },
                         fillStyle: { color: 0x000000, alpha: 1 }
-                    }).strokeRect(j * GameConstants.GRID_SIZE, i * GameConstants.GRID_SIZE, GameConstants.GRID_SIZE - 1, GameConstants.GRID_SIZE - 1)
-                        .fillRect(j * GameConstants.GRID_SIZE, i * GameConstants.GRID_SIZE, GameConstants.GRID_SIZE - 1, GameConstants.GRID_SIZE - 1);
+                    }).strokeRect(j * GameConstants.GRID_UNIT_SIZE, i * GameConstants.GRID_UNIT_SIZE, GameConstants.GRID_UNIT_SIZE - 1, GameConstants.GRID_UNIT_SIZE - 1)
+                        .fillRect(j * GameConstants.GRID_UNIT_SIZE, i * GameConstants.GRID_UNIT_SIZE, GameConstants.GRID_UNIT_SIZE - 1, GameConstants.GRID_UNIT_SIZE - 1);
                     fieldContainer.add(fillRect);
                 }
             }
@@ -152,8 +152,25 @@ export class FieldSupervision {
     }
 
     isWall = (position: Util.Position) => {
+        if (position.row < 0 || position.row >= GameConstants.H) {
+            return true;
+        }
+        if (position.column < 0 || position.column >= GameConstants.W) {
+            return true;
+        }
         if (this.currentField[position.row][position.column] === 1) {
             return true;
+        }
+        return false;
+    }
+
+    containsWallInArea = (position: Util.Position, size: number) => {
+        for (let i = 0; i < size; i++) {
+            for (let j = 0; j < size; j++) {
+                if (this.isWall({ row: position.row + i, column: position.column + j })) {
+                    return true;
+                }
+            }
         }
         return false;
     }
@@ -177,7 +194,7 @@ export class FieldSupervision {
         for (const position of GameConstants.FINAL_ROUND_BLOCK_POSITIONS) {
             const row = position.row;
             const column = position.column;
-            const batsuImage = SceneContext.make.image({key: "batsu", x: column * GameConstants.GRID_SIZE + 4, y: row * GameConstants.GRID_SIZE + 4}, false);
+            const batsuImage = SceneContext.make.image({ key: "batsu", x: column * GameConstants.GRID_UNIT_SIZE + 4, y: row * GameConstants.GRID_UNIT_SIZE + 4 }, false);
             batsuImage.setOrigin(0);
             fieldContainer.add(batsuImage);
         }

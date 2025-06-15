@@ -4,6 +4,7 @@ import * as GameConstants from "./gameConstants";
 import { IFieldActor } from "./iFieldActor";
 import { SceneContext } from "./sceneContext";
 import { GameSceneContainerContext } from "./gameSceneContainerContext";
+import { Boss } from "./boss";
 
 enum EnemyState {
     SEARCHING = 0,
@@ -25,25 +26,27 @@ export class Enemy implements IFieldActor {
     private readonly moveCostChasing: number;
 
     private chargeAmount: number;
+    private readonly size: number;
     private readonly priorityScanDirections: DIRECTION[];
     private readonly strategy: SearchingStrategy;
     private readonly onPlayerCaptured: () => void;
     private readonly getFirstFootprint: () => Util.Position;
     private readonly stepOnFirstFootprint: () => void;
-    private readonly isShortestDirection: (from: Util.Position, to: Util.Position, direction: DIRECTION) => boolean;
+    private readonly isShortestDirection: (from: Util.Position, to: Util.Position, size: number, direction: DIRECTION) => boolean;
     private readonly getPlayerRoomId: () => number;
     private readonly isFinalRound: () => boolean;
     private readonly onPlayerSpotted: (spottedRoomId: number) => void;
     private readonly getEnemyList: () => Enemy[];
+    private readonly getBossList: () => Boss[];
     private readonly isFloor: (position: Util.Position) => boolean;
 
     constructor(iniRow: number,
         iniColumn: number, params: any, priorityScanDirections: DIRECTION[],
         strategy: SearchingStrategy, onPlayerCaptured: () => void,
         getFirstFootprint: () => Util.Position, stepOnFirstFootprint: () => void,
-        isShortestDirection: (from: Util.Position, to: Util.Position, direction: DIRECTION) => boolean,
+        isShortestDirection: (from: Util.Position, to: Util.Position, size: number, direction: DIRECTION) => boolean,
         getPlayerRoomId: () => number, isFinalRound: () => boolean, onPlayerSpotted: (spottedRoomId: number) => void,
-        getEnemyList: () => Enemy[], isFloor: (position: Util.Position) => boolean
+        getEnemyList: () => Enemy[], getBossList: () => Boss[], isFloor: (position: Util.Position) => boolean
     ) {
         this.image = SceneContext.make.image({ key: "enemy" }, false);
         this.image.setDepth(10);
@@ -55,6 +58,7 @@ export class Enemy implements IFieldActor {
         this.moveCostChasing = params.enemyMoveCostChasing;
 
         this.chargeAmount = 0;
+        this.size = 1;
         this.priorityScanDirections = priorityScanDirections;
         this.strategy = strategy;
         this.onPlayerCaptured = onPlayerCaptured;
@@ -65,11 +69,16 @@ export class Enemy implements IFieldActor {
         this.isFinalRound = isFinalRound;
         this.onPlayerSpotted = onPlayerSpotted;
         this.getEnemyList = getEnemyList;
+        this.getBossList = getBossList;
         this.isFloor = isFloor;
     }
 
     position() {
         return { row: this.row, column: this.column };
+    }
+
+    getSize(): number {
+        return this.size;
     }
 
     charge() {
@@ -78,9 +87,10 @@ export class Enemy implements IFieldActor {
 
     setup() {
         GameSceneContainerContext.fieldContainer.add(this.image);
-        this.image.setPosition(this.column * GameConstants.GRID_SIZE, this.row * GameConstants.GRID_SIZE);
+        this.image.setPosition(this.column * GameConstants.GRID_UNIT_SIZE, this.row * GameConstants.GRID_UNIT_SIZE);
         // 1ピクセル左にずらすとうまく収まるから。不都合があればまた調整
         this.image.setDisplayOrigin(1, 0);
+        this.image.setScale(this.size);
         this.draw();
         this.strategy.setup();
     }
@@ -150,6 +160,11 @@ export class Enemy implements IFieldActor {
                 }
             }
         }
+        for (const boss of this.getBossList()) {
+            if (Util.isSamePosition(nextPosition, boss.position())) {
+                return false;
+            }
+        }
         if (!this.isFloor({ row: nextPosition.row, column: nextPosition.column })) {
             return false;
         }
@@ -176,7 +191,7 @@ export class Enemy implements IFieldActor {
     }
 
     private draw() {
-        this.image.setPosition(this.column * GameConstants.GRID_SIZE, this.row * GameConstants.GRID_SIZE);
+        this.image.setPosition(this.column * GameConstants.GRID_UNIT_SIZE, this.row * GameConstants.GRID_UNIT_SIZE);
     }
 
     show() {
@@ -235,7 +250,7 @@ export class Enemy implements IFieldActor {
 
     private decideMoveDirection(targetPosition: Util.Position) {
         for (const d of this.priorityScanDirections) {
-            if (this.isShortestDirection({ row: this.row, column: this.column }, targetPosition, d)) {
+            if (this.isShortestDirection({ row: this.row, column: this.column }, targetPosition, this.size, d)) {
                 return d;
             }
         }

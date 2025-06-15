@@ -12,6 +12,8 @@ export class Treasure implements IFieldActor {
     private column!: number;
     private state: number;
 
+    private readonly size: number;
+
     // ファイナルランドのゴールかどうか。そもそもゴールと宝は扱いが別の気がするので、フラグで管理すべきか検討中
     private readonly isGoal;
 
@@ -25,11 +27,17 @@ export class Treasure implements IFieldActor {
         this.image = SceneContext.make.image({ key: "dummy" }, false);
         this.state = Treasure.TREASURE_STATE.NON_APPEARANCE;
         this.isGoal = isGoal;
+        this.size = 1;
+    }
+
+    getSize(): number {
+        return this.size;
     }
 
     setup(position: Position) {
         this.setPosition(position);
         //GameSceneContainerContext.fieldContainer.add(this.graphics);
+        this.image.setScale(this.size);
         GameSceneContainerContext.fieldContainer.add(this.image);
     }
 
@@ -67,7 +75,7 @@ export class Treasure implements IFieldActor {
         }
         // 1ピクセル左にずらすとうまく収まるから。不都合があればまた調整
         this.image.setDisplayOrigin(1, 0);
-        this.image.setPosition(this.column * GameConstants.GRID_SIZE, this.row * GameConstants.GRID_SIZE);
+        this.image.setPosition(this.column * GameConstants.GRID_UNIT_SIZE, this.row * GameConstants.GRID_UNIT_SIZE);
     }
 
     show() {

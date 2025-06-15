@@ -58,7 +58,7 @@ export class Player {
         GameSceneContainerContext.fieldContainer.add(this.image);
         GameSceneContainerContext.fieldContainer.add(this.graphics);
 
-        this.image.setPosition(this.column * GameConstants.GRID_SIZE, this.row * GameConstants.GRID_SIZE).setDisplayOrigin(1, 0);
+        this.image.setPosition(this.column * GameConstants.GRID_UNIT_SIZE, this.row * GameConstants.GRID_UNIT_SIZE).setDisplayOrigin(1, 0);
         // 1ピクセル左にずらすとうまく収まるから。不都合があればまた調整
         this.image.setDisplayOrigin(1, 0);
         GameSceneContainerContext.fieldContainer.add(this.image);
@@ -136,7 +136,7 @@ export class Player {
     }
 
     private draw() {
-        this.image.setPosition(this.column * GameConstants.GRID_SIZE, this.row * GameConstants.GRID_SIZE);
+        this.image.setPosition(this.column * GameConstants.GRID_UNIT_SIZE, this.row * GameConstants.GRID_UNIT_SIZE);
     }
 
     readonly getLastMoveDirection = () => {
@@ -148,7 +148,10 @@ export class Player {
     }
 
     handleCollisionWith(actor: IFieldActor) {
-        if (Util.isSamePosition(this.position(), actor.position())) {
+        const playerPosition = this.position();
+        const actorPosition = actor.position();
+        const actorSize = actor.getSize();
+        if(playerPosition.row >= actorPosition.row && playerPosition.row <= actorPosition.row + (actorSize - 1) && playerPosition.column >= actorPosition.column && playerPosition.column <= actorPosition.column + (actorSize - 1)) {
             actor.onCollideWithPlayer();
         }
     }

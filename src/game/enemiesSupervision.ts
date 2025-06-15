@@ -1,3 +1,4 @@
+import { Boss } from "./boss";
 import { DebugDataMediator } from "./debugData";
 import { DIRECTION } from "./drection";
 import { Enemy, FlankingStrategy, FollowerStrategy, InterceptStrategy, PatrolStrategy, SearchingStrategy } from "./enemy";
@@ -15,6 +16,7 @@ interface StrategyInitArgs {
 
 export class EnemiesSupervision {
     private readonly enemyList: Enemy[];
+    private readonly bossList: Boss[];
     private lastSpottedRoomId: number;
     private extractCurrentAppearanceTreasures: () => IFieldActor[];
 
@@ -32,9 +34,9 @@ export class EnemiesSupervision {
 
     constructor(params: any,
         onPlayerCaptured: () => void, footprint: Footprint,
-        isShortestDirection: (from: Util.Position, to: Util.Position, direction: DIRECTION) => boolean,
+        isShortestDirection: (from: Util.Position, to: Util.Position, size: number, direction: DIRECTION) => boolean,
         getPlayerRoomId: () => number, isFinalRound: () => boolean, extractCurrentAppearanceTreasures: () => IFieldActor[],
-        isFloor: (position: Util.Position) => boolean
+        isFloor: (position: Util.Position) => boolean, playerPotision: () => Util.Position
     ) {
         this.lastSpottedRoomId = getPlayerRoomId();
         this.extractCurrentAppearanceTreasures = extractCurrentAppearanceTreasures;
@@ -44,6 +46,7 @@ export class EnemiesSupervision {
                 footprint, isShortestDirection, getPlayerRoomId, isFinalRound, isFloor
             );
         });
+        this.bossList = [this.createBoss(onPlayerCaptured, isShortestDirection, playerPotision)];
         this.framesSinceRoomCheckOrderUpdate = 0;
         this.roomConditionCheckOrder = [...GameConstants.INITIAL_ROOM_CONDITION_CHECK_ORDER];
     }
@@ -51,7 +54,7 @@ export class EnemiesSupervision {
     private createEnemy(
         index: number, params: any,
         onPlayerCaptured: () => void, footprint: Footprint,
-        isShortestDirection: (from: Util.Position, to: Util.Position, direction: DIRECTION) => boolean,
+        isShortestDirection: (from: Util.Position, to: Util.Position, size: number, direction: DIRECTION) => boolean,
         getPlayerRoomId: () => number, isFinalRound: () => boolean,
         isFloor: (position: Util.Position) => boolean
     ) {
@@ -69,8 +72,15 @@ export class EnemiesSupervision {
             params, GameConstants.parametersOfEnemies[index].priorityScanDirections, strategy,
             onPlayerCaptured, footprint.getFirstPrint, footprint.onSteppedOnByEnemy,
             isShortestDirection, getPlayerRoomId, isFinalRound, this.onPlayerSpotted, this.getEnemyList,
-            isFloor
+            this.getBossList, isFloor
         );
+    }
+
+    private createBoss(onPlayerCaptured: () => void,
+        isShortestDirection: (from: Util.Position, to: Util.Position, size: number, direction: DIRECTION) => boolean,
+        playerPotision: () => Util.Position
+    ) {
+        return new Boss(1, 38, onPlayerCaptured, isShortestDirection, playerPotision);
     }
 
     private createStrategy(order: string, args: StrategyInitArgs): SearchingStrategy {
@@ -92,6 +102,9 @@ export class EnemiesSupervision {
         for (const enemy of this.enemyList) {
             enemy.setup();
         }
+        for (const boss of this.bossList) {
+            boss.setup();
+        }
         DebugDataMediator.setEnemiesDebugValue(
             this.enemyList.map(e => { return e.getDebugValueData() })
         );
@@ -100,10 +113,10 @@ export class EnemiesSupervision {
     resolveFrame() {
         this.framesSinceRoomCheckOrderUpdate++;
 
-        if(this.framesSinceRoomCheckOrderUpdate >= GameConstants.DESTINATION_FORCE_UPDATE_INTERVAL) {
+        if (this.framesSinceRoomCheckOrderUpdate >= GameConstants.DESTINATION_FORCE_UPDATE_INTERVAL) {
             // 最後にroomConditionCheckOrderの順番を更新してから一定時間経過したから、ローテーション
             const roomId = this.roomConditionCheckOrder.shift();
-            if(roomId !== undefined) {
+            if (roomId !== undefined) {
                 this.roomConditionCheckOrder.push(roomId);
             }
             this.framesSinceRoomCheckOrderUpdate = 0;
@@ -112,6 +125,11 @@ export class EnemiesSupervision {
         for (const enemy of this.enemyList) {
             enemy.resolveEnemyFrame();
         }
+
+        for (const boss of this.bossList) {
+            boss.resolveBossFrame();
+        }
+
         DebugDataMediator.setEnemiesDebugValue(
             this.enemyList.map(e => { return e.getDebugValueData() })
         );
@@ -121,15 +139,25 @@ export class EnemiesSupervision {
         return this.enemyList;
     }
 
+    readonly getBossList = () => {
+        return this.bossList;
+    }
+
     handlePause() {
         this.enemyList.forEach(enemy => {
             enemy.hide();
+        });
+        this.bossList.forEach(boss => {
+            boss.hide();
         });
     }
 
     handleResume() {
         this.enemyList.forEach(enemy => {
             enemy.show();
+        });
+        this.bossList.forEach(boss => {
+            boss.show();
         });
     }
 

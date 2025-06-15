@@ -56,7 +56,7 @@ export class Footprint {
         this.graphics.fillStyle(0x0000ff, 0.3);
         for (const footprint of this.queue) {
             footprint.position;
-            this.graphics.fillRect(footprint.position.column * GameConstants.GRID_SIZE, footprint.position.row * GameConstants.GRID_SIZE, GameConstants.GRID_SIZE, GameConstants.GRID_SIZE);
+            this.graphics.fillRect(footprint.position.column * GameConstants.GRID_UNIT_SIZE, footprint.position.row * GameConstants.GRID_UNIT_SIZE, GameConstants.GRID_UNIT_SIZE, GameConstants.GRID_UNIT_SIZE);
         }
     }
 

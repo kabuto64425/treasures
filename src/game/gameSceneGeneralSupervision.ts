@@ -60,7 +60,7 @@ export class GameSceneGeneralSupervision {
         this.player = new Player(GameConstants.parameterPlayer.row, GameConstants.parameterPlayer.column, this.params, this.fieldSupervision.isFloor);
 
         //フィールド評価
-        this.fieldEvaluation = new FieldEvaluation(this.player.getFootPrint().getFirstPrint, this.fieldSupervision.isWall);
+        this.fieldEvaluation = new FieldEvaluation(this.player.getFootPrint().getFirstPrint, this.fieldSupervision.isWall, this.fieldSupervision.containsWallInArea);
 
         // ラウンド進行監督
         this.roundsSupervision = new RoundsSupervision(this.onGameCompleted, this.fieldSupervision.isFloor, this.fieldSupervision.onFinalRound);
@@ -71,7 +71,7 @@ export class GameSceneGeneralSupervision {
             this.player.getFootPrint(), this.fieldEvaluation.isShortestDirection,
             this.player.getRoomId, this.roundsSupervision.isFinalRound,
             this.roundsSupervision.extractCurrentAppearanceTreasures,
-            this.fieldSupervision.isFloor
+            this.fieldSupervision.isFloor, this.player.position
         );
 
     }
@@ -134,6 +134,9 @@ export class GameSceneGeneralSupervision {
         for (const enemy of this.enemiesSupervision.getEnemyList()) {
             this.player.handleCollisionWith(enemy);
         }
+        for(const boss of this.enemiesSupervision.getBossList()) {
+            this.player.handleCollisionWith(boss);
+        }
 
         // 敵と接触しているとゲームステータスが変わるから
         if (!this.isPlaying()) {
@@ -167,6 +170,9 @@ export class GameSceneGeneralSupervision {
         // 敵との接触判定・ゲームオーバー更新
         for (const enemy of this.enemiesSupervision.getEnemyList()) {
             this.player.handleCollisionWith(enemy);
+        }
+        for(const boss of this.enemiesSupervision.getBossList()) {
+            this.player.handleCollisionWith(boss);
         }
 
         // 敵と接触しているとステータスが変わるから
