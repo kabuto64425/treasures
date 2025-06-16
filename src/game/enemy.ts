@@ -38,7 +38,7 @@ export class Enemy implements IFieldActor {
     private readonly onPlayerSpotted: (spottedRoomId: number) => void;
     private readonly getEnemyList: () => Enemy[];
     private readonly getBossList: () => Boss[];
-    private readonly isFloor: (position: Util.Position) => boolean;
+    private readonly isAllFloorInArea: (position: Util.Position, size: number) => boolean;
 
     constructor(iniRow: number,
         iniColumn: number, params: any, priorityScanDirections: DIRECTION[],
@@ -46,7 +46,7 @@ export class Enemy implements IFieldActor {
         getFirstFootprint: () => Util.Position, stepOnFirstFootprint: () => void,
         isShortestDirection: (from: Util.Position, to: Util.Position, size: number, direction: DIRECTION) => boolean,
         getPlayerRoomId: () => number, isFinalRound: () => boolean, onPlayerSpotted: (spottedRoomId: number) => void,
-        getEnemyList: () => Enemy[], getBossList: () => Boss[], isFloor: (position: Util.Position) => boolean
+        getEnemyList: () => Enemy[], getBossList: () => Boss[], isAllFloorInArea: (position: Util.Position, size:number) => boolean
     ) {
         this.image = SceneContext.make.image({ key: "enemy" }, false);
         this.image.setDepth(10);
@@ -70,7 +70,7 @@ export class Enemy implements IFieldActor {
         this.onPlayerSpotted = onPlayerSpotted;
         this.getEnemyList = getEnemyList;
         this.getBossList = getBossList;
-        this.isFloor = isFloor;
+        this.isAllFloorInArea = isAllFloorInArea;
     }
 
     position() {
@@ -155,17 +155,17 @@ export class Enemy implements IFieldActor {
         // 他の敵との衝突回避
         for (const enemy of this.getEnemyList()) {
             if (this !== enemy) {
-                if (Util.isSamePosition(nextPosition, enemy.position())) {
+                if (Util.checkCollision(nextPosition, this.size, enemy.position(), enemy.getSize())) {
                     return false;
                 }
             }
         }
         for (const boss of this.getBossList()) {
-            if (Util.isSamePosition(nextPosition, boss.position())) {
+            if (Util.checkCollision(nextPosition, this.size, boss.position(), boss.getSize())) {
                 return false;
             }
         }
-        if (!this.isFloor({ row: nextPosition.row, column: nextPosition.column })) {
+        if (!this.isAllFloorInArea({ row: nextPosition.row, column: nextPosition.column }, this.size)) {
             return false;
         }
         return true;

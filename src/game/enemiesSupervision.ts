@@ -36,17 +36,21 @@ export class EnemiesSupervision {
         onPlayerCaptured: () => void, footprint: Footprint,
         isShortestDirection: (from: Util.Position, to: Util.Position, size: number, direction: DIRECTION) => boolean,
         getPlayerRoomId: () => number, isFinalRound: () => boolean, extractCurrentAppearanceTreasures: () => IFieldActor[],
-        isFloor: (position: Util.Position) => boolean, playerPotision: () => Util.Position
+        isAllFloorInArea: (position: Util.Position, size: number) => boolean, playerPotision: () => Util.Position
     ) {
         this.lastSpottedRoomId = getPlayerRoomId();
         this.extractCurrentAppearanceTreasures = extractCurrentAppearanceTreasures;
         this.enemyList = Array.from({ length: GameConstants.numberOfEnemyies }, (_, i) => {
             return this.createEnemy(
                 i, params, onPlayerCaptured,
-                footprint, isShortestDirection, getPlayerRoomId, isFinalRound, isFloor
+                footprint, isShortestDirection, getPlayerRoomId, isFinalRound, isAllFloorInArea
             );
         });
-        this.bossList = [this.createBoss(onPlayerCaptured, isShortestDirection, playerPotision)];
+        this.bossList = [this.createBoss(
+            onPlayerCaptured, isShortestDirection, playerPotision,
+            this.getEnemyList,
+            this.getBossList, isAllFloorInArea
+        )];
         this.framesSinceRoomCheckOrderUpdate = 0;
         this.roomConditionCheckOrder = [...GameConstants.INITIAL_ROOM_CONDITION_CHECK_ORDER];
     }
@@ -56,7 +60,7 @@ export class EnemiesSupervision {
         onPlayerCaptured: () => void, footprint: Footprint,
         isShortestDirection: (from: Util.Position, to: Util.Position, size: number, direction: DIRECTION) => boolean,
         getPlayerRoomId: () => number, isFinalRound: () => boolean,
-        isFloor: (position: Util.Position) => boolean
+        isAllFloorInArea: (position: Util.Position, size: number) => boolean
     ) {
         const strategyInitArgs: StrategyInitArgs = {
             firstTargetRoomId: this.lastSpottedRoomId,
@@ -72,15 +76,19 @@ export class EnemiesSupervision {
             params, GameConstants.parametersOfEnemies[index].priorityScanDirections, strategy,
             onPlayerCaptured, footprint.getFirstPrint, footprint.onSteppedOnByEnemy,
             isShortestDirection, getPlayerRoomId, isFinalRound, this.onPlayerSpotted, this.getEnemyList,
-            this.getBossList, isFloor
+            this.getBossList, isAllFloorInArea
         );
     }
 
     private createBoss(onPlayerCaptured: () => void,
         isShortestDirection: (from: Util.Position, to: Util.Position, size: number, direction: DIRECTION) => boolean,
-        playerPotision: () => Util.Position
+        playerPotision: () => Util.Position,
+        getEnemyList: () => Enemy[], getBossList: () => Boss[], isAllFloorInArea: (position: Util.Position, size: number) => boolean
     ) {
-        return new Boss(1, 38, onPlayerCaptured, isShortestDirection, playerPotision);
+        return new Boss(
+            1, 38, onPlayerCaptured, isShortestDirection, playerPotision,
+            getEnemyList, getBossList, isAllFloorInArea
+        );
     }
 
     private createStrategy(order: string, args: StrategyInitArgs): SearchingStrategy {

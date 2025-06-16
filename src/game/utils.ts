@@ -38,6 +38,32 @@ export function isSamePosition(positionA: Position, positionB: Position) {
     return positionA.row === positionB.row && positionA.column === positionB.column;
 }
 
+export function checkCollision(positionA: Position, sizeA: number, positionB: Position, sizeB: number) {
+    const positionATopLeft = positionA;
+    const positionABottomRight = {row: positionA.row + sizeA - 1, column: positionA.column + sizeA - 1};
+
+    const positionBTopLeft = positionB;
+    const positionBBottomRight = {row: positionB.row + sizeB - 1, column: positionB.column + sizeB - 1};
+
+    if(positionABottomRight.row < positionBTopLeft.row) {
+        return false;
+    }
+
+    if(positionATopLeft.row > positionBBottomRight.row) {
+        return false;
+    }
+
+    if(positionABottomRight.column < positionBTopLeft.column) {
+        return false;
+    }
+
+    if(positionATopLeft.column > positionBBottomRight.column) {
+        return false;
+    }
+
+    return true;
+}
+
 // 線形探索である
 export function findRoomRowIndex(i: number): number {
     for (let row = 0; row < GameConstants.ROOM_ROW_COUNT - 1; row++) {
@@ -78,7 +104,7 @@ export function calculateRoomDistanceManhattan(roomId1: number, roomId2: number)
 export function calculateRoomRowColumn(roomId: number) {
     const roomRow = Math.floor(roomId / GameConstants.ROOM_COLUMN_COUNT);
     const roomColumn = roomId % GameConstants.ROOM_COLUMN_COUNT;
-    return {roomRow: roomRow, roomColumn: roomColumn};
+    return { roomRow: roomRow, roomColumn: roomColumn };
 }
 
 export function calculateRoomId(roomRow: number, roomColumn: number) {

@@ -120,7 +120,7 @@ export class Player {
 
     private canMove(direction: DIRECTION) {
         const nextPosition = Util.calculateNextPosition(this.position(), direction);
-        if (!this.isFloor({row: nextPosition.row, column: nextPosition.column})) {
+        if (!this.isFloor({ row: nextPosition.row, column: nextPosition.column })) {
             return false;
         }
         return true;
@@ -151,7 +151,7 @@ export class Player {
         const playerPosition = this.position();
         const actorPosition = actor.position();
         const actorSize = actor.getSize();
-        if(playerPosition.row >= actorPosition.row && playerPosition.row <= actorPosition.row + (actorSize - 1) && playerPosition.column >= actorPosition.column && playerPosition.column <= actorPosition.column + (actorSize - 1)) {
+        if (Util.checkCollision(playerPosition, 1, actorPosition, actorSize)) {
             actor.onCollideWithPlayer();
         }
     }

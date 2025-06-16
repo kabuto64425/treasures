@@ -151,6 +151,17 @@ export class FieldSupervision {
         return false;
     }
 
+    isAllFloorInArea = (position: Util.Position, size: number) => {
+        for (let i = 0; i < size; i++) {
+            for (let j = 0; j < size; j++) {
+                if (!this.isFloor({ row: position.row + i, column: position.column + j })) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
     isWall = (position: Util.Position) => {
         if (position.row < 0 || position.row >= GameConstants.H) {
             return true;
