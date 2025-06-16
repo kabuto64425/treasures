@@ -37,6 +37,13 @@ export const parametersOfEnemies = [
     { row: 24, column: 38, priorityScanDirections: [DIRECTION.UP, DIRECTION.RIGHT, DIRECTION.DOWN, DIRECTION.LEFT] }
 ];
 
+export const numberOfBosses = 2;
+
+export const parametersOfBosses = [
+    { row: 1, column: 38, priorityScanDirections: [DIRECTION.RIGHT, DIRECTION.DOWN, DIRECTION.LEFT, DIRECTION.UP] },
+    { row: 28, column: 1, priorityScanDirections: [DIRECTION.LEFT, DIRECTION.UP, DIRECTION.RIGHT, DIRECTION.DOWN] },
+];
+
 export const goalPosition = { row: 1, column: 1 };
 
 export const FIELD = [

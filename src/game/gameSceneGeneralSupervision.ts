@@ -71,7 +71,7 @@ export class GameSceneGeneralSupervision {
             this.player.getFootPrint(), this.fieldEvaluation.isShortestDirection,
             this.player.getRoomId, this.roundsSupervision.isFinalRound,
             this.roundsSupervision.extractCurrentAppearanceTreasures,
-            this.fieldSupervision.isFloor
+            this.fieldSupervision.isAllFloorInArea
         );
 
     }

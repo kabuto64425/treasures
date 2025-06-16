@@ -73,9 +73,14 @@ export class Boss implements IFieldActor {
             // 最後の足跡から順に目的候補を算出し、目的地候補に行けると分かったらその地点を目的地とする
             // プレイヤーの地点を中心に、ある足跡と点対象となる地点を目的地候補とする
             for (const position of this.caluculatePointSymmetricPositions()) {
-                if(this.isAllFloorInArea(position, this.size)) {
-                    targetPosition = position;
-                    break;
+                for (let i = 0; i < this.size; i++) {
+                    for (let j = 0; j < this.size; j++) {
+                        const candidateTargetPosition = { row: position.row - i, column: position.column - j };
+                        if (this.isAllFloorInArea(candidateTargetPosition, this.size)) {
+                            targetPosition = position;
+                            break;
+                        }
+                    }
                 }
             }
             const firstDirection = this.decideMoveDirection(targetPosition);
@@ -100,7 +105,10 @@ export class Boss implements IFieldActor {
         if (direction === undefined) {
             return false;
         }
-        const nextPosition = Util.calculateNextPosition(this.position(), direction);
+        const nextPosition = Util.calculateNextPosition(this.position(), direction, false);
+        if (nextPosition === undefined) {
+            return false;
+        }
         // 他の敵との衝突回避
         for (const enemy of this.getEnemyList()) {
             if (Util.checkCollision(nextPosition, this.size, enemy.position(), enemy.getSize())) {
@@ -124,7 +132,8 @@ export class Boss implements IFieldActor {
         if (direction === undefined) {
             return;
         }
-        const nextPosition = Util.calculateNextPosition(this.position(), direction);
+        // 移動先チェックをしているので、nextPositionは返ってくるはずだが、undefinedが万が一undefinedだった場合はそのままの位置にしておく
+        const nextPosition = Util.calculateNextPosition(this.position(), direction, false) ?? this.position();
         this.row = nextPosition.row;
         this.column = nextPosition.column;
         this.chargeAmount = 0;
@@ -151,7 +160,7 @@ export class Boss implements IFieldActor {
     }
 
     private decideMoveDirection(targetPosition?: Util.Position) {
-        if(targetPosition === undefined) {
+        if (targetPosition === undefined) {
             return undefined;
         }
         for (const d of DIRECTION.values()) {

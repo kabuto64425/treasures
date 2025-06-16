@@ -46,7 +46,7 @@ export class Enemy implements IFieldActor {
         getFirstFootprint: () => Util.Position, stepOnFirstFootprint: () => void,
         isShortestDirection: (from: Util.Position, to: Util.Position, size: number, direction: DIRECTION) => boolean,
         getPlayerRoomId: () => number, isFinalRound: () => boolean, onPlayerSpotted: (spottedRoomId: number) => void,
-        getEnemyList: () => Enemy[], getBossList: () => Boss[], isAllFloorInArea: (position: Util.Position, size:number) => boolean
+        getEnemyList: () => Enemy[], getBossList: () => Boss[], isAllFloorInArea: (position: Util.Position, size: number) => boolean
     ) {
         this.image = SceneContext.make.image({ key: "enemy" }, false);
         this.image.setDepth(10);
@@ -151,7 +151,10 @@ export class Enemy implements IFieldActor {
         if (direction === undefined) {
             return false;
         }
-        const nextPosition = Util.calculateNextPosition(this.position(), direction);
+        const nextPosition = Util.calculateNextPosition(this.position(), direction, false);
+        if (nextPosition === undefined) {
+            return false;
+        }
         // 他の敵との衝突回避
         for (const enemy of this.getEnemyList()) {
             if (this !== enemy) {
@@ -175,7 +178,8 @@ export class Enemy implements IFieldActor {
         if (direction === undefined) {
             return;
         }
-        const nextPosition = Util.calculateNextPosition(this.position(), direction);
+        // 移動先チェックをしているので、nextPositionは返ってくるはずだが、undefinedが万が一undefinedだった場合はそのままの位置にしておく
+        const nextPosition = Util.calculateNextPosition(this.position(), direction, false) ?? this.position();
         this.row = nextPosition.row;
         this.column = nextPosition.column;
         this.chargeAmount = 0;

@@ -27,10 +27,26 @@ export function calculateNumberOfTreasuresInALLRounds() {
     return GameConstants.numberOfTreasuresPerRound * GameConstants.numberOfTreasuresRounds;
 }
 
-export function calculateNextPosition(position: Position, direction: DIRECTION): Position {
-    return {
-        row: (position.row + direction.dr + GameConstants.H) % GameConstants.H,
-        column: (position.column + direction.dc + GameConstants.W) % GameConstants.W,
+// isLoop: falseだと画面外に出ようとしたときはundefinedを返す。trueの場合は、上下左右がつながっているとみなしてポジションを返す。
+export function calculateNextPosition(position: Position, direction: DIRECTION, isLoop: boolean): Position|undefined {
+    if (isLoop) {
+        return {
+            row: (position.row + direction.dr + GameConstants.H) % GameConstants.H,
+            column: (position.column + direction.dc + GameConstants.W) % GameConstants.W,
+        }
+    } else {
+        const row = position.row + direction.dr;
+        const column = position.column + direction.dc;
+
+        if(row < 0 || row >= GameConstants.H) {
+            return undefined;
+        }
+
+        if(column < 0 || column >= GameConstants.W) {
+            return undefined;
+        }
+
+        return {row: row, column: column};
     }
 }
 

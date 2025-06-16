@@ -46,11 +46,14 @@ export class EnemiesSupervision {
                 footprint, isShortestDirection, getPlayerRoomId, isFinalRound, isAllFloorInArea
             );
         });
-        this.bossList = [this.createBoss(
-            onPlayerCaptured, footprint, isShortestDirection,
-            this.getEnemyList,
-            this.getBossList, isAllFloorInArea
-        )];
+
+        this.bossList = Array.from({ length: GameConstants.numberOfBosses }, (_, i) => {
+            return this.createBoss(
+                i, onPlayerCaptured,
+                footprint, isShortestDirection, this.getEnemyList,
+                this.getBossList, isAllFloorInArea
+            );
+        });
         this.framesSinceRoomCheckOrderUpdate = 0;
         this.roomConditionCheckOrder = [...GameConstants.INITIAL_ROOM_CONDITION_CHECK_ORDER];
     }
@@ -80,13 +83,15 @@ export class EnemiesSupervision {
         );
     }
 
-    private createBoss(onPlayerCaptured: () => void,
+    private createBoss(
+        index: number, onPlayerCaptured: () => void,
         footprint: Footprint,
         isShortestDirection: (from: Util.Position, to: Util.Position, size: number, direction: DIRECTION) => boolean,
         getEnemyList: () => Enemy[], getBossList: () => Boss[], isAllFloorInArea: (position: Util.Position, size: number) => boolean
     ) {
         return new Boss(
-            1, 38, onPlayerCaptured, footprint.caluculatePointSymmetricPositions, isShortestDirection,
+            GameConstants.parametersOfBosses[index].row, GameConstants.parametersOfBosses[index].column,
+            onPlayerCaptured, footprint.caluculatePointSymmetricPositions, isShortestDirection,
             getEnemyList, getBossList, isAllFloorInArea
         );
     }
@@ -192,7 +197,7 @@ export class EnemiesSupervision {
         // あらかじめ記録している部屋を見る順に沿って、宝が最も多い部屋が見つかったら確定
         for (const candidateRoomId of this.roomConditionCheckOrder) {
             const value = roomIdCountsMap.get(candidateRoomId);
-            if(value === maxCount) {
+            if (value === maxCount) {
                 return candidateRoomId;
             }
         }

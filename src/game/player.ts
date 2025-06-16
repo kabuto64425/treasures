@@ -119,7 +119,10 @@ export class Player {
     }
 
     private canMove(direction: DIRECTION) {
-        const nextPosition = Util.calculateNextPosition(this.position(), direction);
+        const nextPosition = Util.calculateNextPosition(this.position(), direction, true);
+        if (nextPosition === undefined) {
+            return false;
+        }
         if (!this.isFloor({ row: nextPosition.row, column: nextPosition.column })) {
             return false;
         }
@@ -127,7 +130,8 @@ export class Player {
     }
 
     private move(direction: DIRECTION, currentFrame: number) {
-        const nextPosition = Util.calculateNextPosition(this.position(), direction);
+        // isLoopにtrueをしているので、nextPositionは返ってくるはずだが、undefinedが万が一undefinedだった場合はそのままの位置にしておく
+        const nextPosition = Util.calculateNextPosition(this.position(), direction, true) ?? this.position();
         this.row = nextPosition.row;
         this.column = nextPosition.column;
         this.lastMoveDirection = direction;

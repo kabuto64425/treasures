@@ -8,6 +8,7 @@ import { WrapArrowFactory } from "./wrapArrowFactory";
 import { GameSceneContainerContext } from "./gameSceneContainerContext";
 import { VirtualStickInput } from "./virtualStickInput";
 import { DebugView } from "./debugView";
+import { Logger } from "./logger";
 
 export class GameScene extends Phaser.Scene {
 
@@ -115,6 +116,9 @@ export class GameScene extends Phaser.Scene {
         gameSceneGeneralSupervision.updatePerFrame();
         this.debugData.frameDelta = _delta;
         this.debugData.updateDuration = performance.now() - now;
+        if(this.debugData.updateDuration >= 5) {
+            Logger.debug(`over 5ms. ${this.debugData.updateDuration}`);
+        }
         this.debugData.fps = this.game.loop.actualFps.toFixed(1);
 
         if (this.isDebugStepMode) {

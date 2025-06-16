@@ -3,7 +3,6 @@ import { SceneContext } from "./sceneContext";
 import * as GameConstants from "./gameConstants";
 import * as Util from "./utils"
 import { WrapArrow, WrapArrowFactory } from "./wrapArrowFactory";
-import { Logger } from "./logger";
 
 export class FieldSupervision {
     private readonly fieldGraphics: Phaser.GameObjects.Graphics;
@@ -146,7 +145,6 @@ export class FieldSupervision {
     }
 
     isFloor = (position: Util.Position) => {
-        Logger.debug([position.row, position.column]);
         if (position.row < 0 || position.row >= GameConstants.H) {
             return false;
         }
