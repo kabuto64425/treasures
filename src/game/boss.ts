@@ -5,6 +5,7 @@ import { SceneContext } from "./sceneContext";
 import * as GameConstants from "./gameConstants";
 import { DIRECTION } from "./drection";
 import { Enemy } from "./enemy";
+import { Position } from "./utils";
 
 export class Boss implements IFieldActor {
     private readonly image: Phaser.GameObjects.Image;
@@ -15,13 +16,16 @@ export class Boss implements IFieldActor {
     private readonly cost: number;
 
     private readonly onPlayerCaptured: () => void;
+    private readonly getFootprints: () => Position[];
     private readonly isShortestDirection: (from: Util.Position, to: Util.Position, size: number, direction: DIRECTION) => boolean;
     private readonly playerPotision: () => Util.Position;
     private readonly getEnemyList: () => Enemy[];
     private readonly getBossList: () => Boss[];
     private readonly isAllFloorInArea: (position: Util.Position, size: number) => boolean;
 
-    constructor(iniRow: number, iniColumn: number, onPlayerCaptured: () => void,
+    constructor(iniRow: number, iniColumn: number,
+        onPlayerCaptured: () => void,
+        getFootprints: () => Position[],
         isShortestDirection: (from: Util.Position, to: Util.Position, size: number, direction: DIRECTION) => boolean,
         playerPotision: () => Util.Position,
         getEnemyList: () => Enemy[], getBossList: () => Boss[], isAllFloorInArea: (position: Util.Position, size: number) => boolean
@@ -31,6 +35,7 @@ export class Boss implements IFieldActor {
         this.row = iniRow;
         this.column = iniColumn;
         this.onPlayerCaptured = onPlayerCaptured;
+        this.getFootprints = getFootprints;
         this.isShortestDirection = isShortestDirection;
         this.playerPotision = playerPotision;
         this.getEnemyList = getEnemyList;
@@ -65,8 +70,24 @@ export class Boss implements IFieldActor {
 
     resolveBossFrame() {
         if (this.isChargeCompleted()) {
-            const tagetPosition = this.playerPotision();
-            const firstDirection = this.decideMoveDirection(tagetPosition);
+            const playerPosition = this.playerPotision();
+            const footprints = this.getFootprints();
+
+            let targetPosition = undefined;
+
+            // bossは、足跡とプレイヤーの位置関係から、目的地を決定する
+            // 最後の足跡から順に目的候補を算出し、目的地候補に行けると分かったらその地点を目的地とする
+            // プレイヤーの地点を中心に、ある足跡と点対象となる地点を目的地候補とする
+            for (const footprint of footprints) {
+                const dr = playerPosition.row - footprint.row;
+                const dc = playerPosition.column - footprint.column;
+                const candidateTargetPosition = {row: playerPosition.row + dr, column: playerPosition.column + dc}
+                if(this.isAllFloorInArea(candidateTargetPosition, this.size)) {
+                    targetPosition = candidateTargetPosition;
+                    break;
+                }
+            }
+            const firstDirection = this.decideMoveDirection(targetPosition);
             if (firstDirection !== undefined) {
                 // 基本は最短方向に移動するが、敵同士が互いに衝突した場合に備えて、
                 // 時計回りで移動できる方向を調べて移動することで移動先を譲れるようにする
@@ -138,7 +159,10 @@ export class Boss implements IFieldActor {
         this.onPlayerCaptured();
     }
 
-    private decideMoveDirection(targetPosition: Util.Position) {
+    private decideMoveDirection(targetPosition?: Util.Position) {
+        if(targetPosition === undefined) {
+            return undefined;
+        }
         for (const d of DIRECTION.values()) {
             if (this.isShortestDirection({ row: this.row, column: this.column }, targetPosition, this.size, d)) {
                 return d;

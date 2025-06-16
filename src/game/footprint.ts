@@ -30,6 +30,12 @@ export class Footprint {
         return this.queue[0].position;
     }
 
+    readonly getFootprints = () => {
+        return this.queue.map(q => {
+            return q.position;
+        });
+    }
+
     readonly onSteppedOnByEnemy = () => {
         this.isFirstPrintStepped = true;
     }

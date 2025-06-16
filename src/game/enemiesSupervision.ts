@@ -47,7 +47,7 @@ export class EnemiesSupervision {
             );
         });
         this.bossList = [this.createBoss(
-            onPlayerCaptured, isShortestDirection, playerPotision,
+            onPlayerCaptured, footprint, isShortestDirection, playerPotision,
             this.getEnemyList,
             this.getBossList, isAllFloorInArea
         )];
@@ -81,12 +81,13 @@ export class EnemiesSupervision {
     }
 
     private createBoss(onPlayerCaptured: () => void,
+        footprint: Footprint,
         isShortestDirection: (from: Util.Position, to: Util.Position, size: number, direction: DIRECTION) => boolean,
         playerPotision: () => Util.Position,
         getEnemyList: () => Enemy[], getBossList: () => Boss[], isAllFloorInArea: (position: Util.Position, size: number) => boolean
     ) {
         return new Boss(
-            1, 38, onPlayerCaptured, isShortestDirection, playerPotision,
+            1, 38, onPlayerCaptured, footprint.getFootprints, isShortestDirection, playerPotision,
             getEnemyList, getBossList, isAllFloorInArea
         );
     }
