@@ -24,7 +24,7 @@ export class Boss implements IFieldActor {
     constructor(iniRow: number, iniColumn: number, onPlayerCaptured: () => void,
         isShortestDirection: (from: Util.Position, to: Util.Position, size: number, direction: DIRECTION) => boolean,
         playerPotision: () => Util.Position,
-        getEnemyList: () => Enemy[], getBossList: () => Boss[], isAllFloorInArea: (position: Util.Position, size:number) => boolean
+        getEnemyList: () => Enemy[], getBossList: () => Boss[], isAllFloorInArea: (position: Util.Position, size: number) => boolean
     ) {
         this.image = SceneContext.make.image({ key: "enemy" }, false);
         this.image.setDepth(10);
@@ -58,7 +58,7 @@ export class Boss implements IFieldActor {
         GameSceneContainerContext.fieldContainer.add(this.image);
         this.image.setPosition(this.column * GameConstants.GRID_UNIT_SIZE, this.row * GameConstants.GRID_UNIT_SIZE);
         // 1ピクセル左にずらすとうまく収まるから。不都合があればまた調整
-        this.image.setDisplayOrigin(1, 0);
+        this.image.setDisplayOrigin(1 / this.size, 0);
         this.image.setScale(this.size);
         this.draw();
     }
