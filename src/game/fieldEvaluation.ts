@@ -26,6 +26,7 @@ export class FieldEvaluation {
     setup(isVisible: boolean) {
         this.graphics.depth = 99;
         this.graphics.setVisible(isVisible);
+        this.graphics.setActive(isVisible);
         GameSceneContainerContext.fieldContainer.add(this.graphics);
         this.draw();
     }
@@ -54,9 +55,9 @@ export class FieldEvaluation {
         const queue = [];
         const dist = [...Array(GameConstants.H)].map(() => [...Array(GameConstants.W)].fill(-1));
 
-        for(let i = 0; i < size; i++) {
-            for(let j = 0; j < size; j++) {
-                if(!this.containsWallInArea({row: centerPosition.row - i, column: centerPosition.column - j}, size)) {
+        for (let i = 0; i < size; i++) {
+            for (let j = 0; j < size; j++) {
+                if (!this.containsWallInArea({ row: centerPosition.row - i, column: centerPosition.column - j }, size)) {
                     queue.push([centerPosition.row - i, centerPosition.column - j]);
                     dist[centerPosition.row - i][centerPosition.column - j] = 0;
                 }
@@ -75,7 +76,7 @@ export class FieldEvaluation {
 
                 // ファイナルラウンドの封鎖場所は評価対象とする
                 // ファイナルラウンド時の敵のハマりを防ぐため
-                if(this.containsWallInArea({row: next_row, column: next_column}, size)) {
+                if (this.containsWallInArea({ row: next_row, column: next_column }, size)) {
                     continue;
                 }
 
@@ -101,23 +102,27 @@ export class FieldEvaluation {
     }
 
     private draw() {
-        this.graphics.clear();
-        this.graphics.lineStyle(0, 0x00ff00);
-        this.graphics.fillStyle(0x00ff00);
-        for (let i = 0; i < GameConstants.H; i++) {
-            for (let j = 0; j < GameConstants.W; j++) {
-                this.isShortestDirection({ row: i, column: j }, this.getFirstPrint(), 1, DIRECTION.LEFT);
-                if (this.isShortestDirection({ row: i, column: j }, this.getFirstPrint(), 1, DIRECTION.LEFT)) {
-                    this.graphics.fillRect(j * GameConstants.GRID_UNIT_SIZE, i * GameConstants.GRID_UNIT_SIZE + GameConstants.GRID_UNIT_SIZE / 2 - GameConstants.GRID_UNIT_SIZE / 10, GameConstants.GRID_UNIT_SIZE / 5, GameConstants.GRID_UNIT_SIZE / 5);
-                }
-                if (this.isShortestDirection({ row: i, column: j }, this.getFirstPrint(), 1, DIRECTION.UP)) {
-                    this.graphics.fillRect(j * GameConstants.GRID_UNIT_SIZE + GameConstants.GRID_UNIT_SIZE / 2 - GameConstants.GRID_UNIT_SIZE / 10, i * GameConstants.GRID_UNIT_SIZE, GameConstants.GRID_UNIT_SIZE / 5, GameConstants.GRID_UNIT_SIZE / 5);
-                }
-                if (this.isShortestDirection({ row: i, column: j }, this.getFirstPrint(), 1, DIRECTION.RIGHT)) {
-                    this.graphics.fillRect((j + 1) * GameConstants.GRID_UNIT_SIZE - GameConstants.GRID_UNIT_SIZE / 5, i * GameConstants.GRID_UNIT_SIZE + GameConstants.GRID_UNIT_SIZE / 2 - GameConstants.GRID_UNIT_SIZE / 10, GameConstants.GRID_UNIT_SIZE / 5, GameConstants.GRID_UNIT_SIZE / 5);
-                }
-                if (this.isShortestDirection({ row: i, column: j }, this.getFirstPrint(), 1, DIRECTION.DOWN)) {
-                    this.graphics.fillRect(j * GameConstants.GRID_UNIT_SIZE + GameConstants.GRID_UNIT_SIZE / 2 - GameConstants.GRID_UNIT_SIZE / 10, (i + 1) * GameConstants.GRID_UNIT_SIZE - GameConstants.GRID_UNIT_SIZE / 5, GameConstants.GRID_UNIT_SIZE / 5, GameConstants.GRID_UNIT_SIZE / 5);
+        // アクティブでなければ描画する必要がない。
+        // ここの描画処理は時間を使うと考えられるので、アクティブでなければ実行させない
+        if (this.graphics.active) {
+            this.graphics.clear();
+            this.graphics.lineStyle(0, 0x00ff00);
+            this.graphics.fillStyle(0x00ff00);
+            for (let i = 0; i < GameConstants.H; i++) {
+                for (let j = 0; j < GameConstants.W; j++) {
+                    this.isShortestDirection({ row: i, column: j }, this.getFirstPrint(), 1, DIRECTION.LEFT);
+                    if (this.isShortestDirection({ row: i, column: j }, this.getFirstPrint(), 1, DIRECTION.LEFT)) {
+                        this.graphics.fillRect(j * GameConstants.GRID_UNIT_SIZE, i * GameConstants.GRID_UNIT_SIZE + GameConstants.GRID_UNIT_SIZE / 2 - GameConstants.GRID_UNIT_SIZE / 10, GameConstants.GRID_UNIT_SIZE / 5, GameConstants.GRID_UNIT_SIZE / 5);
+                    }
+                    if (this.isShortestDirection({ row: i, column: j }, this.getFirstPrint(), 1, DIRECTION.UP)) {
+                        this.graphics.fillRect(j * GameConstants.GRID_UNIT_SIZE + GameConstants.GRID_UNIT_SIZE / 2 - GameConstants.GRID_UNIT_SIZE / 10, i * GameConstants.GRID_UNIT_SIZE, GameConstants.GRID_UNIT_SIZE / 5, GameConstants.GRID_UNIT_SIZE / 5);
+                    }
+                    if (this.isShortestDirection({ row: i, column: j }, this.getFirstPrint(), 1, DIRECTION.RIGHT)) {
+                        this.graphics.fillRect((j + 1) * GameConstants.GRID_UNIT_SIZE - GameConstants.GRID_UNIT_SIZE / 5, i * GameConstants.GRID_UNIT_SIZE + GameConstants.GRID_UNIT_SIZE / 2 - GameConstants.GRID_UNIT_SIZE / 10, GameConstants.GRID_UNIT_SIZE / 5, GameConstants.GRID_UNIT_SIZE / 5);
+                    }
+                    if (this.isShortestDirection({ row: i, column: j }, this.getFirstPrint(), 1, DIRECTION.DOWN)) {
+                        this.graphics.fillRect(j * GameConstants.GRID_UNIT_SIZE + GameConstants.GRID_UNIT_SIZE / 2 - GameConstants.GRID_UNIT_SIZE / 10, (i + 1) * GameConstants.GRID_UNIT_SIZE - GameConstants.GRID_UNIT_SIZE / 5, GameConstants.GRID_UNIT_SIZE / 5, GameConstants.GRID_UNIT_SIZE / 5);
+                    }
                 }
             }
         }

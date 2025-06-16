@@ -167,6 +167,7 @@ export class GameSceneGeneralSupervision {
         // 敵
         this.enemiesSupervision.resolveFrame();
 
+
         // 敵との接触判定・ゲームオーバー更新
         for (const enemy of this.enemiesSupervision.getEnemyList()) {
             this.player.handleCollisionWith(enemy);
@@ -225,7 +226,8 @@ export class GameSceneGeneralSupervision {
     }
 
     readonly restartGame = () => {
-        SceneContext.scenePlugin.restart();
+        SceneContext.scenePlugin.stop();
+        SceneContext.scenePlugin.start();
     }
 
     readonly queryCurrentRecord = () => {

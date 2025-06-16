@@ -116,10 +116,15 @@ export class GameScene extends Phaser.Scene {
         gameSceneGeneralSupervision.updatePerFrame();
         this.debugData.frameDelta = _delta;
         this.debugData.updateDuration = performance.now() - now;
-        if(this.debugData.updateDuration >= 5) {
+        this.debugData.fps = this.game.loop.actualFps.toFixed(1);
+
+        if(this.game.loop.actualFps < 50) {
+            Logger.debug("fps under 50");
+        }
+
+        if(this.debugData.updateDuration > 5) {
             Logger.debug(`over 5ms. ${this.debugData.updateDuration}`);
         }
-        this.debugData.fps = this.game.loop.actualFps.toFixed(1);
 
         if (this.isDebugStepMode) {
             this.doStepOnce = false;
