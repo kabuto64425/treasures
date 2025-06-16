@@ -35,7 +35,7 @@ export class Player {
         // 先行入力受付は、暫定チャージ中いつでもできるように第２引数を指定している。多分これで確定しそう。
         this.playerDirectionBuffer = new PlayerDirectionBuffer(params.playerMoveCost, params.playerMoveCost, this.getLastMoveDirection);
         this.lastMoveDirection = undefined;
-        this.footPrint = new Footprint(params.footPrintLimitFrame);
+        this.footPrint = new Footprint(params.footPrintLimitFrame, this.position);
         this.isFloor = isFloor;
     }
 

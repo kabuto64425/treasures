@@ -16,18 +16,16 @@ export class Boss implements IFieldActor {
     private readonly cost: number;
 
     private readonly onPlayerCaptured: () => void;
-    private readonly getFootprints: () => Position[];
+    private readonly caluculatePointSymmetricPositions: () => Position[];
     private readonly isShortestDirection: (from: Util.Position, to: Util.Position, size: number, direction: DIRECTION) => boolean;
-    private readonly playerPotision: () => Util.Position;
     private readonly getEnemyList: () => Enemy[];
     private readonly getBossList: () => Boss[];
     private readonly isAllFloorInArea: (position: Util.Position, size: number) => boolean;
 
     constructor(iniRow: number, iniColumn: number,
         onPlayerCaptured: () => void,
-        getFootprints: () => Position[],
+        caluculatePointSymmetricPositions: () => Position[],
         isShortestDirection: (from: Util.Position, to: Util.Position, size: number, direction: DIRECTION) => boolean,
-        playerPotision: () => Util.Position,
         getEnemyList: () => Enemy[], getBossList: () => Boss[], isAllFloorInArea: (position: Util.Position, size: number) => boolean
     ) {
         this.image = SceneContext.make.image({ key: "enemy" }, false);
@@ -35,14 +33,13 @@ export class Boss implements IFieldActor {
         this.row = iniRow;
         this.column = iniColumn;
         this.onPlayerCaptured = onPlayerCaptured;
-        this.getFootprints = getFootprints;
+        this.caluculatePointSymmetricPositions = caluculatePointSymmetricPositions;
         this.isShortestDirection = isShortestDirection;
-        this.playerPotision = playerPotision;
         this.getEnemyList = getEnemyList;
         this.getBossList = getBossList;
         this.isAllFloorInArea = isAllFloorInArea;
         this.size = 3;
-        this.cost = 20;
+        this.cost = 12;
 
         this.chargeAmount = 0;
     }
@@ -70,20 +67,14 @@ export class Boss implements IFieldActor {
 
     resolveBossFrame() {
         if (this.isChargeCompleted()) {
-            const playerPosition = this.playerPotision();
-            const footprints = this.getFootprints();
-
             let targetPosition = undefined;
 
             // bossは、足跡とプレイヤーの位置関係から、目的地を決定する
             // 最後の足跡から順に目的候補を算出し、目的地候補に行けると分かったらその地点を目的地とする
             // プレイヤーの地点を中心に、ある足跡と点対象となる地点を目的地候補とする
-            for (const footprint of footprints) {
-                const dr = playerPosition.row - footprint.row;
-                const dc = playerPosition.column - footprint.column;
-                const candidateTargetPosition = {row: playerPosition.row + dr, column: playerPosition.column + dc}
-                if(this.isAllFloorInArea(candidateTargetPosition, this.size)) {
-                    targetPosition = candidateTargetPosition;
+            for (const position of this.caluculatePointSymmetricPositions()) {
+                if(this.isAllFloorInArea(position, this.size)) {
+                    targetPosition = position;
                     break;
                 }
             }

@@ -1,20 +1,23 @@
-import { Position } from "./utils";
+import * as Util from "./utils";
 import * as GameConstants from "./gameConstants";
 import { SceneContext } from "./sceneContext";
 import { GameSceneContainerContext } from "./gameSceneContainerContext";
 
 export class Footprint {
-    private readonly queue: { position: Position, frame: number }[];
+    private readonly queue: { position: Util.Position, frame: number }[];
     private readonly graphics: Phaser.GameObjects.Graphics;
 
     private readonly limit: number;
     private isFirstPrintStepped: boolean;
 
-    constructor(limit: number) {
+    private readonly playerPosition: () => Util.Position;
+
+    constructor(limit: number, playerPosition: () => Util.Position) {
         this.graphics = SceneContext.make.graphics({});
         this.queue = [];
         this.limit = limit;
         this.isFirstPrintStepped = false;
+        this.playerPosition = playerPosition;
     }
 
     setup(isVisible: boolean) {
@@ -22,7 +25,7 @@ export class Footprint {
         this.graphics.setVisible(isVisible);
     }
 
-    push(position: Position, currentFrame: number) {
+    push(position: Util.Position, currentFrame: number) {
         this.queue.push({ position: position, frame: currentFrame });
     }
 
@@ -30,9 +33,10 @@ export class Footprint {
         return this.queue[0].position;
     }
 
-    readonly getFootprints = () => {
+    readonly caluculatePointSymmetricPositions = () => {
+        const playerPosition = this.playerPosition();
         return this.queue.map(q => {
-            return q.position;
+            return Util.calculatePointSymmetricPosition(playerPosition, q.position);
         });
     }
 
@@ -63,6 +67,11 @@ export class Footprint {
         for (const footprint of this.queue) {
             footprint.position;
             this.graphics.fillRect(footprint.position.column * GameConstants.GRID_UNIT_SIZE, footprint.position.row * GameConstants.GRID_UNIT_SIZE, GameConstants.GRID_UNIT_SIZE, GameConstants.GRID_UNIT_SIZE);
+        }
+        this.graphics.lineStyle(0, 0x0000ff, 0.3);
+        this.graphics.fillStyle(0xffff00, 0.3);
+        for (const position of this.caluculatePointSymmetricPositions()) {
+            this.graphics.fillRect(position.column * GameConstants.GRID_UNIT_SIZE, position.row * GameConstants.GRID_UNIT_SIZE, GameConstants.GRID_UNIT_SIZE, GameConstants.GRID_UNIT_SIZE);
         }
     }
 

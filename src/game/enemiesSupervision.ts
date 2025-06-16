@@ -36,7 +36,7 @@ export class EnemiesSupervision {
         onPlayerCaptured: () => void, footprint: Footprint,
         isShortestDirection: (from: Util.Position, to: Util.Position, size: number, direction: DIRECTION) => boolean,
         getPlayerRoomId: () => number, isFinalRound: () => boolean, extractCurrentAppearanceTreasures: () => IFieldActor[],
-        isAllFloorInArea: (position: Util.Position, size: number) => boolean, playerPotision: () => Util.Position
+        isAllFloorInArea: (position: Util.Position, size: number) => boolean
     ) {
         this.lastSpottedRoomId = getPlayerRoomId();
         this.extractCurrentAppearanceTreasures = extractCurrentAppearanceTreasures;
@@ -47,7 +47,7 @@ export class EnemiesSupervision {
             );
         });
         this.bossList = [this.createBoss(
-            onPlayerCaptured, footprint, isShortestDirection, playerPotision,
+            onPlayerCaptured, footprint, isShortestDirection,
             this.getEnemyList,
             this.getBossList, isAllFloorInArea
         )];
@@ -83,11 +83,10 @@ export class EnemiesSupervision {
     private createBoss(onPlayerCaptured: () => void,
         footprint: Footprint,
         isShortestDirection: (from: Util.Position, to: Util.Position, size: number, direction: DIRECTION) => boolean,
-        playerPotision: () => Util.Position,
         getEnemyList: () => Enemy[], getBossList: () => Boss[], isAllFloorInArea: (position: Util.Position, size: number) => boolean
     ) {
         return new Boss(
-            1, 38, onPlayerCaptured, footprint.getFootprints, isShortestDirection, playerPotision,
+            1, 38, onPlayerCaptured, footprint.caluculatePointSymmetricPositions, isShortestDirection,
             getEnemyList, getBossList, isAllFloorInArea
         );
     }

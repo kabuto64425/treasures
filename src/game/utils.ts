@@ -34,30 +34,37 @@ export function calculateNextPosition(position: Position, direction: DIRECTION):
     }
 }
 
+// center地点を中心に、ある地点と点対象になる地点を算出する
+export function calculatePointSymmetricPosition(center: Position, point: Position) {
+    const dr = center.row - point.row;
+    const dc = center.column - point.column;
+    return { row: (center.row + dr + GameConstants.H) % GameConstants.H, column: (center.column + dc + GameConstants.W) % GameConstants.W }
+}
+
 export function isSamePosition(positionA: Position, positionB: Position) {
     return positionA.row === positionB.row && positionA.column === positionB.column;
 }
 
 export function checkCollision(positionA: Position, sizeA: number, positionB: Position, sizeB: number) {
     const positionATopLeft = positionA;
-    const positionABottomRight = {row: positionA.row + sizeA - 1, column: positionA.column + sizeA - 1};
+    const positionABottomRight = { row: positionA.row + sizeA - 1, column: positionA.column + sizeA - 1 };
 
     const positionBTopLeft = positionB;
-    const positionBBottomRight = {row: positionB.row + sizeB - 1, column: positionB.column + sizeB - 1};
+    const positionBBottomRight = { row: positionB.row + sizeB - 1, column: positionB.column + sizeB - 1 };
 
-    if(positionABottomRight.row < positionBTopLeft.row) {
+    if (positionABottomRight.row < positionBTopLeft.row) {
         return false;
     }
 
-    if(positionATopLeft.row > positionBBottomRight.row) {
+    if (positionATopLeft.row > positionBBottomRight.row) {
         return false;
     }
 
-    if(positionABottomRight.column < positionBTopLeft.column) {
+    if (positionABottomRight.column < positionBTopLeft.column) {
         return false;
     }
 
-    if(positionATopLeft.column > positionBBottomRight.column) {
+    if (positionATopLeft.column > positionBBottomRight.column) {
         return false;
     }
 
