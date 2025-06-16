@@ -189,11 +189,11 @@ export class EnemiesSupervision {
 
         const maxCount = Math.max(...roomIdCountsMap.values());
 
-        for (const [key, value] of roomIdCountsMap) {
-            // とりあえず最初に見つけた部屋。
-            // 優先度含めた細かい調整を実装する必要あり
-            if (value === maxCount) {
-                return key;
+        // あらかじめ記録している部屋を見る順に沿って、宝が最も多い部屋が見つかったら確定
+        for (const candidateRoomId of this.roomConditionCheckOrder) {
+            const value = roomIdCountsMap.get(candidateRoomId);
+            if(value === maxCount) {
+                return candidateRoomId;
             }
         }
         // この処理が実行されることはないはずだが、undefinedを回避するため
@@ -207,10 +207,9 @@ export class EnemiesSupervision {
 
         const roomIdSet = new Set(roomIdList);
 
+        // あらかじめ記録している部屋を見る順に沿って、どの敵も索敵部屋にしてない部屋が見つかったら確定
         for (const candidateRoomId of this.roomConditionCheckOrder) {
             if (!roomIdSet.has(candidateRoomId)) {
-                // とりあえず最初に見つけた部屋。
-                // 優先度含めた細かい調整を実装する必要あり
                 return candidateRoomId;
             }
         }
