@@ -35,10 +35,13 @@ export function calculateNextPosition(position: Position, direction: DIRECTION):
 }
 
 // center地点を中心に、ある地点と点対象になる地点を算出する
-export function calculatePointSymmetricPosition(center: Position, point: Position) {
+export function calculatePointSymmetricPosition(center: Position, point: Position, isLoop: boolean = false) {
     const dr = center.row - point.row;
     const dc = center.column - point.column;
-    return { row: (center.row + dr + GameConstants.H) % GameConstants.H, column: (center.column + dc + GameConstants.W) % GameConstants.W }
+
+    const row = (isLoop) ? (center.row + dr + GameConstants.H) % GameConstants.H : center.row + dr;
+    const column = (isLoop) ? (center.column + dc + GameConstants.W) % GameConstants.W : center.column + dc;
+    return { row: row, column: column }
 }
 
 export function isSamePosition(positionA: Position, positionB: Position) {
