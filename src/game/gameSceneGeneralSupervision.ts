@@ -226,8 +226,7 @@ export class GameSceneGeneralSupervision {
     }
 
     readonly restartGame = () => {
-        SceneContext.scenePlugin.stop();
-        SceneContext.scenePlugin.start();
+        SceneContext.scenePlugin.restart();
     }
 
     readonly queryCurrentRecord = () => {
