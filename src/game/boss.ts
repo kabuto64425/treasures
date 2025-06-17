@@ -67,23 +67,25 @@ export class Boss implements IFieldActor {
 
     resolveBossFrame() {
         if (this.isChargeCompleted()) {
-            let targetPosition = undefined;
+            let firstDirection = undefined;
 
             // bossは、足跡とプレイヤーの位置関係から、目的地を決定する
             // 最後の足跡から順に目的候補を算出し、目的地候補に行けると分かったらその地点を目的地とする
             // プレイヤーの地点を中心に、ある足跡と点対象となる地点を目的地候補とする
             for (const position of this.caluculatePointSymmetricPositions()) {
-                for (let i = 0; i < this.size; i++) {
-                    for (let j = 0; j < this.size; j++) {
-                        const candidateTargetPosition = { row: position.row - i, column: position.column - j };
-                        if (this.isAllFloorInArea(candidateTargetPosition, this.size)) {
-                            targetPosition = position;
-                            break;
-                        }
-                    }
+                if(position.row < 0 || position.row >= GameConstants.H) {
+                    continue;
+                }
+                if(position.column < 0 || position.column >= GameConstants.W) {
+                    continue;
+                }
+
+                firstDirection = this.decideMoveDirection(position);
+                if(firstDirection !== undefined) {
+                    break;
                 }
             }
-            const firstDirection = this.decideMoveDirection(targetPosition);
+
             if (firstDirection !== undefined) {
                 // 基本は最短方向に移動するが、敵同士が互いに衝突した場合に備えて、
                 // 時計回りで移動できる方向を調べて移動することで移動先を譲れるようにする

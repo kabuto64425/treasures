@@ -1,6 +1,7 @@
 import { DIRECTION } from "./drection";
 import * as GameConstants from "./gameConstants";
 import { GameSceneContainerContext } from "./gameSceneContainerContext";
+import { Logger } from "./logger";
 import { SceneContext } from "./sceneContext";
 import * as Util from "./utils"
 
@@ -50,6 +51,7 @@ export class FieldEvaluation {
     }
 
     private createEvaluation(centerPosition: Util.Position, size: number) {
+        const start = performance.now();
         const map = [...Array(GameConstants.H)].map(() => [...Array(GameConstants.W)].map(() => this.generateDirectionFlagMap() as Map<string, boolean>));
 
         const queue = [];
@@ -91,6 +93,8 @@ export class FieldEvaluation {
                 map[next_row][next_column].set(d.reverse().keyName, true);
             }
         }
+
+        Logger.debug(`createEvaluation : ${performance.now() - start}`);
 
         return map;
     }
