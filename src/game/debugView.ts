@@ -1,9 +1,13 @@
-import GUI from "lil-gui";
+import GUI, { Controller } from "lil-gui";
 import { DebugData } from "./debugData";
+import { Logger } from "./logger";
 
 export class DebugView {
     private readonly gui;
     private readonly data: DebugData;
+
+    // コントローラを保持（あとで手動更新）
+    private controllers: Record<string, Controller> = {};
 
     constructor(data: DebugData) {
         this.gui = new GUI();
@@ -11,91 +15,71 @@ export class DebugView {
     }
 
     setup() {
-        const view = this; // ← this をキャプチャして保持
-        this.gui.add(this.data, "updateDuration").listen();
-        this.gui.add(this.data, "frameDelta").listen();
-        this.gui.add(this.data, "fps").listen();
-        this.gui.add(this.data, "scaleX").listen();
-        this.gui.add(this.data, "scaleY").listen();
+        const c = this.controllers;
 
-        this.gui.add({
-            get actualWidth() {
-                if(view.data.pauseButton.displayWidth !== undefined) {
-                    return view.data.pauseButton.displayWidth / view.data.scaleX;
-                } else {
-                    return "NONE";
-                }
-            }
-        }, "actualWidth").listen();
+        // 各種数値の表示
+        c.updateDuration = this.gui.add(this.data, "updateDuration");
+        c.frameDelta = this.gui.add({ frameDelta: 0 }, "frameDelta");
+        c.fps = this.gui.add({ fps: "0" }, "fps");
+        c.scaleX = this.gui.add({ scaleX: 1 }, "scaleX");
+        c.scaleY = this.gui.add({ scaleY: 1 }, "scaleY");
 
-        this.gui.add({
-            get actualHeight() {
-                if(view.data.pauseButton.displayHeight !== undefined) {
-                    return view.data.pauseButton.displayHeight / view.data.scaleY;
-                } else {
-                    return "NONE";
-                }
-            }
-        }, "actualHeight").listen();
+        // サイズ表示
+        c.actualWidth = this.gui.add({ actualWidth: "NONE" }, "actualWidth");
+        c.actualHeight = this.gui.add({ actualHeight: "NONE" }, "actualHeight");
 
         const playerFolder = this.gui.addFolder("player");
-
-        playerFolder.add({
-            get chargeAmount() {
-                return view.data.player.chargeAmount ?? "NONE"
-            }
-        }, "chargeAmount").listen();
-        playerFolder.add({
-            get row() {
-                return view.data.player.position?.row ?? "NONE"
-            }
-        }, "row").listen();
-        playerFolder.add({
-            get column() {
-                return view.data.player.position?.column ?? "NONE"
-            }
-        }, "column").listen();
-        playerFolder.add({
-            get roomId() {
-                return view.data.player.roomId ?? "NONE"
-            }
-        }, "roomId").listen();
-        playerFolder.add({
-            get lastMoveDirection() {
-                return view.data.player.lastMoveDirection?.keyName ?? "NONE"
-            }
-        }, "lastMoveDirection").listen();
+        c.player_chargeAmount = playerFolder.add({ chargeAmount: "NONE" }, "chargeAmount");
+        c.player_row = playerFolder.add({ row: "NONE" }, "row");
+        c.player_column = playerFolder.add({ column: "NONE" }, "column");
+        c.player_roomId = playerFolder.add({ roomId: "NONE" }, "roomId");
+        c.player_lastMoveDirection = playerFolder.add({ lastMoveDirection: "NONE" }, "lastMoveDirection");
 
         const enemiesFolder = this.gui.addFolder("enemies");
-        for (const [index, enemy] of view.data.enemies.entries()) {
-            const enemyFolder = enemiesFolder.addFolder(`enemy${index}`);
-            enemyFolder.add({
-                get state() {
-                    return enemy.state ?? "NONE"
-                }
-            }, "state").listen();
-            enemyFolder.add({
-                get chargeAmount() {
-                    return enemy.chargeAmount ?? "NONE"
-                }
-            }, "chargeAmount").listen();
-            enemyFolder.add({
-                get row() {
-                    return enemy.position?.row ?? "NONE"
-                }
-            }, "row").listen();
-            enemyFolder.add({
-                get column() {
-                    return enemy.position?.column ?? "NONE"
-                }
-            }, "column").listen();
-            enemyFolder.add({
-                get roomId() {
-                    return enemy.roomId ?? "NONE"
-                }
-            }, "roomId").listen();
-        }
 
+        this.data.enemies.forEach((_, index) => {
+            const enemyFolder = enemiesFolder.addFolder(`enemy${index}`);
+            c[`enemy${index}_state`] = enemyFolder.add({ state: "NONE" }, "state");
+            c[`enemy${index}_chargeAmount`] = enemyFolder.add({ chargeAmount: "NONE" }, "chargeAmount");
+            c[`enemy${index}_row`] = enemyFolder.add({ row: "NONE" }, "row");
+            c[`enemy${index}_column`] = enemyFolder.add({ column: "NONE" }, "column");
+            c[`enemy${index}_roomId`] = enemyFolder.add({ roomId: "NONE" }, "roomId");
+        });
+
+    }
+
+    update() {
+        // update() 内などで手動更新
+        const d = this.data;
+        const c = this.controllers;
+
+        c.updateDuration.updateDisplay();
+
+        //c.updateDuration.setValue(d.updateDuration);
+        //c.frameDelta.setValue(d.frameDelta);
+        //c.fps.setValue(d.fps);
+        //c.scaleX.setValue(d.scaleX.toFixed(2));
+        //c.scaleY.setValue(d.scaleY.toFixed(2));
+
+        /*const w = d.pauseButton.displayWidth;
+        const h = d.pauseButton.displayHeight;
+        c.actualWidth.setValue(w !== undefined ? (w / d.scaleX).toFixed(2) : "NONE");
+        c.actualHeight.setValue(h !== undefined ? (h / d.scaleY).toFixed(2) : "NONE");
+
+        const p = d.player;
+        c.player_chargeAmount.setValue(p.chargeAmount ?? "NONE");
+        c.player_row.setValue(p.position?.row ?? "NONE");
+        c.player_column.setValue(p.position?.column ?? "NONE");
+        c.player_roomId.setValue(p.roomId ?? "NONE");
+        c.player_lastMoveDirection.setValue(p.lastMoveDirection?.keyName ?? "NONE");
+
+        d.enemies.forEach((enemy, index) => {
+            c[`enemy${index}_state`].setValue(enemy.state ?? "NONE");
+            c[`enemy${index}_chargeAmount`].setValue(enemy.chargeAmount ?? "NONE");
+            c[`enemy${index}_row`].setValue(enemy.position?.row ?? "NONE");
+            c[`enemy${index}_column`].setValue(enemy.position?.column ?? "NONE");
+            c[`enemy${index}_roomId`].setValue(enemy.roomId ?? "NONE");
+        });*/
     }
 
     destroy() {
