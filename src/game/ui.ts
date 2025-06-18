@@ -290,4 +290,15 @@ export class Ui {
             displayHeight: this.pause.displayHeight
         };
     }
+
+    clean() {
+        this.play.off("pointerover");
+        this.play.off("pointerout");
+        this.play.off("pointerup");
+        this.pause.off("pointerover");
+        this.pause.off("pointerout");
+        this.pause.off("pointerup");
+        this.deleteBestRecordButton.clean();
+        this.restartButton.clean();
+    }
 }

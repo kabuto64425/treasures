@@ -110,4 +110,10 @@ export class RestartButton {
             this.progressBar.setVisible(false);
         }
     }
+
+    clean() {
+        this.image.off("pointerdown");
+        this.image.off("pointerup");
+        this.image.off("pointerout");
+    }
 }
