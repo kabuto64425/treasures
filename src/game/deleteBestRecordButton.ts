@@ -130,6 +130,8 @@ export class DeleteBestRecordButton {
     }
 
     clean() {
+        this.clock.removeEvent(this.timerEvent);
+        this.timerEvent.remove();
         this.image.off("pointerdown");
         this.image.off("pointerup");
         this.image.off("pointerout");

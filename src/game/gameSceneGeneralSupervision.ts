@@ -227,6 +227,7 @@ export class GameSceneGeneralSupervision {
 
     readonly restartGame = () => {
         this.ui.clean();
+        this.fieldSupervision.clean();
         SceneContext.scenePlugin.restart();
     }
 

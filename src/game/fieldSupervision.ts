@@ -246,6 +246,14 @@ export class FieldSupervision {
         }
     }
 
+    clean() {
+        for(const registry of this.wrapAroundArrowRegistryList) {
+            for(const arrow of registry.wrapAroundArrowList) {
+                arrow.clean();
+            }
+        }
+    }
+
     handlePause() {
         for (const wrapAroundArrowResistry of this.wrapAroundArrowRegistryList) {
             for (const wrapAroundArrow of wrapAroundArrowResistry.wrapAroundArrowList) {

@@ -48,6 +48,10 @@ export class WrapArrow {
     resumeAnimation() {
         this.sprite.anims.resume();
     }
+
+    clean() {
+        this.sprite.anims.remove("iconAnim");
+    }
 }
 
 export class WrapArrowFactory {

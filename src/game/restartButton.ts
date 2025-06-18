@@ -43,7 +43,7 @@ export class RestartButton {
         this.restartGame = generalSupervision.restartGame;
         this.hasGameStarted = generalSupervision.hasGameStarted;
         this.requestRetryGameFromUi = generalSupervision.getInputCoordinator().requestRetryGameFromUi;
-        
+
         // おそらくrestartというキーが使えなさそう。なので、restart_で代用している
         this.image = SceneContext.make.image({ x: 0, y: 0, key: "restart_" }, false);
         this.image.setOrigin(0, 0);
@@ -74,11 +74,13 @@ export class RestartButton {
         });
 
         this.image.on("pointerup", () => {
+            this.clock.removeEvent(this.timerEvent);
             this.timerEvent.remove();
             this.timerEvent = new Phaser.Time.TimerEvent(this.timerEventConfig);
         });
 
         this.image.on("pointerout", () => {
+            this.clock.removeEvent(this.timerEvent);
             this.timerEvent.remove();
             this.timerEvent = new Phaser.Time.TimerEvent(this.timerEventConfig);
         });
@@ -112,6 +114,8 @@ export class RestartButton {
     }
 
     clean() {
+        this.clock.removeEvent(this.timerEvent);
+        this.timerEvent.remove();
         this.image.off("pointerdown");
         this.image.off("pointerup");
         this.image.off("pointerout");
