@@ -1,6 +1,5 @@
 import GUI, { Controller } from "lil-gui";
 import { DebugData } from "./debugData";
-import { Logger } from "./logger";
 
 export class DebugView {
     private readonly gui;
@@ -50,7 +49,7 @@ export class DebugView {
 
     update() {
         // update() 内などで手動更新
-        const d = this.data;
+        //const d = this.data;
         const c = this.controllers;
 
         c.updateDuration.updateDisplay();

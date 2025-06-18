@@ -18,7 +18,7 @@ export class GameScene extends Phaser.Scene {
     // create内で、必ず初期化しておくこと
     private gameSceneGeneralSupervision!: GameSceneGeneralSupervision;
 
-    private debugView: DebugView;
+    private debugView?: DebugView;
     private debugData: DebugData;
 
     private isDebugStepMode;
@@ -31,7 +31,6 @@ export class GameScene extends Phaser.Scene {
         this.isDebugStepMode = Util.isDebugEnv() && (this.params.isDebugStepMode ?? false);
         this.bestRecoed = bestRecord;
         this.debugData = new DebugData();
-        this.debugView = new DebugView(this.debugData);
     }
 
     preload() {
@@ -87,11 +86,12 @@ export class GameScene extends Phaser.Scene {
         this.gameSceneGeneralSupervision = new GameSceneGeneralSupervision(this);
         this.gameSceneGeneralSupervision.setupSupervision();
         if (Util.isDebugEnv()) {
+            this.debugView = new DebugView(this.debugData);
             this.debugView.setup();
             this.events.once("shutdown", () => {
                 // restartしたときに、destroyしておかないとrestart前のデバッグビューが残り
                 // restartを繰り返すうちに処理が重くなるから
-                this.debugView.destroy();
+                this.debugView!.destroy();
             });
         }
         if (this.isDebugStepMode) {
@@ -135,7 +135,7 @@ export class GameScene extends Phaser.Scene {
         this.debugData.scaleY = this.scale.displayScale.y;
 
         if (Util.isDebugEnv()) {
-            this.debugView.update();
+            this.debugView!.update();
         }
     }
 
