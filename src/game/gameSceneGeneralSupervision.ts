@@ -226,6 +226,7 @@ export class GameSceneGeneralSupervision {
     }
 
     readonly restartGame = () => {
+        SceneContext.cleanup();
         SceneContext.scenePlugin.restart();
     }
 

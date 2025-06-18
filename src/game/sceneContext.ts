@@ -1,3 +1,5 @@
+import { Logger } from "./logger";
+
 export class SceneContext {
 
     private static components: {
@@ -24,23 +26,19 @@ export class SceneContext {
             textures: scene.textures,
             pluginManager: scene.plugins
         } as const;
-
-        scene.events.once('shutdown', () => {
-            SceneContext.cleanup(); // 自動的に解放
-        });
     }
 
     static cleanup() {
         // GameObject の削除
-        //Logger.debug(this.components.children.list.length);
-        /*for(const child of this.components.children.list) {
-            
-        }*/
+        Logger.debug("cleanup");
+        for(const child of this.components.children.list) {
+            child.destroy();   
+        }
 
         // Tween・Timer・Input の解放
-        //this.time.clearPendingEvents();
+        this.time.removeAllEvents();
         //Logger.debug(this.inputPlugin.listeners.length);
-        //this.inputPlugin.removeAllListeners();
+        this.inputPlugin.removeAllListeners();
         //this.anims.removeAll(); // アニメーションも積み上がるなら
 
         // ScenePlugin のイベントも必要に応じて
