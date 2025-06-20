@@ -22,6 +22,7 @@ export class Boss implements IFieldActor {
 
     private row: number;
     private column: number;
+    private roomId: number;
     private chargeAmount: number;
     private readonly size: number;
     private readonly cost: number;
@@ -29,6 +30,7 @@ export class Boss implements IFieldActor {
     private readonly onPlayerCaptured: () => void;
     private readonly caluculatePointSymmetricPositions: () => Position[];
     private readonly isShortestDirection: (from: Util.Position, to: Util.Position, size: number, direction: DIRECTION) => boolean;
+    private readonly getPlayerRoomId: () => number;
     private readonly isFinalRound: () => boolean;
     private readonly getEnemyList: () => Enemy[];
     private readonly getApperanceBossList: () => Boss[];
@@ -37,7 +39,8 @@ export class Boss implements IFieldActor {
     constructor(iniRow: number, iniColumn: number,
         onPlayerCaptured: () => void,
         caluculatePointSymmetricPositions: () => Position[],
-        isShortestDirection: (from: Util.Position, to: Util.Position, size: number, direction: DIRECTION) => boolean, isFinalRound: () => boolean,
+        isShortestDirection: (from: Util.Position, to: Util.Position, size: number, direction: DIRECTION) => boolean,
+        getPlayerRoomId: () => number, isFinalRound: () => boolean,
         getEnemyList: () => Enemy[], getApperanceBossList: () => Boss[], isAllFloorInArea: (position: Util.Position, size: number) => boolean
     ) {
         this.image = SceneContext.make.image({ key: "enemy" }, false);
@@ -45,9 +48,11 @@ export class Boss implements IFieldActor {
         this.state = BossState.NON_APPEARANCE;
         this.row = iniRow;
         this.column = iniColumn;
+        this.roomId = Util.findRoomId({ row: this.row, column: this.column });
         this.onPlayerCaptured = onPlayerCaptured;
         this.caluculatePointSymmetricPositions = caluculatePointSymmetricPositions;
         this.isShortestDirection = isShortestDirection;
+        this.getPlayerRoomId = getPlayerRoomId;
         this.isFinalRound = isFinalRound;
         this.getEnemyList = getEnemyList;
         this.getApperanceBossList = getApperanceBossList;
@@ -88,16 +93,20 @@ export class Boss implements IFieldActor {
     }
 
     private updateState() {
-        if(this.isAppearance()) {
+        if (this.isAppearance()) {
             return;
         }
-        if(!this.isFinalRound()) {
+        if (!this.isFinalRound()) {
             return;
         }
-        if(!this.isAllFloorInArea(this.position(), this.size)) {
+        if (!this.isAllFloorInArea(this.position(), this.size)) {
             return;
         }
-        if(!this.canPlaceAt(this.position())) {
+        if (!this.canPlaceAt(this.position())) {
+            return;
+        }
+        // 出現するタイミングは、プレイヤーと少し離れた時にするため
+        if (Util.calculateRoomDistanceManhattan(this.roomId, this.getPlayerRoomId()) < 2) {
             return;
         }
         this.state = BossState.APPEARANCE;
@@ -162,7 +171,7 @@ export class Boss implements IFieldActor {
     }
 
     // 敵と衝突せず、かつそのポジションに壁や移動不可のものがないことを確認する
-    private canPlaceAt(position : Util.Position) {
+    private canPlaceAt(position: Util.Position) {
         // 他の敵との衝突回避
         for (const enemy of this.getEnemyList()) {
             if (Util.checkCollision(position, this.size, enemy.position(), enemy.getSize())) {

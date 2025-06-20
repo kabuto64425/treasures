@@ -66,7 +66,7 @@ function initGame(params: any) {
         scale: {
             mode: Phaser.Scale.FIT, // parent: "phaser"なので、idがphaser要素のwidth,heightの大きさに応じてゲーム画面が拡大・縮小される
             parent: "phaser",
-            //autoCenter: Phaser.Scale.CENTER_BOTH,
+            autoCenter: Phaser.Scale.CENTER_BOTH,
             width: Game.D_WIDTH,// ゲーム画面の横幅
             height: Game.D_HEIGHT// ゲーム画面の高さ
         },

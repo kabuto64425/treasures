@@ -50,7 +50,7 @@ export class EnemiesSupervision {
         this.bossList = Array.from({ length: GameConstants.numberOfBosses }, (_, i) => {
             return this.createBoss(
                 i, onPlayerCaptured,
-                footprint, isShortestDirection, isFinalRound, this.getEnemyList,
+                footprint, isShortestDirection, getPlayerRoomId, isFinalRound, this.getEnemyList,
                 this.getApperanceBossList, isAllFloorInArea
             );
         });
@@ -87,13 +87,13 @@ export class EnemiesSupervision {
         index: number, onPlayerCaptured: () => void,
         footprint: Footprint,
         isShortestDirection: (from: Util.Position, to: Util.Position, size: number, direction: DIRECTION) => boolean,
-        isFinalRound: () => boolean, getEnemyList: () => Enemy[],
+        getPlayerRoomId: () => number, isFinalRound: () => boolean, getEnemyList: () => Enemy[],
         getBossList: () => Boss[], isAllFloorInArea: (position: Util.Position, size: number) => boolean
     ) {
         return new Boss(
             GameConstants.parametersOfBosses[index].row, GameConstants.parametersOfBosses[index].column,
             onPlayerCaptured, footprint.caluculatePointSymmetricPositions, isShortestDirection,
-            isFinalRound, getEnemyList, getBossList, isAllFloorInArea
+            getPlayerRoomId, isFinalRound, getEnemyList, getBossList, isAllFloorInArea
         );
     }
 
@@ -154,7 +154,7 @@ export class EnemiesSupervision {
     }
 
     readonly getApperanceBossList = () => {
-        return this.bossList.filter(b => {return b.isAppearance()});
+        return this.bossList.filter(b => { return b.isAppearance() });
     }
 
     handlePause() {
