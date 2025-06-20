@@ -134,7 +134,7 @@ export class GameSceneGeneralSupervision {
         for (const enemy of this.enemiesSupervision.getEnemyList()) {
             this.player.handleCollisionWith(enemy);
         }
-        for(const boss of this.enemiesSupervision.getBossList()) {
+        for(const boss of this.enemiesSupervision.getApperanceBossList()) {
             this.player.handleCollisionWith(boss);
         }
 
@@ -172,7 +172,7 @@ export class GameSceneGeneralSupervision {
         for (const enemy of this.enemiesSupervision.getEnemyList()) {
             this.player.handleCollisionWith(enemy);
         }
-        for(const boss of this.enemiesSupervision.getBossList()) {
+        for(const boss of this.enemiesSupervision.getApperanceBossList()) {
             this.player.handleCollisionWith(boss);
         }
 

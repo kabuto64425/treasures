@@ -37,7 +37,7 @@ export class Enemy implements IFieldActor {
     private readonly isFinalRound: () => boolean;
     private readonly onPlayerSpotted: (spottedRoomId: number) => void;
     private readonly getEnemyList: () => Enemy[];
-    private readonly getBossList: () => Boss[];
+    private readonly getApperanceBossList: () => Boss[];
     private readonly isAllFloorInArea: (position: Util.Position, size: number) => boolean;
 
     constructor(iniRow: number,
@@ -46,7 +46,7 @@ export class Enemy implements IFieldActor {
         getFirstFootprint: () => Util.Position, stepOnFirstFootprint: () => void,
         isShortestDirection: (from: Util.Position, to: Util.Position, size: number, direction: DIRECTION) => boolean,
         getPlayerRoomId: () => number, isFinalRound: () => boolean, onPlayerSpotted: (spottedRoomId: number) => void,
-        getEnemyList: () => Enemy[], getBossList: () => Boss[], isAllFloorInArea: (position: Util.Position, size: number) => boolean
+        getEnemyList: () => Enemy[], getApperanceBossList: () => Boss[], isAllFloorInArea: (position: Util.Position, size: number) => boolean
     ) {
         this.image = SceneContext.make.image({ key: "enemy" }, false);
         this.image.setDepth(10);
@@ -69,7 +69,7 @@ export class Enemy implements IFieldActor {
         this.isFinalRound = isFinalRound;
         this.onPlayerSpotted = onPlayerSpotted;
         this.getEnemyList = getEnemyList;
-        this.getBossList = getBossList;
+        this.getApperanceBossList = getApperanceBossList;
         this.isAllFloorInArea = isAllFloorInArea;
     }
 
@@ -163,7 +163,7 @@ export class Enemy implements IFieldActor {
                 }
             }
         }
-        for (const boss of this.getBossList()) {
+        for (const boss of this.getApperanceBossList()) {
             if (Util.checkCollision(nextPosition, this.size, boss.position(), boss.getSize())) {
                 return false;
             }

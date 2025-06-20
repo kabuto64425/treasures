@@ -50,8 +50,8 @@ export class EnemiesSupervision {
         this.bossList = Array.from({ length: GameConstants.numberOfBosses }, (_, i) => {
             return this.createBoss(
                 i, onPlayerCaptured,
-                footprint, isShortestDirection, this.getEnemyList,
-                this.getBossList, isAllFloorInArea
+                footprint, isShortestDirection, isFinalRound, this.getEnemyList,
+                this.getApperanceBossList, isAllFloorInArea
             );
         });
         this.framesSinceRoomCheckOrderUpdate = 0;
@@ -79,7 +79,7 @@ export class EnemiesSupervision {
             params, GameConstants.parametersOfEnemies[index].priorityScanDirections, strategy,
             onPlayerCaptured, footprint.getFirstPrint, footprint.onSteppedOnByEnemy,
             isShortestDirection, getPlayerRoomId, isFinalRound, this.onPlayerSpotted, this.getEnemyList,
-            this.getBossList, isAllFloorInArea
+            this.getApperanceBossList, isAllFloorInArea
         );
     }
 
@@ -87,12 +87,13 @@ export class EnemiesSupervision {
         index: number, onPlayerCaptured: () => void,
         footprint: Footprint,
         isShortestDirection: (from: Util.Position, to: Util.Position, size: number, direction: DIRECTION) => boolean,
-        getEnemyList: () => Enemy[], getBossList: () => Boss[], isAllFloorInArea: (position: Util.Position, size: number) => boolean
+        isFinalRound: () => boolean, getEnemyList: () => Enemy[],
+        getBossList: () => Boss[], isAllFloorInArea: (position: Util.Position, size: number) => boolean
     ) {
         return new Boss(
             GameConstants.parametersOfBosses[index].row, GameConstants.parametersOfBosses[index].column,
             onPlayerCaptured, footprint.caluculatePointSymmetricPositions, isShortestDirection,
-            getEnemyList, getBossList, isAllFloorInArea
+            isFinalRound, getEnemyList, getBossList, isAllFloorInArea
         );
     }
 
@@ -152,8 +153,8 @@ export class EnemiesSupervision {
         return this.enemyList;
     }
 
-    readonly getBossList = () => {
-        return this.bossList;
+    readonly getApperanceBossList = () => {
+        return this.bossList.filter(b => {return b.isAppearance()});
     }
 
     handlePause() {

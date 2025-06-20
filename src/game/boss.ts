@@ -7,8 +7,19 @@ import { DIRECTION } from "./drection";
 import { Enemy } from "./enemy";
 import { Position } from "./utils";
 
+enum BossState {
+    NON_APPEARANCE = 0,
+    APPEARANCE = 1
+};
+
 export class Boss implements IFieldActor {
     private readonly image: Phaser.GameObjects.Image;
+    private state: BossState;
+    behaviorMap = {
+        [BossState.NON_APPEARANCE]: new NonAppearanceBehavior(),
+        [BossState.APPEARANCE]: new AppearanceBehavior()
+    };
+
     private row: number;
     private column: number;
     private chargeAmount: number;
@@ -18,25 +29,28 @@ export class Boss implements IFieldActor {
     private readonly onPlayerCaptured: () => void;
     private readonly caluculatePointSymmetricPositions: () => Position[];
     private readonly isShortestDirection: (from: Util.Position, to: Util.Position, size: number, direction: DIRECTION) => boolean;
+    private readonly isFinalRound: () => boolean;
     private readonly getEnemyList: () => Enemy[];
-    private readonly getBossList: () => Boss[];
+    private readonly getApperanceBossList: () => Boss[];
     private readonly isAllFloorInArea: (position: Util.Position, size: number) => boolean;
 
     constructor(iniRow: number, iniColumn: number,
         onPlayerCaptured: () => void,
         caluculatePointSymmetricPositions: () => Position[],
-        isShortestDirection: (from: Util.Position, to: Util.Position, size: number, direction: DIRECTION) => boolean,
-        getEnemyList: () => Enemy[], getBossList: () => Boss[], isAllFloorInArea: (position: Util.Position, size: number) => boolean
+        isShortestDirection: (from: Util.Position, to: Util.Position, size: number, direction: DIRECTION) => boolean, isFinalRound: () => boolean,
+        getEnemyList: () => Enemy[], getApperanceBossList: () => Boss[], isAllFloorInArea: (position: Util.Position, size: number) => boolean
     ) {
         this.image = SceneContext.make.image({ key: "enemy" }, false);
         this.image.setDepth(10);
+        this.state = BossState.NON_APPEARANCE;
         this.row = iniRow;
         this.column = iniColumn;
         this.onPlayerCaptured = onPlayerCaptured;
         this.caluculatePointSymmetricPositions = caluculatePointSymmetricPositions;
         this.isShortestDirection = isShortestDirection;
+        this.isFinalRound = isFinalRound;
         this.getEnemyList = getEnemyList;
-        this.getBossList = getBossList;
+        this.getApperanceBossList = getApperanceBossList;
         this.isAllFloorInArea = isAllFloorInArea;
         this.size = 3;
         this.cost = 12;
@@ -62,10 +76,42 @@ export class Boss implements IFieldActor {
         // 1ピクセル左にずらすとうまく収まるから。不都合があればまた調整
         this.image.setDisplayOrigin(1 / this.size, 0);
         this.image.setScale(this.size);
+        this.hide();
         this.draw();
     }
 
     resolveBossFrame() {
+        this.updateState();
+
+        const behavior = this.behaviorMap[this.state];
+        behavior.resolveFrame(this);
+    }
+
+    private updateState() {
+        if(this.isAppearance()) {
+            return;
+        }
+        if(!this.isFinalRound()) {
+            return;
+        }
+        if(!this.isAllFloorInArea(this.position(), this.size)) {
+            return;
+        }
+        if(!this.canPlaceAt(this.position())) {
+            return;
+        }
+        this.state = BossState.APPEARANCE;
+    }
+
+    resolveFrameNonAppearance() {
+        this.hide();
+
+        this.draw();
+    }
+
+    resolveFrameAppearance() {
+        this.show();
+
         if (this.isChargeCompleted()) {
             let firstDirection = undefined;
 
@@ -73,15 +119,15 @@ export class Boss implements IFieldActor {
             // 最後の足跡から順に目的候補を算出し、目的地候補に行けると分かったらその地点を目的地とする
             // プレイヤーの地点を中心に、ある足跡と点対象となる地点を目的地候補とする
             for (const position of this.caluculatePointSymmetricPositions()) {
-                if(position.row < 0 || position.row >= GameConstants.H) {
+                if (position.row < 0 || position.row >= GameConstants.H) {
                     continue;
                 }
-                if(position.column < 0 || position.column >= GameConstants.W) {
+                if (position.column < 0 || position.column >= GameConstants.W) {
                     continue;
                 }
 
                 firstDirection = this.decideMoveDirection(position);
-                if(firstDirection !== undefined) {
+                if (firstDirection !== undefined) {
                     break;
                 }
             }
@@ -112,19 +158,25 @@ export class Boss implements IFieldActor {
             return false;
         }
         // 他の敵との衝突回避
+        return this.canPlaceAt(nextPosition);
+    }
+
+    // 敵と衝突せず、かつそのポジションに壁や移動不可のものがないことを確認する
+    private canPlaceAt(position : Util.Position) {
+        // 他の敵との衝突回避
         for (const enemy of this.getEnemyList()) {
-            if (Util.checkCollision(nextPosition, this.size, enemy.position(), enemy.getSize())) {
+            if (Util.checkCollision(position, this.size, enemy.position(), enemy.getSize())) {
                 return false;
             }
         }
-        for (const boss of this.getBossList()) {
+        for (const boss of this.getApperanceBossList()) {
             if (this !== boss) {
-                if (Util.checkCollision(nextPosition, this.size, boss.position(), boss.getSize())) {
+                if (Util.checkCollision(position, this.size, boss.position(), boss.getSize())) {
                     return false;
                 }
             }
         }
-        if (!this.isAllFloorInArea({ row: nextPosition.row, column: nextPosition.column }, this.size)) {
+        if (!this.isAllFloorInArea(position, this.size)) {
             return false;
         }
         return true;
@@ -171,5 +223,25 @@ export class Boss implements IFieldActor {
             }
         }
         return undefined;
+    }
+
+    readonly isAppearance = () => {
+        return this.state === BossState.APPEARANCE;
+    }
+}
+
+interface BossBehavior {
+    resolveFrame(boss: Boss): void;
+}
+
+class NonAppearanceBehavior implements BossBehavior {
+    resolveFrame(boss: Boss) {
+        boss.resolveFrameNonAppearance();
+    }
+}
+
+class AppearanceBehavior implements BossBehavior {
+    resolveFrame(boss: Boss) {
+        boss.resolveFrameAppearance();
     }
 }
