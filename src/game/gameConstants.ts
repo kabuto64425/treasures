@@ -30,6 +30,8 @@ export const numberOfTreasuresPerRound = 5;
 
 export const numberOfTreasuresRounds = 6;
 
+export const TREASURE_ROOM_ID_LIST = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 0, 1, 2, 3, 4, 5, 6, 7];
+
 export const parametersOfEnemies = [
     { row: 24, column: 34, priorityScanDirections: [DIRECTION.RIGHT, DIRECTION.DOWN, DIRECTION.LEFT, DIRECTION.UP] },
     { row: 28, column: 34, priorityScanDirections: [DIRECTION.DOWN, DIRECTION.LEFT, DIRECTION.UP, DIRECTION.RIGHT] },

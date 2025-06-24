@@ -25,6 +25,12 @@ export class FieldEvaluation {
     }
 
     setup(isVisible: boolean) {
+        for(let i = 0; i < GameConstants.H; i++) {
+            for(let j = 0; j < GameConstants.W; j++) {
+                this.createMapKeyFromPosition({row: i, column: j}, 1);
+                this.createMapKeyFromPosition({row: i, column: j}, 3);
+            }
+        }
         this.graphics.depth = 99;
         this.graphics.setVisible(isVisible);
         this.graphics.setActive(isVisible);

@@ -5,10 +5,12 @@ import * as Util from "./utils";
 
 export class TreasuresRoundSupervision implements ISingleRoundSupervision {
 
+    private readonly roundIndex: number;
     private readonly treasureList: Treasure[];
     private readonly isFloor: (position: Util.Position) => boolean;
 
-    constructor(isFloor: (position: Util.Position) => boolean) {
+    constructor(roundIndex: number, isFloor: (position: Util.Position) => boolean) {
+        this.roundIndex = roundIndex;
         this.isFloor = isFloor;
         this.treasureList = Array.from({ length: GameConstants.numberOfTreasuresPerRound }, _ => {
             return new Treasure(false);
@@ -20,7 +22,6 @@ export class TreasuresRoundSupervision implements ISingleRoundSupervision {
     }
 
     private setupTreasures() {
-        GameConstants.FINAL_ROUND_BLOCK_POSITIONS;
         const excludedPositions = [...GameConstants.FINAL_ROUND_BLOCK_POSITIONS];
 
         const isExcludedPosition = (treasurePos: Util.Position) => {
@@ -29,11 +30,25 @@ export class TreasuresRoundSupervision implements ISingleRoundSupervision {
             });
         };
 
-        for (const treasure of this.treasureList) {
-            let treasurePos = { row: Math.floor(Math.random() * GameConstants.H), column: Math.floor(Math.random() * GameConstants.W) };
+        for (const [index, treasure] of this.treasureList.entries()) {
+            const treasureRoomIdIndex = this.roundIndex * GameConstants.numberOfTreasuresPerRound + index;
+            const treasureRoomId = GameConstants.TREASURE_ROOM_ID_LIST[treasureRoomIdIndex];
+            const roomRowColumn = Util.calculateRoomRowColumn(treasureRoomId);
+            
+            const rowBorders = [0, ...GameConstants.ROOM_ROW_BORDERS, GameConstants.H - 1];
+            const columnBorders = [0, ...GameConstants.ROOM_COLUMN_BORDERS, GameConstants.W - 1];
+
+            const rowFrom = rowBorders[roomRowColumn.roomRow];
+            const rowTo = rowBorders[roomRowColumn.roomRow + 1];
+
+            const columFrom = columnBorders[roomRowColumn.roomColumn];
+            const columTo = columnBorders[roomRowColumn.roomColumn + 1];
+
+
+            let treasurePos = { row:  Phaser.Math.Between(rowFrom, rowTo), column: Phaser.Math.Between(columFrom, columTo) };
             // 床に宝を配置しないようにする
             while (!this.isFloor(treasurePos) || isExcludedPosition(treasurePos)) {
-                treasurePos = { row: Math.floor(Math.random() * GameConstants.H), column: Math.floor(Math.random() * GameConstants.W) };
+                treasurePos = { row:  Phaser.Math.Between(rowFrom, rowTo), column: Phaser.Math.Between(columFrom, columTo) };
             }
             excludedPositions.push(treasurePos);
             treasure.setup(treasurePos);

@@ -18,7 +18,7 @@ export class RoundsSupervision {
         // +1でファイナルラウンドに対応しているのは暫定
         const totalRounds = GameConstants.numberOfTreasuresRounds + 1;
         this.singleRoundSupervisionList = Array.from({ length: totalRounds }, (_, i) =>
-            (i === totalRounds - 1) ? new FinalRoundSupervision(onFinalRoundForFieldSupervision) : new TreasuresRoundSupervision(isFloor)
+            (i === totalRounds - 1) ? new FinalRoundSupervision(onFinalRoundForFieldSupervision) : new TreasuresRoundSupervision(i, isFloor)
         );
     }
 
