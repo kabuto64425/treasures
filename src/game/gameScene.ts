@@ -7,7 +7,7 @@ import { SceneContext } from "./sceneContext";
 import { WrapArrowFactory } from "./wrapArrowFactory";
 import { GameSceneContainerContext } from "./gameSceneContainerContext";
 import { VirtualStickInput } from "./virtualStickInput";
-import { DebugView } from "./debugView";
+//import { DebugView } from "./debugView";
 import { Logger } from "./logger";
 
 export class GameScene extends Phaser.Scene {
@@ -36,12 +36,12 @@ export class GameScene extends Phaser.Scene {
         //https://cdn.phaserfiles.com/v385/assets/atlas/bitmap-fonts-debug.png
         //https://cdn.phaserfiles.com/v385/assets/atlas/bitmap-fonts.json
         //https://cdn.phaserfiles.com/v385/assets/fonts/bitmap/azo-fire.xml
-        this.load.atlas("fontatlas", "/treasures/bitmap-fonts-debug.png", "/treasures/bitmap-fonts.json");
-        this.load.xml("azoXML", "/treasures/azo-fire.xml");
+        //this.load.atlas("fontatlas", "/treasures/bitmap-fonts-debug.png", "/treasures/bitmap-fonts.json");
+        //this.load.xml("azoXML", "/treasures/azo-fire.xml");
 
         //https://cdn.phaserfiles.com/v385/assets/ui/nine-slice.png
         //https://cdn.phaserfiles.com/v385/assets/ui/nine-slice.json
-        this.load.atlas('ui', 'nine-slice.png', 'nine-slice.json');
+        //this.load.atlas('ui', 'nine-slice.png', 'nine-slice.json');
 
         //https://icon-rainbow.com/
         this.load.image("play", "/treasures/play.png");
@@ -57,7 +57,7 @@ export class GameScene extends Phaser.Scene {
         });
 
         // https://dot-illust.net/category/character/page/8/
-        this.load.image('renga_gray', '/treasures/block_renga_gray.svg');
+        //this.load.image('renga_gray', '/treasures/block_renga_gray.svg');
         this.load.image('goal', '/treasures/goal.png');
         this.load.image("batsu", "/treasures/batsu.png");
 
@@ -72,7 +72,7 @@ export class GameScene extends Phaser.Scene {
     }
 
     create() {
-        Phaser.GameObjects.BitmapText.ParseFromAtlas(this, "font", "fontatlas", "azo-fire", "azoXML");
+        //Phaser.GameObjects.BitmapText.ParseFromAtlas(this, "font", "fontatlas", "azo-fire", "azoXML");
 
         DebugDataMediator.setDebugData(this.debugData);
         SceneContext.setup(this);
