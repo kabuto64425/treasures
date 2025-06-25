@@ -6,6 +6,9 @@ export default defineConfig({
         sourcemap: true,
         assetsInlineLimit: 0,
     },
+    server: {
+        hmr: false,
+    },
 
     base: "/treasures/",
 

@@ -27,21 +27,20 @@ export class BestRecord {
         }
     }
 
-    getNumberOfCollectedTreasures() {
-        return this.numberOfCollectedTreasures;
+    getBestRecord = () => {
+        return {
+            numberOfCollectedTreasures: this.numberOfCollectedTreasures,
+            elapsedFrame: this.elapsedFrame
+        }
     }
 
-    getElapsedFrame() {
-        return this.elapsedFrame;
-    }
-
-    readonly createBestRecordStr = () => {
+    /*readonly createBestRecordStr = () => {
         let completeTimeStr = "--:--.---";
         if (this.elapsedFrame) {
             completeTimeStr = Utils.createFormattedTimeFromFrame(this.elapsedFrame);
         }
         return `${this.numberOfCollectedTreasures}/${Utils.calculateNumberOfTreasuresInALLRounds()} ${completeTimeStr}`;
-    }
+    }*/
 
     private isNewRecord(isGameComplete: boolean, currentNumberOfCollectedTreasures: number, currentElapedFrame: number) {
         if (isGameComplete) {

@@ -28,7 +28,8 @@ export class Ui {
     private readonly clock: Phaser.Time.Clock;
 
     // コンテナ内でaddしたものの表示順は、depthに関係なく後からaddしたものが前に来るので注意
-    private readonly uiContainer: Phaser.GameObjects.Container;
+    private readonly leftContainer: Phaser.GameObjects.Container;
+    private readonly rightContainer: Phaser.GameObjects.Container;
 
     private readonly readyGoText: Phaser.GameObjects.Text;
 
@@ -50,7 +51,10 @@ export class Ui {
     private readonly restartButton: RestartButton;
     private readonly deleteBestRecordButton: DeleteBestRecordButton;
 
-    private readonly bestRecordText: Phaser.GameObjects.Text;
+    private readonly bestElapsedFrameText: Phaser.GameObjects.Text;
+    private readonly bestNumberOfCollectedTreasuresText: Phaser.GameObjects.Text;
+
+    private readonly newRecordText: Phaser.GameObjects.Text;
 
     private readonly barWidth = 415;
     private readonly barHeight = 20;
@@ -69,7 +73,10 @@ export class Ui {
         numberOfCollectedTreasures: number
     };
 
-    private readonly createBestRecordStr: () => string;
+    private readonly getBestRecord: () => {
+        numberOfCollectedTreasures: number,
+        elapsedFrame: number | undefined
+    };
 
     private readonly requestStartGameFromUi: () => void;
     private readonly requestPauseGameFromUi: () => void;
@@ -81,8 +88,7 @@ export class Ui {
         deleteBestRecord: boolean
     };
 
-    constructor(generalSupervision: GameSceneGeneralSupervision,
-        bestRecord: BestRecord) {
+    constructor(generalSupervision: GameSceneGeneralSupervision, bestRecord: BestRecord) {
         this.clock = SceneContext.time;
 
         this.isStandby = generalSupervision.isStandby;
@@ -96,13 +102,14 @@ export class Ui {
 
         this.queryCurrentRecord = generalSupervision.queryCurrentRecord;
 
-        this.createBestRecordStr = bestRecord.createBestRecordStr;
+        this.getBestRecord = bestRecord.getBestRecord;
 
         this.requestStartGameFromUi = generalSupervision.getInputCoordinator().requestStartGameFromUi;
         this.requestPauseGameFromUi = generalSupervision.getInputCoordinator().requestPauseGameFromUi;
         this.getApprovedActionInfo = generalSupervision.getInputCoordinator().getApprovedActionInfo;
 
-        this.uiContainer = GameSceneContainerContext.uiContainer;
+        this.leftContainer = GameSceneContainerContext.leftContainer;
+        this.rightContainer = GameSceneContainerContext.rightContainer;
 
         this.play = SceneContext.make.image({ x: 405, y: 277, key: "play" }, false);
         this.play.setScale(0.5859375);
@@ -149,30 +156,39 @@ export class Ui {
         this.pause = SceneContext.make.image({ x: 30, y: 390, key: "pause" }, false);
         this.pause.setOrigin(0, 0);
         this.pause.setScale(0.449);
-        this.uiContainer.add(this.pause);
+        this.rightContainer.add(this.pause);
 
         this.restartButton = new RestartButton(generalSupervision, { x: 30, y: 210 });
 
         this.deleteBestRecordButton = new DeleteBestRecordButton(bestRecord, generalSupervision, { x: 30, y: 570 });
 
-        this.timeText = SceneContext.make.text({ x: 5, y: 10, text: "0:00.000", style: textStyle }, false);
-        this.uiContainer.add(this.timeText);
+        this.timeText = SceneContext.make.text({ x: 5, y: 40, text: "0:00.000", style: textStyle }, false);
+        this.rightContainer.add(this.timeText);
 
-        this.collectedTreasuresText = SceneContext.make.text({ x: 5, y: 40, text: `0/${Util.calculateNumberOfTreasuresInALLRounds()}`, style: textStyle }, false);
-        this.uiContainer.add(this.collectedTreasuresText);
+        this.collectedTreasuresText = SceneContext.make.text({ x: 5, y: 70, text: `0/${Util.calculateNumberOfTreasuresInALLRounds()}`, style: textStyle }, false);
+        this.rightContainer.add(this.collectedTreasuresText);
 
-        this.gameOverText = SceneContext.make.text({ x: 5, y: 70, text: "GAME OVER!", style: textStyle }, false);
+        this.gameOverText = SceneContext.make.text({ x: 5, y: 100, text: "GAME OVER!", style: textStyle }, false);
         this.gameOverText.setVisible(false);
-        this.uiContainer.add(this.gameOverText);
+        this.rightContainer.add(this.gameOverText);
 
-        this.congratulationsText = SceneContext.make.text({ x: 5, y: 70, text: "CONGRATULATIONS!", style: textStyle }, false);
+        this.congratulationsText = SceneContext.make.text({ x: 5, y: 100, text: "CONGRATULATIONS!", style: textStyle }, false);
         this.congratulationsText.setVisible(false);
-        this.uiContainer.add(this.congratulationsText);
+        this.rightContainer.add(this.congratulationsText);
 
-        const bestText = SceneContext.make.text({ x: 5, y: 100, text: "BEST", style: textStyle }, false);
-        this.uiContainer.add(bestText);
-        this.bestRecordText = SceneContext.make.text({ x: 5, y: 130, text: this.createBestRecordStr(), style: textStyle }, false);
-        this.uiContainer.add(this.bestRecordText);
+        const bestText = SceneContext.make.text({ x: 5, y: 10, text: "BEST", style: textStyle }, false);
+        this.leftContainer.add(bestText);
+
+        const bestRecordStrObj = this.createBestRecordStrObj();
+        this.bestElapsedFrameText = SceneContext.make.text({ x: 5, y: 40, text: bestRecordStrObj.completeTime, style: textStyle }, false);
+        this.leftContainer.add(this.bestElapsedFrameText);
+
+        this.bestNumberOfCollectedTreasuresText = SceneContext.make.text({ x: 5, y: 70, text: bestRecordStrObj.numberOfCollectedTreasures, style: textStyle }, false);
+        this.leftContainer.add(this.bestNumberOfCollectedTreasuresText);
+
+        this.newRecordText = SceneContext.make.text({ x: 5, y: 100, text: "New Record!", style: textStyle }, false);
+        this.newRecordText.setVisible(false);
+        this.leftContainer.add(this.newRecordText);
     }
 
     setupPlayButton() {
@@ -216,11 +232,11 @@ export class Ui {
     }
 
     setupRetryLongButton() {
-        this.restartButton.setup(this.uiContainer);
+        this.restartButton.setup(this.rightContainer);
     }
 
     setupDeleteBestRecordButton() {
-        this.deleteBestRecordButton.setup(this.uiContainer);
+        this.deleteBestRecordButton.setup(this.rightContainer);
     }
 
     handleApprovedAction() {
@@ -269,7 +285,27 @@ export class Ui {
     }
 
     updateBestRecordText() {
-        this.bestRecordText.setText(this.createBestRecordStr());
+        const bestRecordStrObj = this.createBestRecordStrObj();
+        this.bestElapsedFrameText.setText(bestRecordStrObj.completeTime);
+
+        this.bestNumberOfCollectedTreasuresText.setText(bestRecordStrObj.numberOfCollectedTreasures);
+
+        this.newRecordText.setVisible(true);
+    }
+
+    private createBestRecordStrObj() {
+        let bestCompleteTimeStr = "--:--.---";
+        const bestElapsedFrame = this.getBestRecord().elapsedFrame;
+        if (bestElapsedFrame !== undefined) {
+            bestCompleteTimeStr = Util.createFormattedTimeFromFrame(bestElapsedFrame);
+        }
+
+        const bestNumberOfCollectedTreasuresStr = `${this.getBestRecord().numberOfCollectedTreasures}/${Util.calculateNumberOfTreasuresInALLRounds()}`
+
+        return {
+            completeTime: bestCompleteTimeStr,
+            numberOfCollectedTreasures: bestNumberOfCollectedTreasuresStr
+        } as const;
     }
 
     showGameOverText() {
