@@ -1,5 +1,3 @@
-import * as Utils from "./utils"
-
 export class BestRecord {
     private numberOfCollectedTreasures: number;
     private elapsedFrame: number | undefined;
@@ -33,14 +31,6 @@ export class BestRecord {
             elapsedFrame: this.elapsedFrame
         }
     }
-
-    /*readonly createBestRecordStr = () => {
-        let completeTimeStr = "--:--.---";
-        if (this.elapsedFrame) {
-            completeTimeStr = Utils.createFormattedTimeFromFrame(this.elapsedFrame);
-        }
-        return `${this.numberOfCollectedTreasures}/${Utils.calculateNumberOfTreasuresInALLRounds()} ${completeTimeStr}`;
-    }*/
 
     private isNewRecord(isGameComplete: boolean, currentNumberOfCollectedTreasures: number, currentElapedFrame: number) {
         if (isGameComplete) {
