@@ -79,7 +79,7 @@ export class GameScene extends Phaser.Scene {
         // GameSceneContainerContext, WrapArrowFactoryは
         // 必ずSceneContext.setup(this)よりも後にセットアップすること
         GameSceneContainerContext.setup();
-        VirtualStickInput.setup(this);
+        VirtualStickInput.setup(this, GameSceneContainerContext.leftContainer);
         WrapArrowFactory.setup();
 
         this.gameSceneGeneralSupervision = new GameSceneGeneralSupervision(this);

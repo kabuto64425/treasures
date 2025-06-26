@@ -10,15 +10,21 @@ export class VirtualStickInput {
 
     // VirtualJoyStick は Scene に強く結びついているため、
     // SceneContext を通さず直接 scene を渡すのが正しい設計判断らしい。 by chatgpt
-    static setup(scene: Phaser.Scene) {
+    static setup(scene: Phaser.Scene, container?: Phaser.GameObjects.Container) {
         // 最大半径は89
         // できればbaseを最大半径の○に×の十字キーっぽい見た目にしたい
+        const base = scene.add.circle(0, 0, 89, 0x888888);
+        const thumb =  scene.add.circle(0, 0, 80, 0xcccccc);
+        if(container !== undefined) {
+            container.add(base);
+            container.add(thumb);
+        }
         const joystick = (scene.plugins.get('rexVirtualJoyStick') as VirtualJoyStickPlugin).add(scene, {
             x: 89,
             y: 400,
             radius: 89,
-            base: scene.add.circle(0, 0, 89, 0x888888),
-            thumb: scene.add.circle(0, 0, 80, 0xcccccc),
+            base: base,
+            thumb: thumb,
             // 方向の制限（水平・垂直）も可能
             dir: '4dir',
             forceMin: 0,
