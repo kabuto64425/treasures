@@ -11,6 +11,7 @@ import { SceneContext } from "./sceneContext";
 import { GameSceneOverlay } from "./gameSceneOverlay";
 import { FieldSupervision } from "./fieldSupervision";
 import { Logger } from "./logger";
+import { GameSceneSoundContext } from "./gameSceneSoundContext";
 
 export class GameSceneGeneralSupervision {
     private readonly params: any;
@@ -212,8 +213,9 @@ export class GameSceneGeneralSupervision {
             GameSceneOverlay.onPlayerCaptured();
             this.ui.showGameOverText();
             this.gameState = GameSceneGeneralSupervision.GAME_STATE.GAME_OVER;
-            this.updateBestRecord(this.isGameComplete(), this.recorder.getNumberOfCollectedTreasures(), this.recorder.getElapsedFrame());
-            this.ui.updateBestRecordText();
+            const isNewRecord = this.updateBestRecord(this.isGameComplete(), this.recorder.getNumberOfCollectedTreasures(), this.recorder.getElapsedFrame());
+            this.ui.updateBestRecordText(isNewRecord);
+            GameSceneSoundContext.playLose();
         }
     }
 
@@ -221,8 +223,9 @@ export class GameSceneGeneralSupervision {
         this.ui.showCongratulationsText();
 
         this.gameState = GameSceneGeneralSupervision.GAME_STATE.GAME_COMPLETE;
-        this.updateBestRecord(this.isGameComplete(), this.recorder.getNumberOfCollectedTreasures(), this.recorder.getElapsedFrame());
-        this.ui.updateBestRecordText();
+        const isNewRecord = this.updateBestRecord(this.isGameComplete(), this.recorder.getNumberOfCollectedTreasures(), this.recorder.getElapsedFrame());
+        this.ui.updateBestRecordText(isNewRecord);
+        GameSceneSoundContext.playWin();
     }
 
     readonly restartGame = () => {

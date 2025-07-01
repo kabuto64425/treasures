@@ -1,6 +1,7 @@
 import { ISingleRoundSupervision } from "./iSingleRoundSupervision";
 import { Treasure } from "./treasure";
 import * as GameConstants from "./gameConstants";
+import { GameSceneSoundContext } from "./gameSceneSoundContext";
 
 export class FinalRoundSupervision implements ISingleRoundSupervision {
     private readonly goal: Treasure;
@@ -25,6 +26,7 @@ export class FinalRoundSupervision implements ISingleRoundSupervision {
         // ファイナルラウンドをフィールドに通知
         // ループ道を塞ぐため
         this.onFinalRoundForFieldSupervision();
+        GameSceneSoundContext.playFinalRound();
     }
 
     isRoundCompleted(): boolean {

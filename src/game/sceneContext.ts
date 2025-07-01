@@ -9,7 +9,8 @@ export class SceneContext {
         time: Phaser.Time.Clock,
         anims: Phaser.Animations.AnimationManager,
         textures: Phaser.Textures.TextureManager,
-        pluginManager: Phaser.Plugins.PluginManager
+        pluginManager: Phaser.Plugins.PluginManager,
+        sound: Phaser.Sound.NoAudioSoundManager | Phaser.Sound.HTML5AudioSoundManager | Phaser.Sound.WebAudioSoundManager
     };
 
     static setup(scene: Phaser.Scene) {
@@ -22,29 +23,9 @@ export class SceneContext {
             time: scene.time,
             anims: scene.anims,
             textures: scene.textures,
-            pluginManager: scene.plugins
+            pluginManager: scene.plugins,
+            sound: scene.sound
         } as const;
-
-        scene.events.once('shutdown', () => {
-            SceneContext.cleanup(); // 自動的に解放
-        });
-    }
-
-    static cleanup() {
-        // GameObject の削除
-        //Logger.debug(this.components.children.list.length);
-        /*for(const child of this.components.children.list) {
-            
-        }*/
-
-        // Tween・Timer・Input の解放
-        //this.time.clearPendingEvents();
-        //Logger.debug(this.inputPlugin.listeners.length);
-        //this.inputPlugin.removeAllListeners();
-        //this.anims.removeAll(); // アニメーションも積み上がるなら
-
-        // ScenePlugin のイベントも必要に応じて
-        //this.scenePlugin.events.removeAllListeners();
     }
 
     // これを使用してゲームの物体を生成すると、シーンに自動的に加わる
@@ -79,5 +60,9 @@ export class SceneContext {
 
     static get pluginManager(): Phaser.Plugins.PluginManager {
         return this.components.pluginManager;
+    }
+
+    static get sound():  Phaser.Sound.NoAudioSoundManager | Phaser.Sound.HTML5AudioSoundManager | Phaser.Sound.WebAudioSoundManager {
+        return this.components.sound;
     }
 }

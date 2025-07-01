@@ -1,5 +1,6 @@
 import * as GameConstants from "./gameConstants";
 import { GameSceneContainerContext } from "./gameSceneContainerContext";
+import { GameSceneSoundContext } from "./gameSceneSoundContext";
 import { IFieldActor } from "./iFieldActor";
 import { RecorderMediator } from "./recoder";
 import { SceneContext } from "./sceneContext";
@@ -95,6 +96,7 @@ export class Treasure implements IFieldActor {
         this.clearDisplay();
         if (!this.isGoal) {
             RecorderMediator.notifyTreasureCollected();
+            GameSceneSoundContext.playCollect();
         }
     }
 }

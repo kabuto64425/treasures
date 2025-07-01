@@ -2,6 +2,8 @@ import { ISingleRoundSupervision } from "./iSingleRoundSupervision";
 import { Treasure } from "./treasure";
 import * as GameConstants from "./gameConstants";
 import * as Util from "./utils";
+import { GameSceneSoundContext } from "./gameSceneSoundContext";
+import { Logger } from "./logger";
 
 export class TreasuresRoundSupervision implements ISingleRoundSupervision {
 
@@ -35,15 +37,15 @@ export class TreasuresRoundSupervision implements ISingleRoundSupervision {
             const treasureRoomId = GameConstants.TREASURE_ROOM_ID_LIST[treasureRoomIdIndex];
             const roomRowColumn = Util.calculateRoomRowColumn(treasureRoomId);
             
-            const rowBorders = [0, ...GameConstants.ROOM_ROW_BORDERS, GameConstants.H - 1];
-            const columnBorders = [0, ...GameConstants.ROOM_COLUMN_BORDERS, GameConstants.W - 1];
+            const rowBorders = [0, ...GameConstants.ROOM_ROW_BORDERS, GameConstants.H];
+            const columnBorders = [0, ...GameConstants.ROOM_COLUMN_BORDERS, GameConstants.W];
 
             const rowFrom = rowBorders[roomRowColumn.roomRow];
-            const rowTo = rowBorders[roomRowColumn.roomRow + 1];
+            const rowTo = rowBorders[roomRowColumn.roomRow + 1] - 1;
 
             const columFrom = columnBorders[roomRowColumn.roomColumn];
-            const columTo = columnBorders[roomRowColumn.roomColumn + 1];
-
+            const columTo = columnBorders[roomRowColumn.roomColumn + 1] - 1;
+            Logger.debug([rowFrom, rowTo, columFrom, columTo]);
 
             let treasurePos = { row:  Phaser.Math.Between(rowFrom, rowTo), column: Phaser.Math.Between(columFrom, columTo) };
             // 床に宝を配置しないようにする
@@ -58,6 +60,10 @@ export class TreasuresRoundSupervision implements ISingleRoundSupervision {
     startRound(): void {
         this.setAllTreasuresStateAppearance();
         this.drawAllTreasures();
+        // ファーストラウンド以外は、ラウンドアップの効果音を流すようにしたいから
+        if(this.roundIndex !== 0) {
+            GameSceneSoundContext.playRoundUp();
+        }
     }
 
     isRoundCompleted(): boolean {

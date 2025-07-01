@@ -10,6 +10,7 @@ import { SceneContext } from "./sceneContext";
 import { DeleteBestRecordButton } from "./deleteBestRecordButton";
 import { GameSceneContainerContext } from "./gameSceneContainerContext";
 import { DebugDataMediator } from "./debugData";
+import { GameSceneSoundContext } from "./gameSceneSoundContext";
 
 declare global {
     namespace JSX {
@@ -131,6 +132,7 @@ export class Ui {
                     this.readyGoText.setX(360);
                     this.progressBar.destroy();
                     this.progressBox.destroy();
+                    GameSceneSoundContext.playGo();
 
                     this.clock.delayedCall(GameConstants.READY_DISPLAY_DURATION, () => {
                         this.readyGoText.destroy();
@@ -284,13 +286,13 @@ export class Ui {
         this.collectedTreasuresText.setText(`${numberOfCollectedTreasures}/${Util.calculateNumberOfTreasuresInALLRounds()}`);
     }
 
-    updateBestRecordText() {
+    updateBestRecordText(isNewRecord: boolean) {
         const bestRecordStrObj = this.createBestRecordStrObj();
         this.bestElapsedFrameText.setText(bestRecordStrObj.completeTime);
 
         this.bestNumberOfCollectedTreasuresText.setText(bestRecordStrObj.numberOfCollectedTreasures);
 
-        this.newRecordText.setVisible(true);
+        this.newRecordText.setVisible(isNewRecord);
     }
 
     private createBestRecordStrObj() {

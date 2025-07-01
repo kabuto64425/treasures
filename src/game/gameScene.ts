@@ -9,6 +9,7 @@ import { GameSceneContainerContext } from "./gameSceneContainerContext";
 import { VirtualStickInput } from "./virtualStickInput";
 //import { DebugView } from "./debugView";
 import { Logger } from "./logger";
+import { GameSceneSoundContext } from "./gameSceneSoundContext";
 
 export class GameScene extends Phaser.Scene {
 
@@ -69,6 +70,15 @@ export class GameScene extends Phaser.Scene {
 
         // フォント(htmlに記述だが、素材URLは1箇所にまとめたいのでここに記載)
         //https://booth.pm/ja/items/2747965
+
+        // サウンド
+        //https://www.springin.org/sound-stock/category/retrogame/
+        this.load.audio('collect', ['sound/collect.mp3']);
+        this.load.audio('finalRound', ['sound/finalRound.mp3']);
+        this.load.audio('go', ['sound/go.mp3']);
+        this.load.audio('lose', ['sound/lose.mp3']);
+        this.load.audio('roundUp', ['sound/roundUp.mp3']);
+        this.load.audio('win', ['sound/win.mp3']);
     }
 
     create() {
@@ -81,6 +91,7 @@ export class GameScene extends Phaser.Scene {
         GameSceneContainerContext.setup();
         VirtualStickInput.setup(this, GameSceneContainerContext.leftContainer);
         WrapArrowFactory.setup();
+        GameSceneSoundContext.setup();
 
         this.gameSceneGeneralSupervision = new GameSceneGeneralSupervision(this);
         this.gameSceneGeneralSupervision.setupSupervision();
@@ -118,11 +129,11 @@ export class GameScene extends Phaser.Scene {
         this.debugData.updateDuration = performance.now() - now;
         this.debugData.fps = this.game.loop.actualFps.toFixed(1);
 
-        if(this.game.loop.actualFps < 50) {
+        if (this.game.loop.actualFps < 50) {
             Logger.debug("fps under 50");
         }
 
-        if(this.debugData.updateDuration > 5) {
+        if (this.debugData.updateDuration > 5) {
             Logger.debug(`over 5ms. ${this.debugData.updateDuration}`);
         }
 
