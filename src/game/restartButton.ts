@@ -73,6 +73,8 @@ export class RestartButton {
             this.clock.addEvent(this.timerEvent);
         });
 
+        this.image.on("pointerover", () => this.image.setTint(0x44ff44));
+
         this.image.on("pointerup", () => {
             this.clock.removeEvent(this.timerEvent);
             this.timerEvent.remove();
@@ -83,7 +85,18 @@ export class RestartButton {
             this.clock.removeEvent(this.timerEvent);
             this.timerEvent.remove();
             this.timerEvent = new Phaser.Time.TimerEvent(this.timerEventConfig);
+            this.image.clearTint();
         });
+
+        this.hide();
+    }
+
+    hide() {
+        this.buttonContainer.setVisible(false);
+    }
+
+    show() {
+        this.buttonContainer.setVisible(true);
     }
 
     handleApprovedAction(approved: boolean) {

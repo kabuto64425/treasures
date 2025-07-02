@@ -137,6 +137,8 @@ export class Ui {
                     this.clock.delayedCall(GameConstants.READY_DISPLAY_DURATION, () => {
                         this.readyGoText.destroy();
                         generalSupervision.startGame();
+                        this.restartButton.show();
+                        this.pause.setVisible(true);
                     });
                 }
             },
@@ -156,9 +158,6 @@ export class Ui {
         this.progressBar = SceneContext.make.graphics({ x: 255, y: 403 }, false);
 
         this.pause = SceneContext.make.image({ x: 30, y: 390, key: "pause" }, false);
-        this.pause.setOrigin(0, 0);
-        this.pause.setScale(0.449);
-        this.rightContainer.add(this.pause);
 
         this.restartButton = new RestartButton(generalSupervision, { x: 30, y: 210 });
 
@@ -206,7 +205,13 @@ export class Ui {
         this.play.on("pointerup", () => {
             this.requestStartGameFromUi();
         });
+    }
 
+    setupPauseButton() {
+        this.pause.setOrigin(0, 0);
+        this.pause.setScale(0.449);
+        this.rightContainer.add(this.pause);
+        this.pause.setVisible(false);
         this.pause.setInteractive();
 
         this.pause.on("pointerover", () => this.pause.setTint(0x44ff44));
@@ -233,7 +238,7 @@ export class Ui {
         fieldContainer.add(this.progressBar);
     }
 
-    setupRetryLongButton() {
+    setupRestartButton() {
         this.restartButton.setup(this.rightContainer);
     }
 

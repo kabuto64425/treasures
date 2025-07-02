@@ -85,8 +85,9 @@ export class GameSceneGeneralSupervision {
         this.fieldSupervision.setup();
 
         this.ui.setupPlayButton();
+        this.ui.setupPauseButton();
         this.ui.setupReadyGoTextWithBar();
-        this.ui.setupRetryLongButton();
+        this.ui.setupRestartButton();
         this.ui.setupDeleteBestRecordButton();
 
         // プレイヤー

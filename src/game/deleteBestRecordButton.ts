@@ -87,6 +87,8 @@ export class DeleteBestRecordButton {
             this.clock.addEvent(this.timerEvent);
         });
 
+        this.image.on("pointerover", () => this.image.setTint(0x44ff44));
+
         this.image.on("pointerup", () => {
             this.timerEvent.remove();
             this.timerEvent = new Phaser.Time.TimerEvent(this.timerEventConfig);
@@ -95,6 +97,7 @@ export class DeleteBestRecordButton {
         this.image.on("pointerout", () => {
             this.timerEvent.remove();
             this.timerEvent = new Phaser.Time.TimerEvent(this.timerEventConfig);
+            this.image.clearTint();
         });
     }
 
