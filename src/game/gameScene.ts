@@ -50,6 +50,7 @@ export class GameScene extends Phaser.Scene {
         // おそらくrestartというキーが使えなさそう。なので、restart_で代用
         this.load.image("restart_", "/treasures/restart.png");
         this.load.image("delete", "/treasures/delete.png");
+        this.load.image("help", "/treasures/help.png");
 
         // https://pipoya.net/sozai/assets/icon/icon-image/
         this.load.spritesheet('emotion', '/treasures/pipo-emotion.png', {

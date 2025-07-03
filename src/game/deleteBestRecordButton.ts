@@ -60,7 +60,7 @@ export class DeleteBestRecordButton {
 
         this.timerEvent = new Phaser.Time.TimerEvent(this.timerEventConfig);
 
-        this.deleteModal = SceneContext.add.dom(277, 290, ConfirmDeleteModal({
+        this.deleteModal = SceneContext.add.dom(415, 290, ConfirmDeleteModal({
             onConfirm: () => {
                 bestRecord.deleteBestRecord();
                 // ゲームリスタートで閉じたと見せかける。
@@ -121,7 +121,7 @@ export class DeleteBestRecordButton {
 
             if (this.repeatCount >= requiredHoldFrames) {
                 // 押し続けてたので削除ウィンドウ表示
-                GameSceneOverlay.onShowDeleteBestRecordModal();
+                GameSceneOverlay.onShowModal();
                 SceneContext.scenePlugin.pause();
                 this.deleteModal.setVisible(true);
             }

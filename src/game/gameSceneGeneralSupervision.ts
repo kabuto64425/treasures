@@ -86,6 +86,7 @@ export class GameSceneGeneralSupervision {
 
         this.ui.setupPlayButton();
         this.ui.setupPauseButton();
+        this.ui.setupHelpButton();
         this.ui.setupReadyGoTextWithBar();
         this.ui.setupRestartButton();
         this.ui.setupDeleteBestRecordButton();

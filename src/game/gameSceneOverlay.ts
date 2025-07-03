@@ -24,7 +24,7 @@ export class GameSceneOverlay {
         this.overlay.setDepth(99);
     }
 
-    static onShowDeleteBestRecordModal() {
+    static onShowModal() {
         this.overlay.clear();
         this.overlay.fillStyle(0xffffff, 0.5).fillRect(0, 0, GameConstants.D_WIDTH, GameConstants.D_WIDTH);
         this.overlay.setDepth(99);

@@ -11,6 +11,8 @@ import { DeleteBestRecordButton } from "./deleteBestRecordButton";
 import { GameSceneContainerContext } from "./gameSceneContainerContext";
 import { DebugDataMediator } from "./debugData";
 import { GameSceneSoundContext } from "./gameSceneSoundContext";
+import HelpModal from "../tsx/helpModal";
+import { GameSceneOverlay } from "./gameSceneOverlay";
 
 declare global {
     namespace JSX {
@@ -49,6 +51,8 @@ export class Ui {
 
     private readonly pause: Phaser.GameObjects.Image;
 
+    private readonly help: Phaser.GameObjects.Image;
+
     private readonly restartButton: RestartButton;
     private readonly deleteBestRecordButton: DeleteBestRecordButton;
 
@@ -56,6 +60,8 @@ export class Ui {
     private readonly bestNumberOfCollectedTreasuresText: Phaser.GameObjects.Text;
 
     private readonly newRecordText: Phaser.GameObjects.Text;
+
+    private readonly helpModal: Phaser.GameObjects.DOMElement;
 
     private readonly barWidth = 415;
     private readonly barHeight = 20;
@@ -159,6 +165,8 @@ export class Ui {
 
         this.pause = SceneContext.make.image({ x: 30, y: 390, key: "pause" }, false);
 
+        this.help = SceneContext.make.image({ x: 30, y: 210, key: "help" }, false);
+
         this.restartButton = new RestartButton(generalSupervision, { x: 30, y: 210 });
 
         this.deleteBestRecordButton = new DeleteBestRecordButton(bestRecord, generalSupervision, { x: 30, y: 570 });
@@ -190,6 +198,15 @@ export class Ui {
         this.newRecordText = SceneContext.make.text({ x: 5, y: 100, text: "New Record!", style: textStyle }, false);
         this.newRecordText.setVisible(false);
         this.leftContainer.add(this.newRecordText);
+
+        this.helpModal = SceneContext.add.dom(415, 290, HelpModal(
+            () => {
+                // ゲームリスタートで閉じたと見せかける。
+                generalSupervision.restartGame();
+            }
+        ));
+        this.helpModal.setOrigin(0, 0);
+        this.helpModal.setVisible(false);
     }
 
     setupPlayButton() {
@@ -219,6 +236,23 @@ export class Ui {
 
         this.pause.on("pointerup", () => {
             this.requestPauseGameFromUi();
+        });
+    }
+
+    setupHelpButton() {
+        this.help.setOrigin(0, 0);
+        this.help.setScale(0.449);
+        this.rightContainer.add(this.help);
+
+        this.help.setInteractive();
+
+        this.help.on("pointerover", () => this.help.setTint(0x44ff44));
+        this.help.on("pointerout", () => this.help.clearTint());
+
+        this.help.on("pointerup", () => {
+            GameSceneOverlay.onShowModal();
+            SceneContext.scenePlugin.pause();
+            this.helpModal.setVisible(true);
         });
     }
 
