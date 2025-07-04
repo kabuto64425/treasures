@@ -5,7 +5,14 @@ function HelpModal(onOk: () => void) {
         <div class="box has-text-centered BestTen-CRT" style="background-color: #ffd6d6;">
             <div class="field">
                 <label class="label">
-                    Are you sure you want to delete your best record?
+                    You are the player.
+                    Use the arrow keys to move.
+                    Treasures will appear in groups of five.
+                    Collect a total of 30 treasures.
+                    Then, head for the goal.
+                    If you reach the goal, you clear the game.
+                    But if you touch an enemy, it's game over.
+                    Try to reach the goal as fast as you can!
                 </label>
             </div>
 
