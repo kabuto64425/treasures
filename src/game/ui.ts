@@ -142,6 +142,7 @@ export class Ui {
 
                     this.clock.delayedCall(GameConstants.READY_DISPLAY_DURATION, () => {
                         this.readyGoText.destroy();
+                        this.help.destroy();
                         generalSupervision.startGame();
                         this.restartButton.show();
                         this.pause.setVisible(true);
@@ -377,5 +378,7 @@ export class Ui {
         this.pause.off("pointerup");
         this.deleteBestRecordButton.clean();
         this.restartButton.clean();
+        this.help.destroy();
+        this.helpModal.destroy();
     }
 }
