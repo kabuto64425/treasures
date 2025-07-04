@@ -142,7 +142,6 @@ export class Ui {
 
                     this.clock.delayedCall(GameConstants.READY_DISPLAY_DURATION, () => {
                         this.readyGoText.destroy();
-                        this.help.destroy();
                         generalSupervision.startGame();
                         this.restartButton.show();
                         this.pause.setVisible(true);
@@ -220,7 +219,7 @@ export class Ui {
         this.play.on("pointerover", () => this.play.setTint(0x44ff44));
         this.play.on("pointerout", () => this.play.clearTint());
 
-        this.play.on("pointerup", () => {
+        this.play.on("pointerdown", () => {
             this.requestStartGameFromUi();
         });
     }
@@ -235,7 +234,7 @@ export class Ui {
         this.pause.on("pointerover", () => this.pause.setTint(0x44ff44));
         this.pause.on("pointerout", () => this.pause.clearTint());
 
-        this.pause.on("pointerup", () => {
+        this.pause.on("pointerdown", () => {
             this.requestPauseGameFromUi();
         });
     }
@@ -250,7 +249,7 @@ export class Ui {
         this.help.on("pointerover", () => this.help.setTint(0x44ff44));
         this.help.on("pointerout", () => this.help.clearTint());
 
-        this.help.on("pointerup", () => {
+        this.help.on("pointerdown", () => {
             GameSceneOverlay.onShowModal();
             SceneContext.scenePlugin.pause();
             this.helpModal.setVisible(true);
@@ -311,8 +310,9 @@ export class Ui {
         this.readyGoText.setVisible(true);
         this.progressBox.setVisible(true);
         this.progressBar.setVisible(true);
-        // ゲームスタートが承認された時点で削除ボタンを押せないようにしたいから
+        // ゲームスタートが承認された時点で削除ボタン・ヘルプボタンを押せないようにしたいから
         this.deleteBestRecordButton.hide();
+        this.help.setVisible(false);
 
         this.clock.addEvent(this.timerEvent);
     }
@@ -372,10 +372,10 @@ export class Ui {
     clean() {
         this.play.off("pointerover");
         this.play.off("pointerout");
-        this.play.off("pointerup");
+        this.play.off("pointerdown");
         this.pause.off("pointerover");
         this.pause.off("pointerout");
-        this.pause.off("pointerup");
+        this.pause.off("pointerdown");
         this.deleteBestRecordButton.clean();
         this.restartButton.clean();
         this.help.destroy();
