@@ -1,4 +1,5 @@
 import VirtualJoyStickPlugin from "phaser3-rex-plugins/plugins/virtualjoystick-plugin";
+import * as Util from "./utils"
 
 export class VirtualStickInput {
     private static cusorKeys: {
@@ -31,6 +32,11 @@ export class VirtualStickInput {
         });
 
         this.cusorKeys = joystick.createCursorKeys();
+
+        if(!Util.isMobileOrTablet()) {
+            base.setVisible(false);
+            thumb.setVisible(false);
+        }
     }
 
     static getCusorKeys() {
