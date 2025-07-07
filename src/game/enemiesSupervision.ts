@@ -49,7 +49,7 @@ export class EnemiesSupervision {
 
         this.bossList = Array.from({ length: GameConstants.numberOfBosses }, (_, i) => {
             return this.createBoss(
-                i, onPlayerCaptured,
+                i, params, onPlayerCaptured,
                 footprint, isShortestDirection, getPlayerRoomId, isFinalRound, this.getEnemyList,
                 this.getApperanceBossList, isAllFloorInArea
             );
@@ -84,14 +84,14 @@ export class EnemiesSupervision {
     }
 
     private createBoss(
-        index: number, onPlayerCaptured: () => void,
+        index: number, params: any, onPlayerCaptured: () => void,
         footprint: Footprint,
         isShortestDirection: (from: Util.Position, to: Util.Position, size: number, direction: DIRECTION) => boolean,
         getPlayerRoomId: () => number, isFinalRound: () => boolean, getEnemyList: () => Enemy[],
         getBossList: () => Boss[], isAllFloorInArea: (position: Util.Position, size: number) => boolean
     ) {
         return new Boss(
-            GameConstants.parametersOfBosses[index].row, GameConstants.parametersOfBosses[index].column,
+            GameConstants.parametersOfBosses[index].row, GameConstants.parametersOfBosses[index].column, params,
             onPlayerCaptured, footprint.caluculatePointSymmetricPositions, isShortestDirection,
             getPlayerRoomId, isFinalRound, getEnemyList, getBossList, isAllFloorInArea
         );

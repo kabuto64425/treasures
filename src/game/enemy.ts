@@ -23,7 +23,10 @@ export class Enemy implements IFieldActor {
     private column: number;
     private roomId: number;
     private readonly moveCostSearching: number;
-    private readonly moveCostChasing: number;
+    private readonly moveCostTableChasing: {
+        treasuresRound : number,
+        finalRound : number,
+    };
 
     private chargeAmount: number;
     private readonly size: number;
@@ -55,7 +58,7 @@ export class Enemy implements IFieldActor {
         this.column = iniColumn;
         this.roomId = Util.findRoomId({ row: this.row, column: this.column });
         this.moveCostSearching = params.enemyMoveCostSearching;
-        this.moveCostChasing = params.enemyMoveCostChasing;
+        this.moveCostTableChasing = params.enemyMoveCostTableChasing;
 
         this.chargeAmount = 0;
         this.size = 1;
@@ -233,7 +236,7 @@ export class Enemy implements IFieldActor {
     }
 
     isChargeCompletedChasing() {
-        return this.isChargeCompleted(this.moveCostChasing);
+        return this.isChargeCompleted(this.isFinalRound()? this.moveCostTableChasing.finalRound : this.moveCostTableChasing.treasuresRound);
     }
 
     private isChargeCompleted(cost: number) {

@@ -4,7 +4,11 @@
     "enableUsingLocalstorage": true,
     "playerMoveCost": 6,
     "enemyMoveCostSearching": 15,
-    "enemyMoveCostChasing": 10,
+    "enemyMoveCostTableChasing": {
+        "treasuresRound" : 10,
+        "finalRound" : 8
+    },
+    "bossMoveCost": 10,
     "visibleFootPrint": true,
     "footPrintLimitFrame": 30,
     "visibleRoomRanges": false,

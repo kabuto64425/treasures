@@ -36,7 +36,7 @@ export class Boss implements IFieldActor {
     private readonly getApperanceBossList: () => Boss[];
     private readonly isAllFloorInArea: (position: Util.Position, size: number) => boolean;
 
-    constructor(iniRow: number, iniColumn: number,
+    constructor(iniRow: number, iniColumn: number, params: any,
         onPlayerCaptured: () => void,
         caluculatePointSymmetricPositions: () => Position[],
         isShortestDirection: (from: Util.Position, to: Util.Position, size: number, direction: DIRECTION) => boolean,
@@ -57,8 +57,8 @@ export class Boss implements IFieldActor {
         this.getEnemyList = getEnemyList;
         this.getApperanceBossList = getApperanceBossList;
         this.isAllFloorInArea = isAllFloorInArea;
-        this.size = 3;
-        this.cost = 12;
+        this.size = GameConstants.BOSS_SIZE;
+        this.cost = params.bossMoveCost;
 
         this.chargeAmount = 0;
     }

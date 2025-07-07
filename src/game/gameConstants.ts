@@ -30,7 +30,7 @@ export const numberOfTreasuresPerRound = 5;
 
 export const numberOfTreasuresRounds = 6;
 
-export const TREASURE_ROOM_ID_LIST = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 0, 1, 2, 3, 4, 5, 6, 7];
+export const TREASURE_ROOM_ID_LIST = [4, 4, 4, 5, 5, 1, 2, 2, 6, 10, 9, 9, 9, 5, 6, 7, 3, 11, 10, 9, 8, 0, 1, 2, 3, 11, 11, 11, 11, 11];
 
 export const parametersOfEnemies = [
     { row: 24, column: 34, priorityScanDirections: [DIRECTION.RIGHT, DIRECTION.DOWN, DIRECTION.LEFT, DIRECTION.UP] },
@@ -38,6 +38,8 @@ export const parametersOfEnemies = [
     { row: 28, column: 38, priorityScanDirections: [DIRECTION.LEFT, DIRECTION.UP, DIRECTION.RIGHT, DIRECTION.DOWN] },
     { row: 24, column: 38, priorityScanDirections: [DIRECTION.UP, DIRECTION.RIGHT, DIRECTION.DOWN, DIRECTION.LEFT] }
 ];
+
+export const BOSS_SIZE = 3;
 
 export const numberOfBosses = 2;
 
