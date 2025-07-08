@@ -20,7 +20,7 @@ export class InputCoordinator {
     private readonly cursorKey: Phaser.Types.Input.Keyboard.CursorKeys;
     private readonly enterKey: Phaser.Input.Keyboard.Key;
     private readonly spaceKey: Phaser.Input.Keyboard.Key;
-    private readonly shiftKey: Phaser.Input.Keyboard.Key;
+    private readonly rKey: Phaser.Input.Keyboard.Key;
 
     private readonly stickKeys: StickCursorKeys;
 
@@ -51,7 +51,7 @@ export class InputCoordinator {
         this.cursorKey = this.inputPlugin.keyboard.createCursorKeys();
         this.enterKey = this.inputPlugin.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ENTER);
         this.spaceKey = this.inputPlugin.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
-        this.shiftKey = this.inputPlugin.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SHIFT);
+        this.rKey = this.inputPlugin.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.R);
 
         // スティック登録
         this.stickKeys = VirtualStickInput.getCusorKeys();
@@ -102,7 +102,7 @@ export class InputCoordinator {
         if (Phaser.Input.Keyboard.JustDown(this.enterKey)) {
             this.requestStartGameFromKey();
         }
-        if (this.shiftKey.isDown) {
+        if (this.rKey.isDown) {
             this.requestRetryGameFromKey();
         }
         if (Phaser.Input.Keyboard.JustDown(this.spaceKey)) {

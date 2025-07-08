@@ -44,8 +44,8 @@ export const BOSS_SIZE = 3;
 export const numberOfBosses = 2;
 
 export const parametersOfBosses = [
-    { row: 1, column: 38, priorityScanDirections: [DIRECTION.RIGHT, DIRECTION.DOWN, DIRECTION.LEFT, DIRECTION.UP] },
-    { row: 28, column: 1, priorityScanDirections: [DIRECTION.LEFT, DIRECTION.UP, DIRECTION.RIGHT, DIRECTION.DOWN] },
+    { row: 4, column: 7, priorityScanDirections: [DIRECTION.RIGHT, DIRECTION.DOWN, DIRECTION.LEFT, DIRECTION.UP] },
+    { row: 7, column: 4, priorityScanDirections: [DIRECTION.DOWN, DIRECTION.LEFT, DIRECTION.UP, DIRECTION.RIGHT] },
 ];
 
 export const goalPosition = { row: 1, column: 1 };
