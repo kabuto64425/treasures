@@ -70,6 +70,9 @@ function initGame(params: any) {
             width: Game.D_WIDTH,// ゲーム画面の横幅
             height: Game.D_HEIGHT// ゲーム画面の高さ
         },
+        input: {
+            gamepad: true  // ★ゲームパッド入力を有効にする
+        },
         plugins: {
             global: [{
                 key: 'rexVirtualJoyStick',

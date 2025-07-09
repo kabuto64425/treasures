@@ -22,6 +22,11 @@ export class InputCoordinator {
     private readonly spaceKey: Phaser.Input.Keyboard.Key;
     private readonly rKey: Phaser.Input.Keyboard.Key;
 
+    private gamePad?: Phaser.Input.Gamepad.Gamepad;
+
+    private isPressedPadZeroPreviousFrame: boolean;
+    private isPressedPadNinePreviousFrame: boolean;
+
     private readonly stickKeys: StickCursorKeys;
 
     private isStartGameRequestedFromKey = false;
@@ -64,8 +69,23 @@ export class InputCoordinator {
             playerDirection: undefined
         }
 
+        this.isPressedPadZeroPreviousFrame = false;
+        this.isPressedPadNinePreviousFrame = false;
+
         const mapPairs = DIRECTION.values().map(d => [d.keyName, NO_PRESS_RANK] as [string, number]);
         this.cursorKeysPressOrderRankMap = new Map<string, number>(mapPairs);
+    }
+
+    setup() {
+        if (this.inputPlugin.gamepad.total > 0) {
+            this.gamePad = this.inputPlugin.gamepad.getPad(0);
+        } else {
+            this.inputPlugin.gamepad.once('connected', (padConnected: Phaser.Input.Gamepad.Gamepad) => {
+                this.gamePad = padConnected;
+                this.isPressedPadZeroPreviousFrame = padConnected.buttons[0].pressed;
+                this.isPressedPadNinePreviousFrame = padConnected.buttons[9].pressed;
+            });
+        }
     }
 
     private maxRankCusorKeysPressOrder() {
@@ -87,8 +107,8 @@ export class InputCoordinator {
         return undefined;
     }
 
-    private updateCursorKeyRank(cursorKey: Phaser.Input.Keyboard.Key, stickKey: Phaser.Input.Keyboard.Key, direction: DIRECTION, maxRank: number, inputInspector: string[]) {
-        if (cursorKey.isDown || stickKey.isDown) {
+    private updateCursorKeyRank(cursorKey: Phaser.Input.Keyboard.Key, stickKey: Phaser.Input.Keyboard.Key, isDownPad: boolean | undefined, direction: DIRECTION, maxRank: number, inputInspector: string[]) {
+        if (cursorKey.isDown || stickKey.isDown || (isDownPad ?? false)) {
             inputInspector.push(direction.keyName);
             if (this.cursorKeysPressOrderRankMap.get(direction.keyName) === NO_PRESS_RANK) {
                 this.cursorKeysPressOrderRankMap.set(direction.keyName, maxRank + 1);
@@ -99,13 +119,30 @@ export class InputCoordinator {
     }
 
     handleKeyboardInputs() {
-        if (Phaser.Input.Keyboard.JustDown(this.enterKey)) {
+        let isPressPadZero = (this.gamePad?.buttons[0].pressed ?? false);
+        let isPressPadNine = (this.gamePad?.buttons[9].pressed ?? false);
+
+        let justDownZero = false;
+        let justDownNine = false;
+
+        if (isPressPadZero && !this.isPressedPadZeroPreviousFrame) {
+            justDownZero = true;
+        }
+
+        if (isPressPadNine && !this.isPressedPadNinePreviousFrame) {
+            justDownNine = true;
+        }
+
+        this.isPressedPadZeroPreviousFrame = isPressPadZero;
+        this.isPressedPadNinePreviousFrame = isPressPadNine;
+
+        if (Phaser.Input.Keyboard.JustDown(this.enterKey) || justDownZero) {
             this.requestStartGameFromKey();
         }
-        if (this.rKey.isDown) {
+        if (this.rKey.isDown || (this.gamePad?.buttons[8].pressed ?? false)) {
             this.requestRetryGameFromKey();
         }
-        if (Phaser.Input.Keyboard.JustDown(this.spaceKey)) {
+        if (Phaser.Input.Keyboard.JustDown(this.spaceKey) || justDownNine) {
             this.requestPauseGameFromKey();
         }
 
@@ -114,10 +151,10 @@ export class InputCoordinator {
         // デバッグ用
         const inputInspector: string[] = [];
 
-        this.updateCursorKeyRank(this.cursorKey.left, this.stickKeys.left, DIRECTION.LEFT, maxRank, inputInspector);
-        this.updateCursorKeyRank(this.cursorKey.up, this.stickKeys.up, DIRECTION.UP, maxRank, inputInspector);
-        this.updateCursorKeyRank(this.cursorKey.right, this.stickKeys.right, DIRECTION.RIGHT, maxRank, inputInspector);
-        this.updateCursorKeyRank(this.cursorKey.down, this.stickKeys.down, DIRECTION.DOWN, maxRank, inputInspector);
+        this.updateCursorKeyRank(this.cursorKey.left, this.stickKeys.left, this.gamePad?.left, DIRECTION.LEFT, maxRank, inputInspector);
+        this.updateCursorKeyRank(this.cursorKey.up, this.stickKeys.up, this.gamePad?.up, DIRECTION.UP, maxRank, inputInspector);
+        this.updateCursorKeyRank(this.cursorKey.right, this.stickKeys.right, this.gamePad?.right, DIRECTION.RIGHT, maxRank, inputInspector);
+        this.updateCursorKeyRank(this.cursorKey.down, this.stickKeys.down, this.gamePad?.down, DIRECTION.DOWN, maxRank, inputInspector);
     }
 
     private readonly requestStartGameFromKey = () => {

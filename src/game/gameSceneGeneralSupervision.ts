@@ -84,6 +84,8 @@ export class GameSceneGeneralSupervision {
 
         this.fieldSupervision.setup();
 
+        this.inputCoordinator.setup();
+
         this.ui.setupPlayButton();
         this.ui.setupPauseButton();
         this.ui.setupHelpButton();
