@@ -54,7 +54,7 @@ export class BestRecord {
         if(!isThisGameComplete && this.isGameComplete) {
             return false;
         }
-        return currentNumberOfCollectedTreasures >= this.numberOfCollectedTreasures;
+        return currentNumberOfCollectedTreasures > this.numberOfCollectedTreasures;
     }
 
     readonly updateBestRecord = (isThisGameComplete: boolean, currentNumberOfCollectedTreasures: number, currentElapedFrame: number) => {
