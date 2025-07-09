@@ -87,6 +87,9 @@ export class GameScene extends Phaser.Scene {
 
         DebugDataMediator.setDebugData(this.debugData);
         SceneContext.setup(this);
+        // ゲーム音量を控え目にしておく。
+        // 不快に思われないようにしたいから。
+        SceneContext.sound.volume = 0.3;
         // GameSceneContainerContext, WrapArrowFactoryは
         // 必ずSceneContext.setup(this)よりも後にセットアップすること
         GameSceneContainerContext.setup();
