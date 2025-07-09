@@ -2,16 +2,16 @@ import { h } from "jsx-dom";
 
 function HelpModal(onOk: () => void) {
     const root = (
-        <div class="box has-text-centered BestTen-CRT" style="background-color: #ffd6d6;">
+        <div class="box has-text-centered BestTen-CRT" style="background-color: #ffffff;">
             <div class="field">
                 <label class="label">
-                    You are the player.
-                    Use the arrow keys to move.
-                    Treasures will appear in groups of five.
-                    Collect a total of 30 treasures.
-                    Then, head for the goal.
-                    If you reach the goal, you clear the game.
-                    But if you touch an enemy, it's game over.
+                    You are the player.<br/>
+                    Use the arrow keys to move.<br/>
+                    Treasures will appear in groups of five.<br/>
+                    Collect a total of 30 treasures.<br/>
+                    Then, head for the goal.<br/>
+                    If you reach the goal, you clear the game.<br/>
+                    But if you touch an enemy, it's game over.<br/>
                     Try to reach the goal as fast as you can!
                 </label>
             </div>
