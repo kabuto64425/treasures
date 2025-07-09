@@ -13,5 +13,5 @@
     "footPrintLimitFrame": 30,
     "visibleRoomRanges": false,
     "visibleWrapArrowFrameGraphic": false,
-    "logLevel": "DEBUG"
+    "logLevel": "PRODUCTION"
 }
