@@ -58,7 +58,7 @@ export class Player {
         GameSceneContainerContext.fieldContainer.add(this.image);
         GameSceneContainerContext.fieldContainer.add(this.graphics);
 
-        this.image.setPosition(this.column * GameConstants.GRID_UNIT_SIZE, this.row * GameConstants.GRID_UNIT_SIZE).setDisplayOrigin(1, 0);
+        this.image.setPosition(this.column * GameConstants.GRID_UNIT_SIZE, this.row * GameConstants.GRID_UNIT_SIZE);
         // 1ピクセル左にずらすとうまく収まるから。不都合があればまた調整
         this.image.setDisplayOrigin(1, 0);
         GameSceneContainerContext.fieldContainer.add(this.image);

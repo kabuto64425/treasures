@@ -120,6 +120,7 @@ export class FieldSupervision {
                 }
             }
             fieldContainer.add(roomGraphics);
+            this.drawBlockForFinalRound();
         }
 
         // ループ案内の矢印
@@ -212,7 +213,8 @@ export class FieldSupervision {
             const row = position.row;
             const column = position.column;
             const batsuImage = SceneContext.make.image({ key: "batsu", x: column * GameConstants.GRID_UNIT_SIZE + 4, y: row * GameConstants.GRID_UNIT_SIZE + 4 }, false);
-            batsuImage.setOrigin(0);
+            // 1ピクセル左にずらすとうまく収まるから。不都合があればまた調整
+            batsuImage.setDisplayOrigin(1, 0);
             fieldContainer.add(batsuImage);
         }
     }
