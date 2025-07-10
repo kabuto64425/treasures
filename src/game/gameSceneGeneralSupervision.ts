@@ -51,7 +51,7 @@ export class GameSceneGeneralSupervision {
         this.gameState = GameSceneGeneralSupervision.GAME_STATE.INITIALIZED;
 
         this.inputCoordinator = new InputCoordinator();
-        
+
         this.ui = new Ui(this, scene.getBestRecord());
 
         // フィールド監督
@@ -61,7 +61,7 @@ export class GameSceneGeneralSupervision {
         this.player = new Player(GameConstants.parameterPlayer.row, GameConstants.parameterPlayer.column, this.params, this.fieldSupervision.isFloor);
 
         //フィールド評価
-        this.fieldEvaluation = new FieldEvaluation(this.player.getFootPrint().getFirstPrint, this.fieldSupervision.isWall, this.fieldSupervision.containsWallInArea);
+        this.fieldEvaluation = new FieldEvaluation(scene.getEvaluationMap, scene.getPreEvalutatePriorityPositionQueue, this.player.getFootPrint().getFirstPrint, this.fieldSupervision.isWall, this.fieldSupervision.containsWallInArea);
 
         // ラウンド進行監督
         this.roundsSupervision = new RoundsSupervision(this.onGameCompleted, this.fieldSupervision.isFloor, this.fieldSupervision.onFinalRound);
@@ -121,6 +121,9 @@ export class GameSceneGeneralSupervision {
         this.inputCoordinator.approveRequestedAction();
         this.ui.handleApprovedAction();
         if (!this.isPlaying()) {
+            // 待機中の1フレームで、敵・ボスそれぞれのいずれか目的地とした時の優先探索を1つ分だけ先読み実施
+            // 効率化のため
+            this.fieldEvaluation.preEvaluateMostPriorityPosition();
             return;
         }
         this.recorder.addElapsedFrame();
@@ -139,7 +142,7 @@ export class GameSceneGeneralSupervision {
         for (const enemy of this.enemiesSupervision.getEnemyList()) {
             this.player.handleCollisionWith(enemy);
         }
-        for(const boss of this.enemiesSupervision.getApperanceBossList()) {
+        for (const boss of this.enemiesSupervision.getApperanceBossList()) {
             this.player.handleCollisionWith(boss);
         }
 
@@ -177,7 +180,7 @@ export class GameSceneGeneralSupervision {
         for (const enemy of this.enemiesSupervision.getEnemyList()) {
             this.player.handleCollisionWith(enemy);
         }
-        for(const boss of this.enemiesSupervision.getApperanceBossList()) {
+        for (const boss of this.enemiesSupervision.getApperanceBossList()) {
             this.player.handleCollisionWith(boss);
         }
 
@@ -192,7 +195,7 @@ export class GameSceneGeneralSupervision {
     readonly pauseGame = () => {
         GameSceneOverlay.onPauseGame();
         this.gameState = GameSceneGeneralSupervision.GAME_STATE.PAUSE;
-        Logger.debug("pause"); 
+        Logger.debug("pause");
         this.fieldSupervision.handlePause();
         this.enemiesSupervision.handlePause();
         this.roundsSupervision.getCurrentRoundSupervision().handlePause();

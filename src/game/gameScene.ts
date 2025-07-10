@@ -10,11 +10,16 @@ import { VirtualStickInput } from "./virtualStickInput";
 //import { DebugView } from "./debugView";
 import { Logger } from "./logger";
 import { GameSceneSoundContext } from "./gameSceneSoundContext";
+import * as GameConstants from "./gameConstants";
+import { Queue } from "./queue";
 
 export class GameScene extends Phaser.Scene {
 
     private readonly params: any;
     private readonly bestRecoed: BestRecord;
+
+    private readonly evaluationMap: Map<string, Map<string, boolean>[][]>;
+    private readonly preEvalutatePriorityPositionQueue: Queue<Util.Position>;
 
     // create内で、必ず初期化しておくこと
     private gameSceneGeneralSupervision!: GameSceneGeneralSupervision;
@@ -30,7 +35,26 @@ export class GameScene extends Phaser.Scene {
         // デバッグステップモードは、開発環境でしか使用できないようにする
         this.isDebugStepMode = Util.isDebugEnv() && (this.params.isDebugStepMode ?? false);
         this.bestRecoed = bestRecord;
+
+        this.evaluationMap = new Map<string, Map<string, boolean>[][]>();
+        this.preEvalutatePriorityPositionQueue = this.createPreEvalutatePriorityPositionQueue();
+
         this.debugData = new DebugData();
+    }
+
+    private createPreEvalutatePriorityPositionQueue() {
+        const preEvalutatePriorityPositionQueue = new Queue<Util.Position>();
+        for (const [, waypoints] of Object.entries(GameConstants.ENEMY_SEARCH_WAYPOINTS)) {
+            for (const waypoint of waypoints) {
+                preEvalutatePriorityPositionQueue.enqueue(waypoint);
+            }
+        }
+
+        for (let row = 0; row < GameConstants.H; row++)for (let column = 0; column < GameConstants.W; column++) {
+            preEvalutatePriorityPositionQueue.enqueue({ row: row, column: column });
+        }
+
+        return preEvalutatePriorityPositionQueue;
     }
 
     preload() {
@@ -155,5 +179,13 @@ export class GameScene extends Phaser.Scene {
 
     getBestRecord() {
         return this.bestRecoed;
+    }
+
+    readonly getEvaluationMap = () => {
+        return this.evaluationMap;
+    }
+
+    readonly getPreEvalutatePriorityPositionQueue = () => {
+        return this.preEvalutatePriorityPositionQueue;
     }
 }
