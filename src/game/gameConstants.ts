@@ -39,6 +39,7 @@ export const parametersOfEnemies = [
     { row: 24, column: 38, priorityScanDirections: [DIRECTION.UP, DIRECTION.RIGHT, DIRECTION.DOWN, DIRECTION.LEFT] }
 ];
 
+export const ENEMY_SIZE = 1;
 export const BOSS_SIZE = 3;
 
 export const numberOfBosses = 2;

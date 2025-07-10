@@ -61,7 +61,7 @@ export class Enemy implements IFieldActor {
         this.moveCostTableChasing = params.enemyMoveCostTableChasing;
 
         this.chargeAmount = 0;
-        this.size = 1;
+        this.size = GameConstants.ENEMY_SIZE;
         this.priorityScanDirections = priorityScanDirections;
         this.strategy = strategy;
         this.onPlayerCaptured = onPlayerCaptured;

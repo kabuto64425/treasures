@@ -11,6 +11,7 @@ import { VirtualStickInput } from "./virtualStickInput";
 import { Logger } from "./logger";
 import { GameSceneSoundContext } from "./gameSceneSoundContext";
 import * as GameConstants from "./gameConstants";
+import { Queue } from "./queue";
 
 export class GameScene extends Phaser.Scene {
 
@@ -18,7 +19,7 @@ export class GameScene extends Phaser.Scene {
     private readonly bestRecoed: BestRecord;
 
     private readonly evaluationMap: Map<string, Map<string, boolean>[][]>;
-    private readonly preEvalutatePriorityPositionList: Util.Position[];
+    private readonly preEvalutatePriorityPositionQueue: Queue<Util.Position>;
 
     // create内で、必ず初期化しておくこと
     private gameSceneGeneralSupervision!: GameSceneGeneralSupervision;
@@ -36,24 +37,24 @@ export class GameScene extends Phaser.Scene {
         this.bestRecoed = bestRecord;
 
         this.evaluationMap = new Map<string, Map<string, boolean>[][]>();
-        this.preEvalutatePriorityPositionList = this.createPreEvalutatePriorityPositionList();
+        this.preEvalutatePriorityPositionQueue = this.createPreEvalutatePriorityPositionQueue();
 
         this.debugData = new DebugData();
     }
 
-    private createPreEvalutatePriorityPositionList() {
-        const preEvalutatePriorityPositionList = [];
+    private createPreEvalutatePriorityPositionQueue() {
+        const preEvalutatePriorityPositionQueue = new Queue<Util.Position>();
         for (const [, waypoints] of Object.entries(GameConstants.ENEMY_SEARCH_WAYPOINTS)) {
             for (const waypoint of waypoints) {
-                preEvalutatePriorityPositionList.push(waypoint);
+                preEvalutatePriorityPositionQueue.enqueue(waypoint);
             }
         }
 
         for (let row = 0; row < GameConstants.H; row++)for (let column = 0; column < GameConstants.W; column++) {
-            preEvalutatePriorityPositionList.push({ row: row, column: column });
+            preEvalutatePriorityPositionQueue.enqueue({ row: row, column: column });
         }
 
-        return preEvalutatePriorityPositionList;
+        return preEvalutatePriorityPositionQueue;
     }
 
     preload() {
@@ -184,7 +185,7 @@ export class GameScene extends Phaser.Scene {
         return this.evaluationMap;
     }
 
-    readonly getPreEvalutatePriorityPositionList = () => {
-        return this.preEvalutatePriorityPositionList;
+    readonly getPreEvalutatePriorityPositionQueue = () => {
+        return this.preEvalutatePriorityPositionQueue;
     }
 }

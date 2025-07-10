@@ -12,7 +12,6 @@ import { GameSceneOverlay } from "./gameSceneOverlay";
 import { FieldSupervision } from "./fieldSupervision";
 import { Logger } from "./logger";
 import { GameSceneSoundContext } from "./gameSceneSoundContext";
-import { DIRECTION } from "./drection";
 
 export class GameSceneGeneralSupervision {
     private readonly params: any;
@@ -62,7 +61,7 @@ export class GameSceneGeneralSupervision {
         this.player = new Player(GameConstants.parameterPlayer.row, GameConstants.parameterPlayer.column, this.params, this.fieldSupervision.isFloor);
 
         //フィールド評価
-        this.fieldEvaluation = new FieldEvaluation(scene.getEvaluationMap, scene.getPreEvalutatePriorityPositionList, this.player.getFootPrint().getFirstPrint, this.fieldSupervision.isWall, this.fieldSupervision.containsWallInArea);
+        this.fieldEvaluation = new FieldEvaluation(scene.getEvaluationMap, scene.getPreEvalutatePriorityPositionQueue, this.player.getFootPrint().getFirstPrint, this.fieldSupervision.isWall, this.fieldSupervision.containsWallInArea);
 
         // ラウンド進行監督
         this.roundsSupervision = new RoundsSupervision(this.onGameCompleted, this.fieldSupervision.isFloor, this.fieldSupervision.onFinalRound);
@@ -122,7 +121,9 @@ export class GameSceneGeneralSupervision {
         this.inputCoordinator.approveRequestedAction();
         this.ui.handleApprovedAction();
         if (!this.isPlaying()) {
-            this.fieldEvaluation.isShortestDirection({ row: 0, column: 0 }, { row: 0, column: 0 }, 1, DIRECTION.DOWN);
+            // 待機中の1フレームで、敵・ボスそれぞれのいずれか目的地とした時の優先探索を1つ分だけ先読み実施
+            // 効率化のため
+            this.fieldEvaluation.preEvaluateMostPriorityPosition();
             return;
         }
         this.recorder.addElapsedFrame();

@@ -2,24 +2,25 @@ import { DIRECTION } from "./drection";
 import * as GameConstants from "./gameConstants";
 import { GameSceneContainerContext } from "./gameSceneContainerContext";
 import { Logger } from "./logger";
+import { Queue } from "./queue";
 import { SceneContext } from "./sceneContext";
 import * as Util from "./utils"
 
 export class FieldEvaluation {
     private readonly graphics: Phaser.GameObjects.Graphics;
     private readonly getEvaluationMap: () => Map<string, Map<string, boolean>[][]>;
-    private readonly getPreEvalutatePriorityPositionList: () => Util.Position[];
+    private readonly getPreEvalutatePriorityPositionQueue: () => Queue<Util.Position>;
     private readonly getFirstPrint: () => Util.Position;
 
     //@ts-ignore
     private readonly isWall: (position: Util.Position) => boolean;
     private readonly containsWallInArea: (position: Util.Position, size: number) => boolean;
 
-    constructor(getEvaluationMap: () => Map<string, Map<string, boolean>[][]>, getPreEvalutatePriorityPositionList: () => Util.Position[], getFirstPrint: () => Util.Position, isWall: (position: Util.Position) => boolean, containsWallInArea: (position: Util.Position, size: number) => boolean) {
+    constructor(getEvaluationMap: () => Map<string, Map<string, boolean>[][]>, getPreEvalutatePriorityPositionQueue: () => Queue<Util.Position>, getFirstPrint: () => Util.Position, isWall: (position: Util.Position) => boolean, containsWallInArea: (position: Util.Position, size: number) => boolean) {
         this.graphics = SceneContext.make.graphics({});
         this.getFirstPrint = getFirstPrint;
         this.getEvaluationMap = getEvaluationMap;
-        this.getPreEvalutatePriorityPositionList = getPreEvalutatePriorityPositionList;
+        this.getPreEvalutatePriorityPositionQueue = getPreEvalutatePriorityPositionQueue;
         this.isWall = isWall;
         this.containsWallInArea = containsWallInArea;
     }
@@ -32,10 +33,25 @@ export class FieldEvaluation {
         this.draw();
     }
 
+    // 待機中の1フレームで、敵・ボスそれぞれのいずれか目的地とした時の優先探索を1つ分だけ先読み実施
     preEvaluateMostPriorityPosition() {
-        const preEvalutatePriorityPositionList = this.getPreEvalutatePriorityPositionList();
-        if (preEvalutatePriorityPositionList.length == 0) {
+        const preEvalutatePriorityPositionQueue = this.getPreEvalutatePriorityPositionQueue();
+        if (preEvalutatePriorityPositionQueue.isEmpty()) {
             return;
+        }
+
+        const position = preEvalutatePriorityPositionQueue.dequeue();
+
+        const evaluationMap = this.getEvaluationMap();
+        // 事前にからチェックしているので、アサーションでも大丈夫なはず
+        const mapKeyEnemy = this.createMapKeyFromPosition(position!, GameConstants.ENEMY_SIZE);
+        if (!evaluationMap.has(mapKeyEnemy)) {
+            evaluationMap.set(mapKeyEnemy, this.createEvaluation(position!, GameConstants.ENEMY_SIZE));
+        }
+
+        const mapKeyBoss = this.createMapKeyFromPosition(position!, GameConstants.BOSS_SIZE);
+        if (!evaluationMap.has(mapKeyBoss)) {
+            evaluationMap.set(mapKeyBoss, this.createEvaluation(position!, GameConstants.BOSS_SIZE));
         }
     }
 
@@ -136,27 +152,5 @@ export class FieldEvaluation {
                 }
             }
         }
-    }
-}
-
-class Queue<T> {
-    private stackPush: T[] = [];
-    private stackPop: T[] = [];
-
-    enqueue(value: T): void {
-        this.stackPush.push(value);
-    }
-
-    dequeue(): T | undefined {
-        if (this.stackPop.length === 0) {
-            while (this.stackPush.length > 0) {
-                this.stackPop.push(this.stackPush.pop()!);
-            }
-        }
-        return this.stackPop.pop();
-    }
-
-    isEmpty(): boolean {
-        return this.stackPush.length === 0 && this.stackPop.length === 0;
     }
 }
