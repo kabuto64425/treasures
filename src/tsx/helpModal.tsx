@@ -4,14 +4,14 @@ function HelpModal(onOk: () => void) {
     const root = (
         <div class="box BestTen-CRT" style="background-color: #ffffff; font-size:18px;">
             <div class="field">
-                You are the player.<br />
+                You are <img src="/treasures/player_2.png" class="help_dialog_icon"></img>.<br />
                 Use the arrow keys to move.<br />
-                Treasures will appear in groups of five.<br />
-                Collect a total of 30 treasures.<br />
-                Then, head for the goal.<br />
-                If you reach the goal, you clear the game.<br />
-                But if you touch an enemy, it's game over.<br />
-                Try to reach the goal as quickly as you can!<br />
+                <img src="/treasures/treasure.png" class="help_dialog_icon"></img> will appear in groups of 5.<br />
+                Collect a total of 30 <img src="/treasures/treasure.png" class="help_dialog_icon"></img>.<br />
+                Then, head for <img src="/treasures/goal.png" class="help_dialog_icon"></img>.<br />
+                If you reach <img src="/treasures/goal.png" class="help_dialog_icon"></img>, you clear the game.<br />
+                But if you touch <img src="/treasures/enemy.png" class="help_dialog_icon"></img>, it's game over.<br />
+                Try to reach <img src="/treasures/goal.png" class="help_dialog_icon"></img> as quickly as you can!<br />
                 <br />
                 Press Enter to start the game.<br />
                 Press Space to pause.<br />
