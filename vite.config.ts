@@ -10,7 +10,7 @@ export default defineConfig({
         hmr: false,
     },
     assetsInclude: ['**/*.mp3'],
-    base: "/treasures/",
-
+    //base: "/treasures/",
+    base: "./"
 });
 
