@@ -10,7 +10,7 @@ function HelpModal(onOk: () => void) {
                 Use the arrow keys to move.<br />
                 <img src="/treasures/treasure.png" class="help_dialog_icon"></img> will appear in groups of 5.<br />
                 Collect a total of 30 <img src="/treasures/treasure.png" class="help_dialog_icon"></img>.<br />
-                Then, head for <img src="/treasures/goal.png" class="help_dialog_icon"></img>.<br />
+                Then, head for <img src="/treasures/goal.png" class="help_dialog_icon"></img> - it's the same place where you started.<br />
                 If you reach <img src="/treasures/goal.png" class="help_dialog_icon"></img>, you clear the game.<br />
                 But if you touch <img src="/treasures/enemy.png" class="help_dialog_icon"></img>, it's game over.<br />
                 Try to reach <img src="/treasures/goal.png" class="help_dialog_icon"></img> as quickly as you can!<br />
