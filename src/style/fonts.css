@@ -5,5 +5,6 @@
 
 .BestTen-CRT {
   font-family: 'BestTen-CRT', sans-serif;
+  /* fi,ffなど、特定の文字が続いたときにそれらが表示されなくなることを防ぐため */
   font-variant-ligatures: none;
 }
