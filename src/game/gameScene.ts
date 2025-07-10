@@ -161,10 +161,6 @@ export class GameScene extends Phaser.Scene {
             Logger.debug("fps under 50");
         }
 
-        if (this.debugData.updateDuration > 5) {
-            Logger.debug(`over 5ms. ${this.debugData.updateDuration}`);
-        }
-
         if (this.isDebugStepMode) {
             this.doStepOnce = false;
         }
