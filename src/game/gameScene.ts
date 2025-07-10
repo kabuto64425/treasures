@@ -18,7 +18,7 @@ export class GameScene extends Phaser.Scene {
     private readonly params: any;
     private readonly bestRecoed: BestRecord;
 
-    private readonly evaluationMap: Map<string, Map<string, boolean>[][]>;
+    private readonly evaluationMap: Map<string, Uint8Array>;
     private readonly preEvalutatePriorityPositionQueue: Queue<Util.Position>;
 
     // create内で、必ず初期化しておくこと
@@ -36,13 +36,14 @@ export class GameScene extends Phaser.Scene {
         this.isDebugStepMode = Util.isDebugEnv() && (this.params.isDebugStepMode ?? false);
         this.bestRecoed = bestRecord;
 
-        this.evaluationMap = new Map<string, Map<string, boolean>[][]>();
+        this.evaluationMap = new Map<string, Uint8Array>();
         this.preEvalutatePriorityPositionQueue = this.createPreEvalutatePriorityPositionQueue();
 
         this.debugData = new DebugData();
     }
 
     private createPreEvalutatePriorityPositionQueue() {
+        Logger.debug("createPreEvalutatePriorityPositionQueue");
         const preEvalutatePriorityPositionQueue = new Queue<Util.Position>();
         for (const [, waypoints] of Object.entries(GameConstants.ENEMY_SEARCH_WAYPOINTS)) {
             for (const waypoint of waypoints) {

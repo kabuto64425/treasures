@@ -8,7 +8,7 @@ import * as Util from "./utils"
 
 export class FieldEvaluation {
     private readonly graphics: Phaser.GameObjects.Graphics;
-    private readonly getEvaluationMap: () => Map<string, Map<string, boolean>[][]>;
+    private readonly getEvaluationMap: () => Map<string, Uint8Array>;
     private readonly getPreEvalutatePriorityPositionQueue: () => Queue<Util.Position>;
     private readonly getFirstPrint: () => Util.Position;
 
@@ -16,7 +16,7 @@ export class FieldEvaluation {
     private readonly isWall: (position: Util.Position) => boolean;
     private readonly containsWallInArea: (position: Util.Position, size: number) => boolean;
 
-    constructor(getEvaluationMap: () => Map<string, Map<string, boolean>[][]>, getPreEvalutatePriorityPositionQueue: () => Queue<Util.Position>, getFirstPrint: () => Util.Position, isWall: (position: Util.Position) => boolean, containsWallInArea: (position: Util.Position, size: number) => boolean) {
+    constructor(getEvaluationMap: () => Map<string, Uint8Array>, getPreEvalutatePriorityPositionQueue: () => Queue<Util.Position>, getFirstPrint: () => Util.Position, isWall: (position: Util.Position) => boolean, containsWallInArea: (position: Util.Position, size: number) => boolean) {
         this.graphics = SceneContext.make.graphics({});
         this.getFirstPrint = getFirstPrint;
         this.getEvaluationMap = getEvaluationMap;
@@ -67,7 +67,10 @@ export class FieldEvaluation {
         }
         // if内の処理によって、確実にgetで要素が取れてこれてるはずなので、アサーションつけても大丈夫なはず
         // undefinedを返さないために、??falseとしている。問題にはならないはず
-        return evaluationMap.get(mapKey)![from.row][from.column].get(direction.keyName) ?? false;
+        const evaluation = evaluationMap.get(mapKey)!;
+        const index = from.row * GameConstants.W + from.column;
+        const isShortest = (evaluation[index] & (1 << (direction.id))) !== 0;
+        return isShortest;
     }
 
     private createMapKeyFromPosition(position: Util.Position, size: number) {
@@ -76,7 +79,7 @@ export class FieldEvaluation {
 
     private createEvaluation(centerPosition: Util.Position, size: number) {
         let now = performance.now();
-        const map = [...Array(GameConstants.H)].map(() => [...Array(GameConstants.W)].map(() => this.generateDirectionFlagMap() as Map<string, boolean>));
+        const evaluation = new Uint8Array(GameConstants.H * GameConstants.W);
 
         const queue = new Queue<[number, number]>();
         const dist = [...Array(GameConstants.H)].map(() => [...Array(GameConstants.W)].fill(-1));
@@ -97,6 +100,8 @@ export class FieldEvaluation {
                 const next_row: number = v[0] + d.dr;
                 const next_column: number = v[1] + d.dc;
 
+                const index = next_row * GameConstants.W + next_column;
+
                 if (next_row < 0 || GameConstants.H <= next_row) continue;
                 if (next_column < 0 || GameConstants.W <= next_column) continue;
 
@@ -108,23 +113,17 @@ export class FieldEvaluation {
 
                 if (dist[next_row][next_column] !== -1) {
                     if (dist[next_row][next_column] === dist[v[0]][v[1]] + 1) {
-                        map[next_row][next_column].set(d.reverse().keyName, true);
+                        evaluation[index] |= (1 << (d.reverse().id));
                     }
                     continue;
                 }
                 queue.enqueue([next_row, next_column]);
                 dist[next_row][next_column] = dist[v[0]][v[1]] + 1;
-                map[next_row][next_column].set(d.reverse().keyName, true);
+                evaluation[index] |= (1 << (d.reverse().id));
             }
         }
         Logger.debug(`createEvaluation time:${performance.now() - now}`);
-        return map;
-    }
-
-
-    private generateDirectionFlagMap() {
-        const pairs = DIRECTION.values().map(d => [d.keyName, false] as [string, boolean]);
-        return new Map<string, boolean>(pairs);
+        return evaluation;
     }
 
     private draw() {

@@ -1,10 +1,11 @@
 export class DIRECTION {
-    static readonly LEFT = new DIRECTION("LEFT", 0, -1);
-    static readonly UP = new DIRECTION("UP", -1, 0);
-    static readonly RIGHT = new DIRECTION("RIGHT", 0, 1);
-    static readonly DOWN = new DIRECTION("DOWN", 1, 0);
+    static readonly LEFT = new DIRECTION(0, "LEFT", 0, -1);
+    static readonly UP = new DIRECTION(1, "UP", -1, 0);
+    static readonly RIGHT = new DIRECTION(2, "RIGHT", 0, 1);
+    static readonly DOWN = new DIRECTION(3, "DOWN", 1, 0);
 
     private constructor(
+        public readonly id: number,
         public readonly keyName: string,
         public readonly dr: number,
         public readonly dc: number
