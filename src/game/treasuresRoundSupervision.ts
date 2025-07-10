@@ -3,7 +3,6 @@ import { Treasure } from "./treasure";
 import * as GameConstants from "./gameConstants";
 import * as Util from "./utils";
 import { GameSceneSoundContext } from "./gameSceneSoundContext";
-import { Logger } from "./logger";
 
 export class TreasuresRoundSupervision implements ISingleRoundSupervision {
 
@@ -45,7 +44,6 @@ export class TreasuresRoundSupervision implements ISingleRoundSupervision {
 
             const columFrom = columnBorders[roomRowColumn.roomColumn];
             const columTo = columnBorders[roomRowColumn.roomColumn + 1] - 1;
-            Logger.debug([rowFrom, rowTo, columFrom, columTo]);
 
             let treasurePos = { row:  Phaser.Math.Between(rowFrom, rowTo), column: Phaser.Math.Between(columFrom, columTo) };
             // 床に宝を配置しないようにする

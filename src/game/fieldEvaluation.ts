@@ -1,24 +1,25 @@
 import { DIRECTION } from "./drection";
 import * as GameConstants from "./gameConstants";
 import { GameSceneContainerContext } from "./gameSceneContainerContext";
+import { Logger } from "./logger";
 import { SceneContext } from "./sceneContext";
 import * as Util from "./utils"
 
 export class FieldEvaluation {
-    private readonly evaluationMap: Map<string, Map<string, boolean>[][]>;
-
     private readonly graphics: Phaser.GameObjects.Graphics;
+    private readonly getEvaluationMap: () => Map<string, Map<string, boolean>[][]>;
+    private readonly getPreEvalutatePriorityPositionList: () => Util.Position[];
     private readonly getFirstPrint: () => Util.Position;
 
     //@ts-ignore
     private readonly isWall: (position: Util.Position) => boolean;
     private readonly containsWallInArea: (position: Util.Position, size: number) => boolean;
 
-    constructor(getFirstPrint: () => Util.Position, isWall: (position: Util.Position) => boolean, containsWallInArea: (position: Util.Position, size: number) => boolean) {
-        this.evaluationMap = new Map<string, Map<string, boolean>[][]>();
-
+    constructor(getEvaluationMap: () => Map<string, Map<string, boolean>[][]>, getPreEvalutatePriorityPositionList: () => Util.Position[], getFirstPrint: () => Util.Position, isWall: (position: Util.Position) => boolean, containsWallInArea: (position: Util.Position, size: number) => boolean) {
         this.graphics = SceneContext.make.graphics({});
         this.getFirstPrint = getFirstPrint;
+        this.getEvaluationMap = getEvaluationMap;
+        this.getPreEvalutatePriorityPositionList = getPreEvalutatePriorityPositionList;
         this.isWall = isWall;
         this.containsWallInArea = containsWallInArea;
     }
@@ -31,18 +32,26 @@ export class FieldEvaluation {
         this.draw();
     }
 
+    preEvaluateMostPriorityPosition() {
+        const preEvalutatePriorityPositionList = this.getPreEvalutatePriorityPositionList();
+        if (preEvalutatePriorityPositionList.length == 0) {
+            return;
+        }
+    }
+
     resolveFrame() {
         this.draw();
     }
 
     isShortestDirection = (from: Util.Position, to: Util.Position, size: number, direction: DIRECTION) => {
+        const evaluationMap = this.getEvaluationMap();
         const mapKey = this.createMapKeyFromPosition(to, size);
-        if (!this.evaluationMap.has(mapKey)) {
-            this.evaluationMap.set(mapKey, this.createEvaluation(to, size));
+        if (!evaluationMap.has(mapKey)) {
+            evaluationMap.set(mapKey, this.createEvaluation(to, size));
         }
         // if内の処理によって、確実にgetで要素が取れてこれてるはずなので、アサーションつけても大丈夫なはず
         // undefinedを返さないために、??falseとしている。問題にはならないはず
-        return this.evaluationMap.get(mapKey)![from.row][from.column].get(direction.keyName) ?? false;
+        return evaluationMap.get(mapKey)![from.row][from.column].get(direction.keyName) ?? false;
     }
 
     private createMapKeyFromPosition(position: Util.Position, size: number) {
@@ -50,23 +59,24 @@ export class FieldEvaluation {
     }
 
     private createEvaluation(centerPosition: Util.Position, size: number) {
+        let now = performance.now();
         const map = [...Array(GameConstants.H)].map(() => [...Array(GameConstants.W)].map(() => this.generateDirectionFlagMap() as Map<string, boolean>));
 
-        const queue = [];
+        const queue = new Queue<[number, number]>();
         const dist = [...Array(GameConstants.H)].map(() => [...Array(GameConstants.W)].fill(-1));
 
         for (let i = 0; i < size; i++) {
             for (let j = 0; j < size; j++) {
                 if (!this.containsWallInArea({ row: centerPosition.row - i, column: centerPosition.column - j }, size)) {
-                    queue.push([centerPosition.row - i, centerPosition.column - j]);
+                    queue.enqueue([centerPosition.row - i, centerPosition.column - j]);
                     dist[centerPosition.row - i][centerPosition.column - j] = 0;
                 }
             }
         }
 
-        while (queue.length > 0) {
+        while (!queue.isEmpty()) {
             // 直前で空チェックしてるので、アサーションでもいけるはず
-            const v = queue.shift()!;
+            const v = queue.dequeue()!;
             for (const d of DIRECTION.values()) {
                 const next_row: number = v[0] + d.dr;
                 const next_column: number = v[1] + d.dc;
@@ -86,11 +96,12 @@ export class FieldEvaluation {
                     }
                     continue;
                 }
-                queue.push([next_row, next_column]);
+                queue.enqueue([next_row, next_column]);
                 dist[next_row][next_column] = dist[v[0]][v[1]] + 1;
                 map[next_row][next_column].set(d.reverse().keyName, true);
             }
         }
+        Logger.debug(`createEvaluation time:${performance.now() - now}`);
         return map;
     }
 
@@ -125,5 +136,27 @@ export class FieldEvaluation {
                 }
             }
         }
+    }
+}
+
+class Queue<T> {
+    private stackPush: T[] = [];
+    private stackPop: T[] = [];
+
+    enqueue(value: T): void {
+        this.stackPush.push(value);
+    }
+
+    dequeue(): T | undefined {
+        if (this.stackPop.length === 0) {
+            while (this.stackPush.length > 0) {
+                this.stackPop.push(this.stackPush.pop()!);
+            }
+        }
+        return this.stackPop.pop();
+    }
+
+    isEmpty(): boolean {
+        return this.stackPush.length === 0 && this.stackPop.length === 0;
     }
 }
