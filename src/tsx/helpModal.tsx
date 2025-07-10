@@ -4,6 +4,8 @@ function HelpModal(onOk: () => void) {
     const root = (
         <div class="box BestTen-CRT" style="background-color: #ffffff; font-size:18px;">
             <div class="field">
+                Please note: This game contains sound effects 🔊.<br />
+                <br />
                 You are <img src="/treasures/player_2.png" class="help_dialog_icon"></img>.<br />
                 Use the arrow keys to move.<br />
                 <img src="/treasures/treasure.png" class="help_dialog_icon"></img> will appear in groups of 5.<br />

@@ -5,4 +5,5 @@
 
 .BestTen-CRT {
   font-family: 'BestTen-CRT', sans-serif;
+  font-variant-ligatures: none;
 }
