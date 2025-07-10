@@ -199,13 +199,15 @@ export class Ui {
         this.newRecordText.setVisible(false);
         this.leftContainer.add(this.newRecordText);
 
-        this.helpModal = SceneContext.add.dom(415, 290, HelpModal(
+        // position 0,0は後で設定するが、ここで値を入れる必要があるから仮の値
+        this.helpModal = SceneContext.add.dom(0, 0, HelpModal(
             () => {
                 // ゲームリスタートで閉じたと見せかける。
                 generalSupervision.restartGame();
             }
         ));
         this.helpModal.setOrigin(0, 0);
+        this.helpModal.setPosition((GameConstants.D_WIDTH - this.helpModal.width) / 2, (GameConstants.D_HEIGHT - this.helpModal.height) / 2);
         this.helpModal.setVisible(false);
     }
 

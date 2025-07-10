@@ -7,11 +7,9 @@ type ConfirmDeleteModalProps = {
 
 function ConfirmDeleteModal({ onConfirm, onCancel }: ConfirmDeleteModalProps) {
     const root = (
-        <div class="box has-text-centered BestTen-CRT" style="background-color: #ffd6d6;">
+        <div class="box has-text-centered BestTen-CRT" style="background-color: #ffd6d6; font-size:18px;">
             <div class="field">
-                <label class="label">
-                    Are you sure you want to delete your best record?
-                </label>
+                Are you sure you want to delete your best record?
             </div>
 
             <div class="columns is-justify-content-space-around">

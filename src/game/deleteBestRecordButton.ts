@@ -60,7 +60,8 @@ export class DeleteBestRecordButton {
 
         this.timerEvent = new Phaser.Time.TimerEvent(this.timerEventConfig);
 
-        this.deleteModal = SceneContext.add.dom(415, 290, ConfirmDeleteModal({
+        // position 0,0は後で設定するが、ここで値を入れる必要があるから仮の値
+        this.deleteModal = SceneContext.add.dom(0, 0, ConfirmDeleteModal({
             onConfirm: () => {
                 bestRecord.deleteBestRecord();
                 // ゲームリスタートで閉じたと見せかける。
@@ -72,6 +73,7 @@ export class DeleteBestRecordButton {
             }
         }));
         this.deleteModal.setOrigin(0, 0);
+        this.deleteModal.setPosition((GameConstants.D_WIDTH - this.deleteModal.width) / 2, (GameConstants.D_HEIGHT - this.deleteModal.height) / 2);
         this.deleteModal.setVisible(false);
     }
 
