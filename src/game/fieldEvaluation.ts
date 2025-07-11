@@ -65,8 +65,7 @@ export class FieldEvaluation {
         if (!evaluationMap.has(mapKey)) {
             evaluationMap.set(mapKey, this.createEvaluation(to, size));
         }
-        // if内の処理によって、確実にgetで要素が取れてこれてるはずなので、アサーションつけても大丈夫なはず
-        // undefinedを返さないために、??falseとしている。問題にはならないはず
+        // if内の処理によって、確実にgetで要素が取れてこれてるはずなので、アサーションつけても大丈夫
         const evaluation = evaluationMap.get(mapKey)!;
         const index = from.row * GameConstants.W + from.column;
         const isShortest = (evaluation[index] & (1 << (direction.id))) !== 0;
@@ -94,7 +93,7 @@ export class FieldEvaluation {
         }
 
         while (!queue.isEmpty()) {
-            // 直前で空チェックしてるので、アサーションでもいけるはず
+            // 直前で空チェックしてるので、アサーションでもいける
             const v = queue.dequeue()!;
             for (const d of DIRECTION.values()) {
                 const next_row: number = v[0] + d.dr;
