@@ -11,5 +11,7 @@ export default defineConfig({
     },
     assetsInclude: ['**/*.mp3'],
     base: "/treasures/",
+    // netlify,itch.ioなどに手動アップロードするためのdistフォルダをビルド生成するときはbaseを↓に変更する
+    // base: "./"
 });
 

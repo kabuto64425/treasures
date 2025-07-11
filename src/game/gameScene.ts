@@ -62,37 +62,37 @@ export class GameScene extends Phaser.Scene {
         //https://cdn.phaserfiles.com/v385/assets/atlas/bitmap-fonts-debug.png
         //https://cdn.phaserfiles.com/v385/assets/atlas/bitmap-fonts.json
         //https://cdn.phaserfiles.com/v385/assets/fonts/bitmap/azo-fire.xml
-        //this.load.atlas("fontatlas", "/treasures/bitmap-fonts-debug.png", "/treasures/bitmap-fonts.json");
-        //this.load.xml("azoXML", "/treasures/azo-fire.xml");
+        //this.load.atlas("fontatlas", "./bitmap-fonts-debug.png", "./bitmap-fonts.json");
+        //this.load.xml("azoXML", "./azo-fire.xml");
 
         //https://cdn.phaserfiles.com/v385/assets/ui/nine-slice.png
         //https://cdn.phaserfiles.com/v385/assets/ui/nine-slice.json
         //this.load.atlas('ui', 'nine-slice.png', 'nine-slice.json');
 
         //https://icon-rainbow.com/
-        this.load.image("play", "/treasures/play.png");
-        this.load.image("pause", "/treasures/pause.png");
+        this.load.image("play", "./play.png");
+        this.load.image("pause", "./pause.png");
         // おそらくrestartというキーが使えなさそう。なので、restart_で代用
-        this.load.image("restart_", "/treasures/restart.png");
-        this.load.image("delete", "/treasures/delete.png");
-        this.load.image("help", "/treasures/help.png");
+        this.load.image("restart_", "./restart.png");
+        this.load.image("delete", "./delete.png");
+        this.load.image("help", "./help.png");
 
         // https://pipoya.net/sozai/assets/icon/icon-image/
-        this.load.spritesheet('emotion', '/treasures/pipo-emotion.png', {
+        this.load.spritesheet('emotion', './pipo-emotion.png', {
             frameWidth: 32,  // 1アイコンの幅
             frameHeight: 32, // 1アイコンの高さ
         });
 
         // https://dot-illust.net/category/character/page/8/
-        //this.load.image('renga_gray', '/treasures/block_renga_gray.svg');
-        this.load.image('goal', '/treasures/goal.png');
-        this.load.image("batsu", "/treasures/batsu.png");
+        //this.load.image('renga_gray', './block_renga_gray.svg');
+        this.load.image('goal', './goal.png');
+        this.load.image("batsu", "./batsu.png");
 
         //オリジナル素材とダミー素材
-        this.load.image('player', '/treasures/player_2.png');
-        this.load.image('treasure', '/treasures/treasure.png');
-        this.load.image('enemy', '/treasures/enemy.png');
-        this.load.image('dummy', '/treasures/dummy.png');
+        this.load.image('player', './player_2.png');
+        this.load.image('treasure', './treasure.png');
+        this.load.image('enemy', './enemy.png');
+        this.load.image('dummy', './dummy.png');
 
         // フォント(htmlに記述だが、素材URLは1箇所にまとめたいのでここに記載)
         //https://booth.pm/ja/items/2747965

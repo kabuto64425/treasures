@@ -16,7 +16,7 @@ declare global {
     }
 }
 
-const configFile = `/treasures//config/${(Util.isDebugEnv()) ? "dev.json" : "prod.json"}`
+const configFile = `./config/${(Util.isDebugEnv()) ? "dev.json" : "prod.json"}`
 
 // ウィンドウの幅に応じてゲーム画面のサイズを変更する
 function resizePhaserDom() {

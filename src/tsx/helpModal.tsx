@@ -6,14 +6,14 @@ function HelpModal(onOk: () => void) {
             <div class="field">
                 Please note: This game contains sound effects 🔊.<br />
                 <br />
-                You are <img src="/treasures/player_2.png" class="help_dialog_icon"></img>.<br />
+                You are <img src="./player_2.png" class="help_dialog_icon"></img>.<br />
                 Use the arrow keys to move.<br />
-                <img src="/treasures/treasure.png" class="help_dialog_icon"></img> will appear in groups of 5.<br />
-                Collect a total of 30 <img src="/treasures/treasure.png" class="help_dialog_icon"></img>.<br />
-                Then, head for <img src="/treasures/goal.png" class="help_dialog_icon"></img> - it's the same place where you started.<br />
-                If you reach <img src="/treasures/goal.png" class="help_dialog_icon"></img>, you clear the game.<br />
-                But if you touch <img src="/treasures/enemy.png" class="help_dialog_icon"></img>, it's game over.<br />
-                Try to reach <img src="/treasures/goal.png" class="help_dialog_icon"></img> as quickly as you can!<br />
+                <img src="./treasure.png" class="help_dialog_icon"></img> will appear in groups of 5.<br />
+                Collect a total of 30 <img src="./treasure.png" class="help_dialog_icon"></img>.<br />
+                Then, head for <img src="./goal.png" class="help_dialog_icon"></img> - it's the same place where you started.<br />
+                If you reach <img src="./goal.png" class="help_dialog_icon"></img>, you clear the game.<br />
+                But if you touch <img src="./enemy.png" class="help_dialog_icon"></img>, it's game over.<br />
+                Try to reach <img src="./goal.png" class="help_dialog_icon"></img> as quickly as you can!<br />
                 <br />
                 Press Enter to start the game.<br />
                 Press Space to pause.<br />
