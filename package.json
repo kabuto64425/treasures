@@ -13,6 +13,8 @@
     "vite": "^6.2.0"
   },
   "dependencies": {
+    "@mdi/font": "7.4.47",
+    "bulma": "0.8.0",
     "jsx-dom": "8.0.7",
     "lil-gui": "^0.20.0",
     "phaser": "3.55.2",
